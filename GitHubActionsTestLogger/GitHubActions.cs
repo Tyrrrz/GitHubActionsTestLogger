@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace GitHubActionsTestLogger
 {
+    internal enum LogLevel
+    {
+        Debug,
+        Warning,
+        Error
+    }
+
     internal static class GitHubActions
     {
-        private enum LogLevel
-        {
-            Debug,
-            Warning,
-            Error
-        }
-
         private static string FormatOptions(string? filePath = null, int? line = null, int? column = null)
         {
             var options = new List<string>(3);
@@ -28,7 +28,7 @@ namespace GitHubActionsTestLogger
             return string.Join(",", options);
         }
 
-        private static void WriteOutput(LogLevel level, string message,
+        public static void WriteOutput(LogLevel level, string message,
             string? filePath = null, int? line = null, int? column = null)
         {
             var writer = Console.Out;
@@ -37,17 +37,5 @@ namespace GitHubActionsTestLogger
 
             writer.WriteLine($"::{label} {options}::{message}");
         }
-
-        public static void WriteDebug(string message,
-            string? filePath = null, int? line = null, int? column = null) =>
-            WriteOutput(LogLevel.Debug, message, filePath, line, column);
-
-        public static void WriteWarning(string message,
-            string? filePath = null, int? line = null, int? column = null) =>
-            WriteOutput(LogLevel.Warning, message, filePath, line, column);
-
-        public static void WriteError(string message,
-            string? filePath = null, int? line = null, int? column = null) =>
-            WriteOutput(LogLevel.Error, message, filePath, line, column);
     }
 }
