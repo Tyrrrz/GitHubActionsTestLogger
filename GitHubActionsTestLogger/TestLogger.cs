@@ -8,15 +8,6 @@ namespace GitHubActionsTestLogger
     [ExtensionUri("logger://tyrrrz/ghactions/v1")]
     public class TestLogger : ITestLogger
     {
-        private (string? filePath, int? line) GetSourceLocationInfo(TestResult testResult)
-        {
-            if (!string.IsNullOrWhiteSpace(testResult.TestCase.CodeFilePath))
-                return (testResult.TestCase.CodeFilePath, testResult.TestCase.LineNumber);
-
-            var frame = StackTraceParser.Parse(testResult.ErrorStackTrace).LastOrDefault();
-            return (frame?.FilePath, frame?.Line);
-        }
-
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
             events.TestResult += (sender, args) =>
@@ -24,7 +15,17 @@ namespace GitHubActionsTestLogger
                 if (args.Result.Outcome <= TestOutcome.Passed)
                     return;
 
-                var (filePath, line) = GetSourceLocationInfo(args.Result);
+                var lastStackFrame = !string.IsNullOrWhiteSpace(args.Result.ErrorStackTrace)
+                    ? StackTraceParser.Parse(args.Result.ErrorStackTrace).LastOrDefault()
+                    : null;
+
+                var filePath = !string.IsNullOrWhiteSpace(args.Result.TestCase.CodeFilePath)
+                    ? args.Result.TestCase.CodeFilePath
+                    : lastStackFrame?.FilePath;
+
+                var line = args.Result.TestCase.LineNumber > 0
+                    ? args.Result.TestCase.LineNumber
+                    : lastStackFrame?.Line;
 
                 var message = args.Result.Outcome == TestOutcome.Failed
                     ? $"{args.Result.DisplayName}: {args.Result.ErrorMessage}"
