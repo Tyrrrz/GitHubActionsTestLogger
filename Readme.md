@@ -5,7 +5,9 @@
 [![Downloads](https://img.shields.io/nuget/dt/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
 
-Custom test logger for .NET that writes output in a format that GitHub Actions understands. When using this logger, failed tests will show up in annotations as well as in the list of failed checks.
+Custom test logger for `dotnet test` that writes output in a format that GitHub Actions understands. When using this logger, failed tests show up in annotations as well as in the list of failed checks.
+
+The implementation relies on various heuristics to get source information because .NET test runner does not provide it, even though the contract implies it should.
 
 ## Download
 
@@ -13,20 +15,22 @@ Custom test logger for .NET that writes output in a format that GitHub Actions u
 
 ## Screenshots
 
+Failed tests are highlighted in diffs:
 ![diff](./.screenshots/diff.png)
+
+Failed tests are listed in annotations:
 ![annotations](./.screenshots/annotations.png)
 
 ## Usage
 
 1. Install the NuGet package in the test project
 
-2. Update your workflow so tests are ran with custom logger:
+2. Update your workflow so that tests are ran with custom logger:
 
 ```yaml
 steps:
   # ...
 
-  # Specify 'GitHubActions' as custom logger
   - name: Build & test
-    run: dotnet test -c Release -l GitHubActions
+    run: dotnet test --logger GitHubActions
 ```

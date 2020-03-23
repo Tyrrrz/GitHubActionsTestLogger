@@ -2,12 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using GitHubActionsTestLogger.Internal;
 
 namespace GitHubActionsTestLogger
 {
     // Adapted from https://github.com/atifaziz/StackTraceParser
 
-    internal class StackTraceParser
+    internal partial class StackFrame
+    {
+        // We're only interested in file path and line number
+
+        public string MethodCall { get; }
+
+        public string? FilePath { get; }
+
+        public int? Line { get; }
+
+        public StackFrame(string methodCall, string? filePath, int? line)
+        {
+            MethodCall = methodCall;
+            FilePath = filePath;
+            Line = line;
+        }
+    }
+
+    internal partial class StackFrame
     {
         private const string Space = @"[\x20\t]";
         private const string NotSpace = @"[^\x20\t]";
@@ -51,31 +70,14 @@ namespace GitHubActionsTestLogger
             // https://github.com/atifaziz/StackTraceParser/issues/4
             TimeSpan.FromSeconds(5));
 
-        private static int? ParseNullableInt(string? text) =>
-            int.TryParse(text, out var value) ? value : default;
-
-        public static IEnumerable<StackFrame> Parse(string text) =>
+        public static IEnumerable<StackFrame> ParseMany(string text) =>
             from Match m in Pattern.Matches(text)
-            select m.Groups into groups
+            select m.Groups
+            into groups
             select new StackFrame(
-                groups["method"].Value,
+                groups["type"].Value + '.' + groups["method"].Value,
                 groups["file"].Value,
-                ParseNullableInt(groups["line"].Value));
-    }
-
-    internal class StackFrame
-    {
-        public string Call { get; }
-
-        public string? FilePath { get; }
-
-        public int? Line { get; }
-
-        public StackFrame(string call, string? filePath, int? line)
-        {
-            Call = call;
-            FilePath = filePath;
-            Line = line;
-        }
+                groups["line"].Value.ParseNullableIntOrDefault()
+            );
     }
 }
