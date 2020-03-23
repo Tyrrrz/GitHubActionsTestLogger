@@ -16,9 +16,11 @@ The implementation relies on various heuristics to get source information becaus
 ## Screenshots
 
 Failed tests are highlighted in diffs:
+
 ![diff](./.screenshots/diff.png)
 
 Failed tests are listed in annotations:
+
 ![annotations](./.screenshots/annotations.png)
 
 ## Usage
