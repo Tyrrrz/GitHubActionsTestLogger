@@ -25,9 +25,11 @@ Failed tests are listed in annotations:
 
 ## Usage
 
-1. Install the NuGet package in the test project
+1. Install the NuGet package in your test project
 
-2. Update your workflow so that tests are ran with custom logger:
+2. Ensure your test project is using the latest version of `Microsoft.NET.Test.Sdk`
+
+3. Update your workflow so that tests are ran with custom logger:
 
 ```yaml
 steps:
