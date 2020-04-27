@@ -38,3 +38,9 @@ steps:
   - name: Build & test
     run: dotnet test --logger GitHubActions
 ```
+
+If you don't want to have annotations for skipped tests, you can disable it with a parameter:
+
+```sh
+dotnet test --logger "GitHubActions;report-warnings=false"
+```
