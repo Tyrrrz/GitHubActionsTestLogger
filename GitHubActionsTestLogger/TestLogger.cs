@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GitHubActionsTestLogger.Internal;
@@ -17,8 +18,10 @@ namespace GitHubActionsTestLogger
 
     [FriendlyName("GitHubActions")]
     [ExtensionUri("logger://tyrrrz/ghactions/v1")]
-    public class TestLogger : ITestLogger
+    public class TestLogger : ITestLoggerWithParameters
     {
+        private bool _reportWarnings = true;
+
         // This assumes only one project file per project
         private static string? TryGetProjectFilePath(string startPath)
         {
@@ -87,7 +90,7 @@ namespace GitHubActionsTestLogger
             return stackFrame?.Line;
         }
 
-        private static void HandleTestResult(TestResult testResult)
+        private void HandleTestResult(TestResult testResult)
         {
             // We only care about tests with negative outcomes
             if (testResult.Outcome <= TestOutcome.Passed)
@@ -103,12 +106,20 @@ namespace GitHubActionsTestLogger
 
             if (testResult.Outcome == TestOutcome.Failed)
                 GitHubActions.ReportError(message, filePath, line);
-            else
+            else if (_reportWarnings)
                 GitHubActions.ReportWarning(message, filePath, line);
         }
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
+            events.TestResult += (sender, args) => HandleTestResult(args.Result);
+        }
+
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+        {
+            _reportWarnings =
+                !string.Equals(parameters.GetValueOrDefault("report-warnings"), "false", StringComparison.OrdinalIgnoreCase);
+
             events.TestResult += (sender, args) => HandleTestResult(args.Result);
         }
     }
