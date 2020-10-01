@@ -5,9 +5,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
 
-Custom test logger for `dotnet test` that writes output in a format that GitHub Actions understands. When using this logger, failed tests show up in annotations as well as in the list of failed checks.
-
-The implementation relies on various heuristics to get source information because .NET test runner does not provide it, even though the contract implies it should.
+Custom test logger for `dotnet test` that writes output in a structured format which is understood by GitHub Actions. When using this logger, failed tests show up in diffs as well as in the list of annotations.
 
 ## Download
 
@@ -25,11 +23,16 @@ Failed tests are listed in annotations:
 
 ## Usage
 
-1. Install the NuGet package in your test project
+Prerequisites:
 
-2. Ensure your test project is using the latest version of `Microsoft.NET.Test.Sdk`
+- .NET SDK v3.0 or higher
+- Latest version of `Microsoft.NET.Test.Sdk` referenced in your test project
 
-3. Update your workflow so that tests are ran with custom logger:
+Setup:
+
+1. Install `GitHubActionsTestLogger` in your test project via NuGet
+
+2. Update your workflow by adding a logger option to `dotnet test`:
 
 ```yaml
 steps:
@@ -39,7 +42,9 @@ steps:
     run: dotnet test --logger GitHubActions
 ```
 
-If you don't want to have annotations for skipped tests, you can disable it with a parameter:
+### Ignore warnings
+
+By default, GitHubActionsTestLogger produces warnings for tests that have neither failed nor succeeded (e.g. skipped). If you don't want that, you can disable it with a parameter:
 
 ```sh
 dotnet test --logger "GitHubActions;report-warnings=false"
