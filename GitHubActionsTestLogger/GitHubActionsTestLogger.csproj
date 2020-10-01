@@ -10,10 +10,15 @@
     <PackageTags>github actions test logger</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/GitHubActionsTestLogger</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/blob/master/Changelog.md</PackageReleaseNotes>
+    <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../favicon.png" Pack="True" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.5.0" />
