@@ -8,6 +8,12 @@ namespace GitHubActionsTestLogger
 
     internal static class GitHubActions
     {
+        public static bool IsRunningInsideWorkflow() => string.Equals(
+            Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
+            "true",
+            StringComparison.OrdinalIgnoreCase
+        );
+
         private static void WriteWorkflowCommand(string label, string content, string options)
         {
             // Commands can't have line breaks so trim the content to one line to avoid polluting the console

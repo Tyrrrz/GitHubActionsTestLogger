@@ -112,13 +112,22 @@ namespace GitHubActionsTestLogger
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory)
         {
+            if (!GitHubActions.IsRunningInsideWorkflow())
+                Console.WriteLine("WARN: Not running inside GitHub Actions, but using GitHub Actions Test Logger.");
+
             events.TestResult += (sender, args) => HandleTestResult(args.Result);
         }
 
         public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
         {
-            _reportWarnings =
-                !string.Equals(parameters.GetValueOrDefault("report-warnings"), "false", StringComparison.OrdinalIgnoreCase);
+            _reportWarnings = !string.Equals(
+                parameters.GetValueOrDefault("report-warnings"),
+                "false",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            if (!GitHubActions.IsRunningInsideWorkflow())
+                Console.WriteLine("WARN: Not running inside GitHub Actions, but using GitHub Actions Test Logger.");
 
             events.TestResult += (sender, args) => HandleTestResult(args.Result);
         }
