@@ -13,13 +13,7 @@ Custom test logger for `dotnet test` that writes output in a structured format w
 
 ## Screenshots
 
-Failed tests are highlighted in diffs:
-
 ![diff](./.screenshots/diff.png)
-
-Failed tests are listed in annotations:
-
-![annotations](./.screenshots/annotations.png)
 
 ## Usage
 
