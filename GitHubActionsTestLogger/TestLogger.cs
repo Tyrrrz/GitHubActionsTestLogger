@@ -15,36 +15,23 @@ namespace GitHubActionsTestLogger
 
     [FriendlyName("GitHubActions")]
     [ExtensionUri("logger://tyrrrz/ghactions/v1")]
-    public partial class TestLogger : ITestLoggerWithParameters
+    public class TestLogger : ITestLoggerWithParameters
     {
         public TestLoggerContext? Context { get; private set; }
 
-        public void Initialize(TestLoggerEvents events, string testRunDirectory)
-        {
-            CheckWarnGitHubActionsContext();
-
-            Context = new TestLoggerContext(Console.Out, TestLoggerOptions.Default);
-
-            events.TestResult += (sender, args) => Context.ProcessTestResult(args.Result);
-        }
-
-        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
-        {
-            CheckWarnGitHubActionsContext();
-
-            var options = TestLoggerOptions.Extract(parameters);
-            Context = new TestLoggerContext(Console.Out, options);
-
-            events.TestResult += (sender, args) => Context.ProcessTestResult(args.Result);
-        }
-    }
-
-    public partial class TestLogger
-    {
-        private static void CheckWarnGitHubActionsContext()
+        private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
         {
             if (!GitHubActions.IsRunningInsideWorkflow())
                 Console.WriteLine("WARN: Not running inside GitHub Actions, but using GitHub Actions Test Logger.");
+
+            Context = new TestLoggerContext(Console.Out, options);
+            events.TestResult += (sender, args) => Context.ProcessTestResult(args.Result);
         }
+
+        public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
+            Initialize(events, TestLoggerOptions.Default);
+
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters) =>
+            Initialize(events, TestLoggerOptions.Extract(parameters));
     }
 }

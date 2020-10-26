@@ -141,6 +141,32 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         }
 
         [Fact]
+        public void Failed_tests_get_logged_with_approximate_source_information_if_exception_was_not_thrown()
+        {
+            // Arrange
+            using var writer = new StringWriter();
+            var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+
+            var testResult = new TestResult(new TestCase
+            {
+                DisplayName = "Test1",
+                Source = typeof(LoggingSpecs).Assembly.Location
+            })
+            {
+                Outcome = TestOutcome.Failed,
+                ErrorMessage = "Bla bla"
+            };
+
+            // Act
+            context.ProcessTestResult(testResult);
+
+            // Assert
+            writer.ToString().Should().MatchRegex(
+                @"^\:\:error.*?file=.*?\.csproj.*?\:\:.+$"
+            );
+        }
+
+        [Fact]
         public void Skipped_tests_get_logged()
         {
             // Arrange

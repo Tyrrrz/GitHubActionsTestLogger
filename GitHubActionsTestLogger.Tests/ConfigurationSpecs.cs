@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Fakes;
 using Xunit;
@@ -15,7 +16,7 @@ namespace GitHubActionsTestLogger.Tests
             var events = new FakeTestLoggerEvents();
 
             // Act
-            logger.Initialize(events, "not-used");
+            logger.Initialize(events, Directory.GetCurrentDirectory());
 
             // Assert
             logger.Context.Should().NotBeNull();
