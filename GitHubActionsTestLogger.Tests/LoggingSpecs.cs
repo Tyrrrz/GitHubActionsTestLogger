@@ -123,7 +123,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             var testResult = new TestResult(new TestCase
             {
                 DisplayName = "SendEnvelopeAsync_ItemRateLimit_DropsItem",
-                FullyQualifiedName = "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem"
+                FullyQualifiedName = "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
             })
             {
                 Outcome = TestOutcome.Failed,
