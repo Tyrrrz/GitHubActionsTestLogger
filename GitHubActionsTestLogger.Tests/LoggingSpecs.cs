@@ -96,6 +96,51 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         }
 
         [Fact]
+        public void Failed_tests_get_logged_with_source_information_if_exception_was_thrown_in_async_method()
+        {
+            // .NET test platform never sends source information, so we can only
+            // rely on exception stack traces for it.
+
+            // Arrange
+            using var writer = new StringWriter();
+            var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+
+            var stackTrace = @"
+at System.Net.Http.HttpContent.CheckDisposed()
+at System.Net.Http.HttpContent.ReadAsStringAsync()
+at Sentry.Tests.Internals.Http.HttpTransportTests.<SendEnvelopeAsync_ItemRateLimit_DropsItem>d__3.MoveNext() in D:\a\sentry-dotnet\sentry-dotnet\test\Sentry.Tests\Internals\Http\HttpTransportTests.cs:line 187
+--- End of stack trace from previous location where exception was thrown ---
+at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+--- End of stack trace from previous location where exception was thrown ---
+at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+--- End of stack trace from previous location where exception was thrown ---
+at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+".Trim();
+
+            var testResult = new TestResult(new TestCase
+            {
+                DisplayName = "SendEnvelopeAsync_ItemRateLimit_DropsItem",
+                FullyQualifiedName = "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem"
+            })
+            {
+                Outcome = TestOutcome.Failed,
+                ErrorMessage = "Bla bla",
+                ErrorStackTrace = stackTrace
+            };
+
+            // Act
+            context.ProcessTestResult(testResult);
+
+            // Assert
+            writer.ToString().Should().MatchRegex(
+                @"^\:\:error.*?file=D:\\a\\sentry-dotnet\\sentry-dotnet\\test\\Sentry.Tests\\Internals\\Http\\HttpTransportTests.cs,line=187.*?\:\:.+$"
+            );
+        }
+
+        [Fact]
         public void Skipped_tests_get_logged()
         {
             // Arrange

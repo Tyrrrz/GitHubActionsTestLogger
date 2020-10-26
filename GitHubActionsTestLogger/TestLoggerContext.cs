@@ -48,11 +48,25 @@ namespace GitHubActionsTestLogger
                 return null;
 
             // Get fully qualified test method name (substring until method parameters)
-            var testMethodName = testResult.TestCase.FullyQualifiedName.SubstringUntil("(", StringComparison.OrdinalIgnoreCase);
+            var testMethodFullyQualifiedName = testResult.TestCase.FullyQualifiedName.SubstringUntil(
+                "(",
+                StringComparison.OrdinalIgnoreCase
+            );
 
-            // Find the deepest stack frame that contains this method
-            return StackFrame.ParseMany(testResult.ErrorStackTrace)
-                .LastOrDefault(f => f.MethodCall.StartsWith(testMethodName, StringComparison.OrdinalIgnoreCase));
+            var testMethodName = testMethodFullyQualifiedName.SubstringAfterLast(
+                ".",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            var matchingStackFrames = StackFrame.ParseMany(testResult.ErrorStackTrace)
+                .Where(f =>
+                    // Sync method call
+                    f.MethodCall.StartsWith(testMethodName, StringComparison.OrdinalIgnoreCase) ||
+                    // Async method call
+                    f.MethodCall.Contains('<' + testMethodName + '>', StringComparison.OrdinalIgnoreCase)
+                );
+
+            return matchingStackFrames.LastOrDefault();
         }
 
         private static string? TryGetSourceFilePath(TestResult testResult, StackFrame? stackFrame)
