@@ -2,7 +2,7 @@
   <Import Project="../GitHubActionsTestLogger.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net451</TargetFrameworks>
     <Authors>$(Company)</Authors>
     <Description>Test logger that reports to the GitHub Actions platform</Description>
     <PackageTags>github actions test logger</PackageTags>
@@ -10,6 +10,11 @@
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <!-- Disable nullability warnings on older frameworks because there is no nullability info for BCL -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net451'">
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

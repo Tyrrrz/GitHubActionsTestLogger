@@ -10,9 +10,8 @@ namespace GitHubActionsTestLogger
     // that GitHub Actions runner recognizes as workflow commands.
     // We try to get the source information (file, line number) of the failed tests and
     // report them to GitHub Actions so it highlights them as failed checks in diff and annotations.
-
-    // The problem is that .NET doesn't provide source information, even though the contract implies
-    // that it's supposed to. That's why we're employing some additional workarounds to get it if possible.
+    // Unfortunately .NET test platform does not provide source information, so most of the logic in
+    // the code revolves around parsing stack traces and using other heuristics to extract information.
 
     [FriendlyName("GitHubActions")]
     [ExtensionUri("logger://tyrrrz/ghactions/v1")]
