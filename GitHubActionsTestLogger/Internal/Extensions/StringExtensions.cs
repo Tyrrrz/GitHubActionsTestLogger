@@ -1,9 +1,9 @@
 using System;
 using System.Globalization;
 
-namespace GitHubActionsTestLogger.Internal
+namespace GitHubActionsTestLogger.Internal.Extensions
 {
-    internal static class Extensions
+    internal static class StringExtensions
     {
         public static string SubstringUntil(this string str, string sub,
             StringComparison comparison = StringComparison.Ordinal)

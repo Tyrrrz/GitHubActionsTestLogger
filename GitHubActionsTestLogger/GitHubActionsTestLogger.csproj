@@ -1,10 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../GitHubActionsTestLogger.props" />
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
-    <Version>1.1.1</Version>
-    <Company>Tyrrrz</Company>
-    <Copyright>Copyright (C) Alexey Golub</Copyright>
     <Authors>$(Company)</Authors>
     <Description>Test logger that reports to the GitHub Actions platform</Description>
     <PackageTags>github actions test logger</PackageTags>
@@ -12,9 +10,6 @@
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

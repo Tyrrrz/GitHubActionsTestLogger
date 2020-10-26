@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GitHubActionsTestLogger
+namespace GitHubActionsTestLogger.Internal
 {
     // More info: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
 
@@ -14,7 +14,10 @@ namespace GitHubActionsTestLogger
             StringComparison.OrdinalIgnoreCase
         );
 
-        private static void WriteWorkflowCommand(string label, string content, string options)
+        private static string FormatWorkflowCommand(
+            string label,
+            string content,
+            string options)
         {
             // Commands can't have line breaks so trim the content to one line to avoid polluting the console
             var trimmedContent = content
@@ -22,10 +25,13 @@ namespace GitHubActionsTestLogger
                 .FirstOrDefault()
                 ?.Trim();
 
-            Console.WriteLine($"::{label} {options}::{trimmedContent}");
+            return $"::{label} {options}::{trimmedContent}";
         }
 
-        private static string FormatOptions(string? filePath = null, int? line = null, int? column = null)
+        private static string FormatOptions(
+            string? filePath = null,
+            int? line = null,
+            int? column = null)
         {
             var options = new List<string>(3);
 
@@ -41,10 +47,18 @@ namespace GitHubActionsTestLogger
             return string.Join(",", options);
         }
 
-        public static void ReportError(string message, string? filePath = null, int? line = null, int? column = null) =>
-            WriteWorkflowCommand("error", message, FormatOptions(filePath, line, column));
+        public static string FormatError(
+            string message,
+            string? filePath = null,
+            int? line = null,
+            int? column = null) =>
+            FormatWorkflowCommand("error", message, FormatOptions(filePath, line, column));
 
-        public static void ReportWarning(string message, string? filePath = null, int? line = null, int? column = null) =>
-            WriteWorkflowCommand("warning", message, FormatOptions(filePath, line, column));
+        public static string FormatWarning(
+            string message,
+            string? filePath = null,
+            int? line = null,
+            int? column = null) =>
+            FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column));
     }
 }

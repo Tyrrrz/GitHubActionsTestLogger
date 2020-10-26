@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GitHubActionsTestLogger.Internal;
+using GitHubActionsTestLogger.Internal.Extensions;
 
-namespace GitHubActionsTestLogger
+namespace GitHubActionsTestLogger.Internal
 {
     // Adapted from https://github.com/atifaziz/StackTraceParser
 
@@ -58,12 +58,12 @@ namespace GitHubActionsTestLogger
             )
             \s*
             $",
-            RegexOptions.IgnoreCase
-            | RegexOptions.Multiline
-            | RegexOptions.ExplicitCapture
-            | RegexOptions.CultureInvariant
-            | RegexOptions.IgnorePatternWhitespace
-            | RegexOptions.Compiled,
+            RegexOptions.IgnoreCase |
+            RegexOptions.Multiline |
+            RegexOptions.ExplicitCapture |
+            RegexOptions.CultureInvariant |
+            RegexOptions.IgnorePatternWhitespace |
+            RegexOptions.Compiled,
             // Cap the evaluation time to make it obvious should the expression
             // fall into the "catastrophic backtracking" trap due to over
             // generalization.
