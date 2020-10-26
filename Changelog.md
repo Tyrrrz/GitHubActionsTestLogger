@@ -1,3 +1,7 @@
+### v1.1.2 (26-Oct-2020)
+
+- Fixed an issue where source information was sometimes not properly extracted from tests implemented as async methods.
+
 ### v1.1.1 (01-Oct-2020)
 
 - Added a warning message when using this logger outside of GitHub Actions.
