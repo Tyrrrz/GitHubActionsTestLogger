@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../GitHubActionsTestLogger.props" />
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net451</TargetFrameworks>
@@ -12,17 +11,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
-  <!-- Disable nullability warnings on older frameworks because there is no nullability info for BCL -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net451'">
-    <Nullable>annotations</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Include="../favicon.png" Pack="True" PackagePath="" />
+    <None Include="../favicon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="16.7.1" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="16.8.3" />
   </ItemGroup>
 
   <ItemGroup>

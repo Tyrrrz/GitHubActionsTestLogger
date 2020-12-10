@@ -7,7 +7,7 @@ ProjectSection(SolutionItems) = preProject
 	Changelog.md = Changelog.md
 	License.txt = License.txt
 	Readme.md = Readme.md
-	GitHubActionsTestLogger.props = GitHubActionsTestLogger.props
+	Directory.Build.props = Directory.Build.props
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsTestLogger.Tests", "GitHubActionsTestLogger.Tests\GitHubActionsTestLogger.Tests.csproj", "{AB9190BD-F358-4765-9068-A1EEB668463B}"
