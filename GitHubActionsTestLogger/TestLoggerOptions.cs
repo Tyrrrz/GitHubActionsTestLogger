@@ -15,7 +15,7 @@ namespace GitHubActionsTestLogger
 
     public partial class TestLoggerOptions
     {
-        public static TestLoggerOptions Default { get; } = new TestLoggerOptions(true);
+        public static TestLoggerOptions Default { get; } = new(true);
 
         public static TestLoggerOptions Extract(IReadOnlyDictionary<string, string> parameters)
         {

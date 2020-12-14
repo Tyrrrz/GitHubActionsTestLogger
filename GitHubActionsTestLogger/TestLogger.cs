@@ -25,7 +25,7 @@ namespace GitHubActionsTestLogger
                 Console.WriteLine("WARN: Not running inside GitHub Actions, but using GitHub Actions Test Logger.");
 
             Context = new TestLoggerContext(Console.Out, options);
-            events.TestResult += (sender, args) => Context.ProcessTestResult(args.Result);
+            events.TestResult += (_, args) => Context.ProcessTestResult(args.Result);
         }
 
         public void Initialize(TestLoggerEvents events, string testRunDirectory) =>

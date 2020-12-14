@@ -31,7 +31,7 @@ namespace GitHubActionsTestLogger.Internal
         private const string Space = @"[\x20\t]";
         private const string NotSpace = @"[^\x20\t]";
 
-        private static readonly Regex Pattern = new Regex(@"
+        private static readonly Regex Pattern = new(@"
             ^
             " + Space + @"*
             \w+ " + Space + @"+
