@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
 
-**Project status: active**.
+✅ **Project status: active**.
 
 Custom test logger for `dotnet test` that writes output in a structured format which is understood by GitHub Actions. When using this logger, failed tests show up in diffs as well as in the list of annotations.
 
