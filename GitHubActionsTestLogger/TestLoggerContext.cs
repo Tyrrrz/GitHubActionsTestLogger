@@ -42,7 +42,7 @@ namespace GitHubActionsTestLogger
     public partial class TestLoggerContext
     {
         // We use this method as a last resort if we can't get source information from anywhere else.
-        // This will hopefully give us the file path of the project that defines the test,
+        // This will hopefully give us the file path of the project that contains the test,
         // which is not ideal but still better than nothing.
         private static string? TryGetProjectFilePath(string startPath)
         {
@@ -64,7 +64,7 @@ namespace GitHubActionsTestLogger
             return null;
         }
 
-        // This method attempts to get the stack frame that represents the call to test method.
+        // This method attempts to get the stack frame that represents the call to the test method.
         // Obviously, this only works if the test threw an exception.
         private static StackFrame? TryGetTestStackFrame(TestResult testResult)
         {
@@ -84,8 +84,10 @@ namespace GitHubActionsTestLogger
             var matchingStackFrames = StackFrame.ParseMany(testResult.ErrorStackTrace)
                 .Where(f =>
                     // Sync method call
+                    // e.g. MyTests.EnsureOnePlusOneEqualsTwo()
                     f.MethodCall.StartsWith(testMethodFullyQualifiedName, StringComparison.OrdinalIgnoreCase) ||
                     // Async method call
+                    // e.g. MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
                     f.MethodCall.Contains('<' + testMethodName + '>', StringComparison.OrdinalIgnoreCase)
                 );
 

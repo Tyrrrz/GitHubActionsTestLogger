@@ -58,7 +58,7 @@ namespace GitHubActionsTestLogger.Tests
         public void Failed_tests_get_logged_with_source_information_if_exception_was_thrown()
         {
             // .NET test platform never sends source information, so we can only
-            // rely on exception stack traces for it.
+            // rely on exception stack traces to get it.
 
             // Arrange
             using var writer = new StringWriter();
@@ -96,10 +96,10 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         }
 
         [Fact]
-        public void Failed_tests_get_logged_with_source_information_if_exception_was_thrown_in_async_method()
+        public void Failed_tests_get_logged_with_source_information_if_exception_was_thrown_in_an_async_method()
         {
             // .NET test platform never sends source information, so we can only
-            // rely on exception stack traces for it.
+            // rely on exception stack traces to get it.
 
             // Arrange
             using var writer = new StringWriter();

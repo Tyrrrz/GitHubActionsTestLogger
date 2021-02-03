@@ -22,8 +22,8 @@ namespace GitHubActionsTestLogger.Internal
             // Commands can't have line breaks so trim the content to one line to avoid polluting the console
             var trimmedContent = content
                 .Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
-                .FirstOrDefault()
-                ?.Trim();
+                .FirstOrDefault()?
+                .Trim();
 
             return $"::{label} {options}::{trimmedContent}";
         }

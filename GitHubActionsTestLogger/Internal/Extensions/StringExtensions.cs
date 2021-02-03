@@ -5,10 +5,6 @@ namespace GitHubActionsTestLogger.Internal.Extensions
 {
     internal static class StringExtensions
     {
-        public static bool Contains(this string str, string sub,
-            StringComparison comparison = StringComparison.Ordinal) =>
-            str.IndexOf(sub, comparison) >= 0;
-
         public static string SubstringUntil(this string str, string sub,
             StringComparison comparison = StringComparison.Ordinal)
         {

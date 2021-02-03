@@ -10,8 +10,6 @@ namespace GitHubActionsTestLogger.Internal
 
     internal partial class StackFrame
     {
-        // We're only interested in file path and line number
-
         public string MethodCall { get; }
 
         public string? FilePath { get; }
