@@ -8,7 +8,8 @@
 
 ✅ **Project status: active**.
 
-Custom test logger for `dotnet test` that writes output in a structured format which is understood by GitHub Actions. When using this logger, failed tests show up in diffs as well as in the list of annotations.
+Custom logger for `dotnet test` that reports test results in a structured format that GitHub Actions understands.
+When using this logger, failed tests are listed in workflow annotations and highlighted in code diffs.
 
 ## Download
 
@@ -20,28 +21,44 @@ Custom test logger for `dotnet test` that writes output in a structured format w
 
 ## Usage
 
-Prerequisites:
+> Note: In order to use GitHubActionsTestLogger, you must be running your tests with **.NET SDK v3.0 or higher**.
+If you are using `actions/setup-dotnet` in your workflow to install .NET SDK, ensure that `dotnet-version` is set to `3.0.x` or higher.
+Attempting to run tests with this logger on an older version of the SDK will result in a build error.
 
-- .NET SDK v3.0 or higher
-- Latest version of `Microsoft.NET.Test.Sdk` referenced in your test project
+### Installation
 
-Setup:
+To use GitHubActionsTestLogger, follow these steps:
 
-1. Install `GitHubActionsTestLogger` in your test project via NuGet
-
-2. Update your workflow by adding a logger option to `dotnet test`:
+1. Install `GitHubActionsTestLogger`
+2. Install `Microsoft.NET.Test.Sdk` (or update to latest version if it's already installed)
+3. Modify your GitHub Actions workflow file to run tests using this logger:
 
 ```yaml
-steps:
-  # ...
+name: CI
+on: [push, pull_request]
 
-  - name: Build & test
-    run: dotnet test --logger GitHubActions
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.3
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          # Note: version 3.0.x or higher is required!
+          dotnet-version: 5.0.x
+
+      - name: Build & test
+        # Specify custom logger to use via the `--logger` option
+        run: dotnet test --configuration Release --logger GitHubActions
 ```
+### Options
 
-### Ignore warnings
-
-By default, GitHubActionsTestLogger produces warnings for tests that have neither failed nor succeeded (e.g. skipped). If you don't want that, you can disable it with a parameter:
+By default, GitHubActionsTestLogger produces warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
+If that's not desirable, you can disable this behavior with a switch:
 
 ```sh
 dotnet test --logger "GitHubActions;report-warnings=false"
