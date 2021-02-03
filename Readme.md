@@ -31,7 +31,7 @@ To use GitHubActionsTestLogger, follow these steps:
 
 1. Install `GitHubActionsTestLogger`
 2. Install `Microsoft.NET.Test.Sdk` (or update to latest version if it's already installed)
-3. Modify your GitHub Actions workflow file to run tests using this logger:
+3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
 name: CI
