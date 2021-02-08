@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GitHubActionsTestLogger.Internal.Extensions;
+using GitHubActionsTestLogger.Utils.Extensions;
 
-namespace GitHubActionsTestLogger.Internal
+namespace GitHubActionsTestLogger.Utils
 {
     // Adapted from https://github.com/atifaziz/StackTraceParser
 

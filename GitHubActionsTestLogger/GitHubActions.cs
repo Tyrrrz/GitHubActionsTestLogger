@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GitHubActionsTestLogger.Internal
+namespace GitHubActionsTestLogger
 {
     // More info: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
 

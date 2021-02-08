@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using GitHubActionsTestLogger.Internal;
-using GitHubActionsTestLogger.Internal.Extensions;
+using GitHubActionsTestLogger.Utils;
+using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger

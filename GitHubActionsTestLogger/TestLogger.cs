@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GitHubActionsTestLogger.Internal;
+using GitHubActionsTestLogger.Utils;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 

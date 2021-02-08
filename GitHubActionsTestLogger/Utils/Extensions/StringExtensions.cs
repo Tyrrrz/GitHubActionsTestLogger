@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace GitHubActionsTestLogger.Internal.Extensions
+namespace GitHubActionsTestLogger.Utils.Extensions
 {
     internal static class StringExtensions
     {
