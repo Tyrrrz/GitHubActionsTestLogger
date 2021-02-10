@@ -13,7 +13,7 @@ When using this logger, failed tests are listed in workflow annotations and high
 
 ## Download
 
-- [NuGet](https://nuget.org/packages/GitHubActionsTestLogger): `dotnet add package GitHubActionsTestLogger`
+📦 [NuGet](https://nuget.org/packages/GitHubActionsTestLogger): `dotnet add package GitHubActionsTestLogger`
 
 ## Screenshots
 
@@ -21,16 +21,12 @@ When using this logger, failed tests are listed in workflow annotations and high
 
 ## Usage
 
-> Note: In order to use GitHubActionsTestLogger, you must be running your tests with **.NET SDK v3.0 or higher**.
-If you are using `actions/setup-dotnet` in your workflow to install .NET SDK, ensure that `dotnet-version` is set to `3.0.x` or higher.
-Attempting to run tests with this logger on an older version of the SDK will result in a build error.
-
 ### Installation
 
 To use GitHubActionsTestLogger, follow these steps:
 
-1. Install `GitHubActionsTestLogger`
-2. Install `Microsoft.NET.Test.Sdk` (or update to latest version if it's already installed)
+1. Install `GitHubActionsTestLogger` package in your test project
+2. Install `Microsoft.NET.Test.Sdk` package in your test project (or update to latest)
 3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
@@ -55,6 +51,13 @@ jobs:
         # Specify custom logger to use via the `--logger` option
         run: dotnet test --configuration Release --logger GitHubActions
 ```
+
+> Note: Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
+Older versions of the SDK don't support custom test loggers added via NuGet packages.
+
+> Note: Ensure that your test project references `Microsoft.NET.Test.Sdk` version `16.8.0` or higher.
+Older versions of this package may not work properly with custom test loggers.
+
 ### Options
 
 By default, GitHubActionsTestLogger produces warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
