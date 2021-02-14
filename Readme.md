@@ -52,10 +52,10 @@ jobs:
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
-> Note: Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
+⚠️ Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
 Older versions of the SDK don't support custom test loggers added via NuGet packages.
 
-> Note: Ensure that your test project references `Microsoft.NET.Test.Sdk` version `16.8.0` or higher.
+⚠️ Ensure that your test project references `Microsoft.NET.Test.Sdk` version `16.8.0` or higher.
 Older versions of this package may not work properly with custom test loggers.
 
 ### Options
