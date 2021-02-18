@@ -48,7 +48,7 @@ jobs:
           dotnet-version: 5.0.x
 
       - name: Build & test
-        # Specify custom logger to use via the `--logger` option
+        # Specify custom logger here
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
@@ -60,9 +60,19 @@ Older versions of this package may not work properly with custom test loggers.
 
 ### Options
 
-By default, GitHubActionsTestLogger produces warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
-If that's not desirable, you can disable this behavior with a switch:
+GitHubActionsTestLogger has a few options that you can override to customize its behavior.
+In order to pass an option to the logger, include it as a parameter to the `--logger` option like so:
 
 ```sh
-dotnet test --logger "GitHubActions;report-warnings=false"
+dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 ```
+
+Supported options:
+
+- #### `report-warnings`
+
+Specifies whether to report warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
+If disabled, only failed tests will be logged and all other tests will be ignored.
+Can be either `true` or `false`.
+
+By default this option is set to `true`.
