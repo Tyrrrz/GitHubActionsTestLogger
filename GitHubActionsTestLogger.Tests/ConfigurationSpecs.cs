@@ -20,7 +20,7 @@ namespace GitHubActionsTestLogger.Tests
 
             // Assert
             logger.Context.Should().NotBeNull();
-            logger.Context!.Options.Should().BeEquivalentTo(TestLoggerOptions.Default);
+            logger.Context!.Options.Should().Be(TestLoggerOptions.Default);
         }
 
         [Fact]
@@ -28,10 +28,11 @@ namespace GitHubActionsTestLogger.Tests
         {
             // Arrange
             var logger = new TestLogger();
-            var events = new FakeTestLoggerEvents();
 
+            var events = new FakeTestLoggerEvents();
             var parameters = new Dictionary<string, string>
             {
+                ["format"] = "$test -> $outcome",
                 ["report-warnings"] = "false"
             };
 
@@ -40,7 +41,8 @@ namespace GitHubActionsTestLogger.Tests
 
             // Assert
             logger.Context.Should().NotBeNull();
-            logger.Context!.Options.Should().BeEquivalentTo(new TestLoggerOptions(false));
+            logger.Context!.Options.MessageFormat.Template.Should().Be("$test -> $outcome");
+            logger.Context!.Options.ReportWarnings.Should().BeFalse();
         }
     }
 }

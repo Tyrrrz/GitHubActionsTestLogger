@@ -19,7 +19,12 @@ namespace GitHubActionsTestLogger.Utils.Extensions
             return index >= 0 ? str.Substring(index + sub.Length, str.Length - index - sub.Length) : "";
         }
 
-        public static int? ParseNullableIntOrDefault(this string? str) =>
+        public static bool? TryParseBool(this string? str) =>
+            bool.TryParse(str, out var result)
+                ? result
+                : (bool?) null;
+
+        public static int? TryParseInt(this string? str) =>
             int.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)
                 ? result
                 : (int?) null;

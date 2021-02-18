@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GitHubActionsTestLogger.Utils;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -32,6 +31,6 @@ namespace GitHubActionsTestLogger
             Initialize(events, TestLoggerOptions.Default);
 
         public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters) =>
-            Initialize(events, TestLoggerOptions.Extract(parameters));
+            Initialize(events, TestLoggerOptions.Resolve(parameters));
     }
 }

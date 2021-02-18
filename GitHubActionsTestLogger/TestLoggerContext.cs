@@ -28,14 +28,16 @@ namespace GitHubActionsTestLogger
             var filePath = TryGetSourceFilePath(testResult, stackFrame);
             var line = TryGetSourceLine(testResult, stackFrame);
 
-            var message = !string.IsNullOrWhiteSpace(testResult.ErrorMessage)
-                ? $"{testResult.TestCase.DisplayName}: {testResult.ErrorMessage}"
-                : $"{testResult.TestCase.DisplayName}: {testResult.Outcome}";
+            var message = Options.MessageFormat.Apply(testResult);
 
             if (testResult.Outcome == TestOutcome.Failed)
+            {
                 Output.WriteLine(GitHubActions.FormatError(message, filePath, line));
+            }
             else if (Options.ReportWarnings)
+            {
                 Output.WriteLine(GitHubActions.FormatWarning(message, filePath, line));
+            }
         }
     }
 

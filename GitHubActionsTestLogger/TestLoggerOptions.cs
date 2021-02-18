@@ -1,33 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger
 {
     public partial class TestLoggerOptions
     {
+        public TestResultMessageFormat MessageFormat { get; }
+
         public bool ReportWarnings { get; }
 
-        public TestLoggerOptions(bool reportWarnings)
+        public TestLoggerOptions(
+            TestResultMessageFormat messageFormat,
+            bool reportWarnings)
         {
+            MessageFormat = messageFormat;
             ReportWarnings = reportWarnings;
         }
     }
 
     public partial class TestLoggerOptions
     {
-        public static TestLoggerOptions Default { get; } = new(true);
+        // ReSharper disable ArgumentsStyleOther
+        // ReSharper disable ArgumentsStyleLiteral
+        // ReSharper disable ArgumentsStyleNamedExpression
+        public static TestLoggerOptions Default { get; } = new(
+            messageFormat: TestResultMessageFormat.Default,
+            reportWarnings: true
+        );
 
-        public static TestLoggerOptions Extract(IReadOnlyDictionary<string, string> parameters)
-        {
-            var reportWarnings = !string.Equals(
-                parameters.GetValueOrDefault("report-warnings"),
-                "false",
-                StringComparison.OrdinalIgnoreCase
-            );
-
-            return new TestLoggerOptions(
-                reportWarnings
-            );
-        }
+        public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string> parameters) => new(
+            messageFormat: parameters.GetValueOrDefault("format")?.Pipe(s => new TestResultMessageFormat(s)) ??
+                           Default.MessageFormat,
+            reportWarnings: parameters.GetValueOrDefault("report-warnings")?.TryParseBool() ??
+                            Default.ReportWarnings
+        );
+        // ReSharper restore ArgumentsStyleOther
+        // ReSharper restore ArgumentsStyleLiteral
+        // ReSharper restore ArgumentsStyleNamedExpression
     }
 }

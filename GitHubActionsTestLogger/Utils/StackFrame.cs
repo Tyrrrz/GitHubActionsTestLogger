@@ -75,7 +75,7 @@ namespace GitHubActionsTestLogger.Utils
             select new StackFrame(
                 groups["type"].Value + '.' + groups["method"].Value,
                 groups["file"].Value,
-                groups["line"].Value.ParseNullableIntOrDefault()
+                groups["line"].Value.TryParseInt()
             );
     }
 }
