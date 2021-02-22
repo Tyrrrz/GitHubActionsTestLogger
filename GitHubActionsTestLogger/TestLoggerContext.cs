@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger
 {
-    public partial class TestLoggerContext
+    public class TestLoggerContext
     {
         public TextWriter Output { get; }
 
@@ -19,30 +19,6 @@ namespace GitHubActionsTestLogger
             Options = options;
         }
 
-        public void ProcessTestResult(TestResult testResult)
-        {
-            if (testResult.Outcome <= TestOutcome.Passed)
-                return;
-
-            var stackFrame = TryGetTestStackFrame(testResult);
-            var filePath = TryGetSourceFilePath(testResult, stackFrame);
-            var line = TryGetSourceLine(testResult, stackFrame);
-
-            var message = Options.MessageFormat.Apply(testResult);
-
-            if (testResult.Outcome == TestOutcome.Failed)
-            {
-                Output.WriteLine(GitHubActions.FormatError(message, filePath, line));
-            }
-            else if (Options.ReportWarnings)
-            {
-                Output.WriteLine(GitHubActions.FormatWarning(message, filePath, line));
-            }
-        }
-    }
-
-    public partial class TestLoggerContext
-    {
         // We use this method as a last resort if we can't get source information from anywhere else.
         // This will hopefully give us the file path of the project that contains the test,
         // which is not ideal but still better than nothing.
@@ -125,6 +101,27 @@ namespace GitHubActionsTestLogger
 
             // Try to extract it from stack trace (works only if there was an exception)
             return stackFrame?.Line;
+        }
+
+        public void ProcessTestResult(TestResult testResult)
+        {
+            if (testResult.Outcome <= TestOutcome.Passed)
+                return;
+
+            var stackFrame = TryGetTestStackFrame(testResult);
+            var filePath = TryGetSourceFilePath(testResult, stackFrame);
+            var line = TryGetSourceLine(testResult, stackFrame);
+
+            var message = Options.MessageFormat.Apply(testResult);
+
+            if (testResult.Outcome == TestOutcome.Failed)
+            {
+                Output.WriteLine(GitHubActions.FormatError(message, filePath, line));
+            }
+            else if (Options.ReportWarnings)
+            {
+                Output.WriteLine(GitHubActions.FormatWarning(message, filePath, line));
+            }
         }
     }
 }

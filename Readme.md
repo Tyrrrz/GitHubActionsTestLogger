@@ -67,7 +67,24 @@ In order to pass an option to the logger, include it as a parameter to the `--lo
 dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 ```
 
-Supported options:
+The following options are supported:
+
+- #### `format`
+
+Specifies the format used when logging test results to the console.
+
+The following replacement tokens are available:
+
+- `$test` -- replaced with the display name of the test
+- `$outcome` -- replaced with the error message (in case of an exception) or the outcome of the test
+- `$traits.TRAIT_NAME` -- replaced with the value of the trait named `TRAIT_NAME`
+
+Default: `$test: $outcome`.
+
+Examples:
+
+- `$test: $outcome` -> `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
+- `[$traits.Category] $test: $outcome` -> `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
 
 - #### `report-warnings`
 
@@ -75,4 +92,4 @@ Specifies whether to report warnings for tests that have neither failed nor succ
 If disabled, only failed tests will be logged and all other tests will be ignored.
 Can be either `true` or `false`.
 
-By default this option is set to `true`.
+Default: `true`.

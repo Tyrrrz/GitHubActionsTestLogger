@@ -46,7 +46,7 @@ namespace GitHubActionsTestLogger.Tests
             })
             {
                 Outcome = TestOutcome.Failed,
-                ErrorMessage = "Bla bla"
+                ErrorMessage = "ErrorMessage"
             };
 
             // Act
@@ -55,9 +55,9 @@ namespace GitHubActionsTestLogger.Tests
             var output = writer.ToString().Trim();
 
             // Assert
-            output.Should().MatchRegex(
-                @"^\:\:error.*?\:\:.+$"
-            );
+            output.Should().StartWith("::error ");
+            output.Should().Contain("Test1");
+            output.Should().Contain("ErrorMessage");
         }
 
         [Fact]
@@ -89,7 +89,7 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
             })
             {
                 Outcome = TestOutcome.Failed,
-                ErrorMessage = "Bla bla",
+                ErrorMessage = "ErrorMessage",
                 ErrorStackTrace = stackTrace
             };
 
@@ -99,9 +99,11 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
             var output = writer.ToString().Trim();
 
             // Assert
-            output.Should().MatchRegex(
-                @"^\:\:error.*?file=/dir/CliWrap.Tests/CancellationSpecs.cs,line=75.*?\:\:.+$"
-            );
+            output.Should().StartWith("::error ");
+            output.Should().Contain("file=/dir/CliWrap.Tests/CancellationSpecs.cs");
+            output.Should().Contain("line=75");
+            output.Should().Contain("I can execute a command with buffering and cancel it immediately");
+            output.Should().Contain("ErrorMessage");
         }
 
         [Fact]
@@ -118,7 +120,7 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
             var stackTrace = @"
 at System.Net.Http.HttpContent.CheckDisposed()
 at System.Net.Http.HttpContent.ReadAsStringAsync()
-at Sentry.Tests.Internals.Http.HttpTransportTests.<SendEnvelopeAsync_ItemRateLimit_DropsItem>d__3.MoveNext() in D:\a\sentry-dotnet\sentry-dotnet\test\Sentry.Tests\Internals\Http\HttpTransportTests.cs:line 187
+at Sentry.Tests.Internals.Http.HttpTransportTests.<SendEnvelopeAsync_ItemRateLimit_DropsItem>d__3.MoveNext() in /dir/Sentry.Tests/Internals/Http/HttpTransportTests.cs:line 187
 --- End of stack trace from previous location where exception was thrown ---
 at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
 at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
@@ -137,7 +139,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             })
             {
                 Outcome = TestOutcome.Failed,
-                ErrorMessage = "Bla bla",
+                ErrorMessage = "ErrorMessage",
                 ErrorStackTrace = stackTrace
             };
 
@@ -147,9 +149,11 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             var output = writer.ToString().Trim();
 
             // Assert
-            output.Should().MatchRegex(
-                @"^\:\:error.*?file=D:\\a\\sentry-dotnet\\sentry-dotnet\\test\\Sentry.Tests\\Internals\\Http\\HttpTransportTests.cs,line=187.*?\:\:.+$"
-            );
+            output.Should().StartWith("::error ");
+            output.Should().Contain("file=/dir/Sentry.Tests/Internals/Http/HttpTransportTests.cs");
+            output.Should().Contain("line=187");
+            output.Should().Contain("SendEnvelopeAsync_ItemRateLimit_DropsItem");
+            output.Should().Contain("ErrorMessage");
         }
 
         [Fact]
@@ -167,7 +171,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             })
             {
                 Outcome = TestOutcome.Failed,
-                ErrorMessage = "Bla bla"
+                ErrorMessage = "ErrorMessage"
             };
 
             // Act
@@ -176,9 +180,10 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             var output = writer.ToString().Trim();
 
             // Assert
-            output.Should().MatchRegex(
-                @"^\:\:error.*?file=.*?\.csproj.*?\:\:.+$"
-            );
+            output.Should().StartWith("::error ");
+            output.Should().MatchRegex(@"file=.*?\.csproj");
+            output.Should().Contain("Test1");
+            output.Should().Contain("ErrorMessage");
         }
 
         [Fact]
@@ -203,9 +208,9 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             var output = writer.ToString().Trim();
 
             // Assert
-            output.Should().MatchRegex(
-                @"^\:\:warning.*?\:\:.+$"
-            );
+            output.Should().StartWith("::warning ");
+            output.Should().Contain("Test1");
+            output.Should().Contain("Skipped");
         }
 
         [Fact]
@@ -237,81 +242,6 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
 
             // Assert
             output.Should().BeEmpty();
-        }
-
-        [Fact]
-        public void Failed_tests_get_logged_using_custom_format_if_configured()
-        {
-            // Arrange
-            using var writer = new StringWriter();
-
-            var context = new TestLoggerContext(
-                writer,
-                new TestLoggerOptions(
-                    new TestResultMessageFormat("<$test> -> $outcome"),
-                    TestLoggerOptions.Default.ReportWarnings
-                )
-            );
-
-            var testResult = new TestResult(new TestCase
-            {
-                DisplayName = "Test1"
-            })
-            {
-                Outcome = TestOutcome.Failed,
-                ErrorMessage = "Bla bla"
-            };
-
-            // Act
-            context.ProcessTestResult(testResult);
-
-            var output = writer.ToString().Trim();
-
-            // Assert
-            output.Should().MatchRegex(
-                @"^\:\:error.*?\:\:.+$"
-            );
-
-            output.Should().EndWith(
-                "<Test1> -> Bla bla"
-            );
-        }
-
-        [Fact]
-        public void Skipped_tests_get_logged_using_custom_format_if_configured()
-        {
-            // Arrange
-            using var writer = new StringWriter();
-
-            var context = new TestLoggerContext(
-                writer,
-                new TestLoggerOptions(
-                    new TestResultMessageFormat("<$test> -> $outcome"),
-                    TestLoggerOptions.Default.ReportWarnings
-                )
-            );
-
-            var testResult = new TestResult(new TestCase
-            {
-                DisplayName = "Test1"
-            })
-            {
-                Outcome = TestOutcome.Skipped
-            };
-
-            // Act
-            context.ProcessTestResult(testResult);
-
-            var output = writer.ToString().Trim();
-
-            // Assert
-            output.Should().MatchRegex(
-                @"^\:\:warning.*?\:\:.+$"
-            );
-
-            output.Should().EndWith(
-                "<Test1> -> Skipped"
-            );
         }
     }
 }

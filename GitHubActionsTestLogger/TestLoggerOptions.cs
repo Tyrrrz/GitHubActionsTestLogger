@@ -18,11 +18,11 @@ namespace GitHubActionsTestLogger
         }
     }
 
+    // ReSharper disable ArgumentsStyleOther
+    // ReSharper disable ArgumentsStyleLiteral
+    // ReSharper disable ArgumentsStyleNamedExpression
     public partial class TestLoggerOptions
     {
-        // ReSharper disable ArgumentsStyleOther
-        // ReSharper disable ArgumentsStyleLiteral
-        // ReSharper disable ArgumentsStyleNamedExpression
         public static TestLoggerOptions Default { get; } = new(
             messageFormat: TestResultMessageFormat.Default,
             reportWarnings: true
@@ -34,8 +34,8 @@ namespace GitHubActionsTestLogger
             reportWarnings: parameters.GetValueOrDefault("report-warnings")?.TryParseBool() ??
                             Default.ReportWarnings
         );
-        // ReSharper restore ArgumentsStyleOther
-        // ReSharper restore ArgumentsStyleLiteral
-        // ReSharper restore ArgumentsStyleNamedExpression
     }
+    // ReSharper restore ArgumentsStyleOther
+    // ReSharper restore ArgumentsStyleLiteral
+    // ReSharper restore ArgumentsStyleNamedExpression
 }
