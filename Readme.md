@@ -69,7 +69,7 @@ dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 
 The following options are supported:
 
-- #### `format`
+#### `format`
 
 Specifies the format used when logging test results to the console.
 
@@ -86,7 +86,7 @@ Examples:
 - `$test: $outcome` -> `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
 - `[$traits.Category] $test: $outcome` -> `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
 
-- #### `report-warnings`
+#### `report-warnings`
 
 Specifies whether to report warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
 If disabled, only failed tests will be logged and all other tests will be ignored.
