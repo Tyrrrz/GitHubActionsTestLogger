@@ -38,10 +38,10 @@ namespace GitHubActionsTestLogger
             if (!string.IsNullOrWhiteSpace(filePath))
                 options.Add($"file={filePath}");
 
-            if (line != null)
+            if (line is not null)
                 options.Add($"line={line}");
 
-            if (column != null)
+            if (column is not null)
                 options.Add($"col={column}");
 
             return string.Join(",", options);
