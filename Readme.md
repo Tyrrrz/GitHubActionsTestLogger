@@ -61,13 +61,11 @@ Older versions of this package may not work properly with custom test loggers.
 ### Options
 
 GitHubActionsTestLogger has a few options that you can override to customize its behavior.
-In order to pass an option to the logger, include it as a parameter to the `--logger` option like so:
+In order to pass an option to the logger, include it as an additional parameter inside `--logger`:
 
 ```sh
 dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 ```
-
-The following options are supported:
 
 #### `format`
 
@@ -77,7 +75,7 @@ The following replacement tokens are available:
 
 - `$test` -- replaced with the display name of the test
 - `$outcome` -- replaced with the error message (in case of an exception) or the outcome of the test
-- `$traits.TRAIT_NAME` -- replaced with the value of the trait named `TRAIT_NAME`
+- `$traits.TRAIT_NAME` -- replaced with the value of a trait named `TRAIT_NAME`
 
 Default: `$test: $outcome`.
 
@@ -89,7 +87,8 @@ Examples:
 #### `report-warnings`
 
 Specifies whether to report warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
-If disabled, only failed tests will be logged and all other tests will be ignored.
-Can be either `true` or `false`.
+If disabled, only errors that represent failed tests will be logged and all other tests will be ignored.
+
+Can be set to either `true` or `false`.
 
 Default: `true`.
