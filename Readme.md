@@ -25,8 +25,8 @@ When using this logger, failed tests are listed in workflow annotations and high
 
 To use GitHubActionsTestLogger, follow these steps:
 
-1. Install `GitHubActionsTestLogger` package in your test project
-2. Install `Microsoft.NET.Test.Sdk` package in your test project (or update to latest)
+1. Install **GitHubActionsTestLogger** package in your test project
+2. Install **Microsoft.NET.Test.Sdk** package in your test project (or update to latest)
 3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
@@ -52,10 +52,10 @@ jobs:
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
-⚠️ Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
+> ⚠️ Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
 Older versions of the SDK don't support custom test loggers added via NuGet packages.
 
-⚠️ Ensure that your test project references `Microsoft.NET.Test.Sdk` version `16.8.0` or higher.
+> ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **16.8.0** or higher.
 Older versions of this package may not work properly with custom test loggers.
 
 ### Options
@@ -86,8 +86,8 @@ Examples:
 
 #### `report-warnings`
 
-Specifies whether to report warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
-If disabled, only errors that represent failed tests will be logged and all other tests will be ignored.
+Specifies whether to additionally report warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
+If disabled, only failed tests will be reported.
 
 Can be set to either `true` or `false`.
 
