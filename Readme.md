@@ -54,6 +54,7 @@ jobs:
 
 > ⚠️ Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
 Older versions of the SDK don't support custom test loggers added via NuGet packages.
+Otherwise, you can also try [this workaround](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
 > ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **16.8.0** or higher.
 Older versions of this package may not work properly with custom test loggers.
