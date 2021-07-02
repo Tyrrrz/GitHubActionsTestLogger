@@ -44,20 +44,16 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v1.7.2
         with:
-          # Note: version 3.0.x or higher is required!
           dotnet-version: 5.0.x
 
       - name: Build & test
-        # Specify custom logger here
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
-> ⚠️ Ensure that you are running your tests with **.NET SDK v3.0 or higher**.
-Older versions of the SDK don't support custom test loggers added via NuGet packages.
-Otherwise, you can also try [this workaround](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
-
 > ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **16.8.0** or higher.
 Older versions of this package may not work properly with custom test loggers.
+
+> ⚠️ Note that if you are using **.NET SDK v2.2 or lower**, you need to enable [`<CopyLocalLockFileAssemblies>`](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667) property in your test project.
 
 ### Options
 
