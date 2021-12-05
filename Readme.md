@@ -1,4 +1,4 @@
-# GitHubActionsTestLogger
+# GitHub Actions Test Logger
 
 [![Build](https://github.com/Tyrrrz/GitHubActionsTestLogger/workflows/CI/badge.svg?branch=master)](https://github.com/Tyrrrz/GitHubActionsTestLogger/actions)
 [![Coverage](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger/branch/master/graph/badge.svg)](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger)
@@ -7,7 +7,7 @@
 [![Discord](https://img.shields.io/discord/869237470565392384?label=discord)](https://discord.gg/2SUWKFnHSm)
 [![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
 
-✅ **Project status: active**.
+✅ **Project status: active**. [What does it mean?](https://github.com/Tyrrrz/shared/blob/master/docs/project-status.md)
 
 Custom logger for `dotnet test` that reports test results in a structured format that GitHub Actions understands.
 When using this logger, failed tests are listed in workflow annotations and highlighted in code diffs.
@@ -26,7 +26,7 @@ When using this logger, failed tests are listed in workflow annotations and high
 
 ### Installation
 
-To use GitHubActionsTestLogger, follow these steps:
+To use **GitHub Actions Test Logger**, follow these steps:
 
 1. Install **GitHubActionsTestLogger** package in your test project
 2. Install **Microsoft.NET.Test.Sdk** package in your test project (or update to latest)
@@ -60,7 +60,7 @@ Older versions of this package may not work properly with custom test loggers.
 
 ### Options
 
-GitHubActionsTestLogger has a few options that you can override to customize its behavior.
+**GitHub Actions Test Logger** has a few options that you can override to customize its behavior.
 In order to pass an option to the logger, include it as an additional parameter inside `--logger`:
 
 ```sh
