@@ -2,58 +2,57 @@
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace GitHubActionsTestLogger
+namespace GitHubActionsTestLogger;
+
+public partial class TestResultMessageFormat
 {
-    public partial class TestResultMessageFormat
+    private const string NameToken = "$test";
+    private const string OutcomeToken = "$outcome";
+    private const string TraitsToken = "$traits";
+
+    public string Template { get; }
+
+    public TestResultMessageFormat(string template) => Template = template;
+
+    private static void ReplaceNameTokens(StringBuilder buffer, TestResult testResult)
     {
-        private const string NameToken = "$test";
-        private const string OutcomeToken = "$outcome";
-        private const string TraitsToken = "$traits";
+        buffer.Replace(NameToken, testResult.TestCase.DisplayName);
+    }
 
-        public string Template { get; }
+    private static void ReplaceOutcomeTokens(StringBuilder buffer, TestResult testResult)
+    {
+        var outcome = !string.IsNullOrWhiteSpace(testResult.ErrorMessage)
+            ? testResult.ErrorMessage
+            : testResult.Outcome.ToString();
 
-        public TestResultMessageFormat(string template) => Template = template;
+        buffer.Replace(OutcomeToken, outcome);
+    }
 
-        private static void ReplaceNameTokens(StringBuilder buffer, TestResult testResult)
+    private static void ReplaceTraitsTokens(StringBuilder buffer, TestResult testResult)
+    {
+        var traits = testResult.Traits.Concat(testResult.TestCase.Traits).Distinct();
+
+        foreach (var trait in traits)
         {
-            buffer.Replace(NameToken, testResult.TestCase.DisplayName);
-        }
+            var traitToken = $"{TraitsToken}.{trait.Name}";
 
-        private static void ReplaceOutcomeTokens(StringBuilder buffer, TestResult testResult)
-        {
-            var outcome = !string.IsNullOrWhiteSpace(testResult.ErrorMessage)
-                ? testResult.ErrorMessage
-                : testResult.Outcome.ToString();
-
-            buffer.Replace(OutcomeToken, outcome);
-        }
-
-        private static void ReplaceTraitsTokens(StringBuilder buffer, TestResult testResult)
-        {
-            var traits = testResult.Traits.Concat(testResult.TestCase.Traits).Distinct();
-
-            foreach (var trait in traits)
-            {
-                var traitToken = $"{TraitsToken}.{trait.Name}";
-
-                buffer.Replace(traitToken, trait.Value);
-            }
-        }
-
-        public string Apply(TestResult testResult)
-        {
-            var buffer = new StringBuilder(Template);
-
-            ReplaceNameTokens(buffer, testResult);
-            ReplaceOutcomeTokens(buffer, testResult);
-            ReplaceTraitsTokens(buffer, testResult);
-
-            return buffer.ToString();
+            buffer.Replace(traitToken, trait.Value);
         }
     }
 
-    public partial class TestResultMessageFormat
+    public string Apply(TestResult testResult)
     {
-        public static TestResultMessageFormat Default { get; } = new($"{NameToken}: {OutcomeToken}");
+        var buffer = new StringBuilder(Template);
+
+        ReplaceNameTokens(buffer, testResult);
+        ReplaceOutcomeTokens(buffer, testResult);
+        ReplaceTraitsTokens(buffer, testResult);
+
+        return buffer.ToString();
     }
+}
+
+public partial class TestResultMessageFormat
+{
+    public static TestResultMessageFormat Default { get; } = new($"{NameToken}: {OutcomeToken}");
 }

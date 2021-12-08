@@ -3,81 +3,80 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
 
-namespace GitHubActionsTestLogger.Tests
+namespace GitHubActionsTestLogger.Tests;
+
+public class ResultFormattingSpecs
 {
-    public class ResultFormattingSpecs
+    [Fact]
+    public void Custom_format_can_be_used_when_writing_test_results()
     {
-        [Fact]
-        public void Custom_format_can_be_used_when_writing_test_results()
+        // Arrange
+        using var writer = new StringWriter();
+
+        var context = new TestLoggerContext(
+            writer,
+            new TestLoggerOptions(
+                new TestResultMessageFormat("<$test> -> $outcome"),
+                TestLoggerOptions.Default.ReportWarnings
+            )
+        );
+
+        var testResult = new TestResult(new TestCase
         {
-            // Arrange
-            using var writer = new StringWriter();
-
-            var context = new TestLoggerContext(
-                writer,
-                new TestLoggerOptions(
-                    new TestResultMessageFormat("<$test> -> $outcome"),
-                    TestLoggerOptions.Default.ReportWarnings
-                )
-            );
-
-            var testResult = new TestResult(new TestCase
-            {
-                DisplayName = "Test1"
-            })
-            {
-                Outcome = TestOutcome.Failed,
-                ErrorMessage = "ErrorMessage"
-            };
-
-            // Act
-            context.ProcessTestResult(testResult);
-
-            var output = writer.ToString().Trim();
-
-            // Assert
-            output.Should().Contain(
-                "<Test1> -> ErrorMessage"
-            );
-        }
-
-        [Fact]
-        public void Custom_format_can_reference_test_traits()
+            DisplayName = "Test1"
+        })
         {
-            // Arrange
-            using var writer = new StringWriter();
+            Outcome = TestOutcome.Failed,
+            ErrorMessage = "ErrorMessage"
+        };
 
-            var context = new TestLoggerContext(
-                writer,
-                new TestLoggerOptions(
-                    new TestResultMessageFormat("[$traits.Category] <$test> -> $outcome"),
-                    TestLoggerOptions.Default.ReportWarnings
-                )
-            );
+        // Act
+        context.ProcessTestResult(testResult);
 
-            var testResult = new TestResult(new TestCase
+        var output = writer.ToString().Trim();
+
+        // Assert
+        output.Should().Contain(
+            "<Test1> -> ErrorMessage"
+        );
+    }
+
+    [Fact]
+    public void Custom_format_can_reference_test_traits()
+    {
+        // Arrange
+        using var writer = new StringWriter();
+
+        var context = new TestLoggerContext(
+            writer,
+            new TestLoggerOptions(
+                new TestResultMessageFormat("[$traits.Category] <$test> -> $outcome"),
+                TestLoggerOptions.Default.ReportWarnings
+            )
+        );
+
+        var testResult = new TestResult(new TestCase
+        {
+            DisplayName = "Test1",
+            Traits =
             {
-                DisplayName = "Test1",
-                Traits =
-                {
-                    {"Category", "UI Test"},
-                    {"Document", "SS01"}
-                }
-            })
-            {
-                Outcome = TestOutcome.Failed,
-                ErrorMessage = "ErrorMessage"
-            };
+                {"Category", "UI Test"},
+                {"Document", "SS01"}
+            }
+        })
+        {
+            Outcome = TestOutcome.Failed,
+            ErrorMessage = "ErrorMessage"
+        };
 
-            // Act
-            context.ProcessTestResult(testResult);
+        // Act
+        context.ProcessTestResult(testResult);
 
-            var output = writer.ToString().Trim();
+        var output = writer.ToString().Trim();
 
-            // Assert
-            output.Should().Contain(
-                "[UI Test] <Test1> -> ErrorMessage"
-            );
-        }
+        // Assert
+        output.Should().Contain(
+            "[UI Test] <Test1> -> ErrorMessage"
+        );
     }
 }
