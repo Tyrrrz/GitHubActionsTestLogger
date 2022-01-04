@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <IsPackable>false</IsPackable>
 
     <!-- Set this to 'true' in order to run tests -->
     <IsTestProject>false</IsTestProject>
