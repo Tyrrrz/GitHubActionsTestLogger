@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GitHubActionsTestLogger;
-// More info: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
 
-internal static class GitHubActions
+// More info: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+internal static class GitHubWorkflow
 {
-    public static bool IsRunningInsideWorkflow() => string.Equals(
+    public static bool IsRunningOnAgent => string.Equals(
         Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
         "true",
         StringComparison.OrdinalIgnoreCase
@@ -15,22 +14,24 @@ internal static class GitHubActions
 
     private static string FormatWorkflowCommand(
         string label,
-        string content,
+        string message,
         string options)
     {
-        // Commands can't have line breaks so trim the content to one line to avoid polluting the console
-        var trimmedContent = content
-            .Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault()?
-            .Trim();
+        // Escape linebreaks in message to allow multiline output
+        // https://github.community/t/set-output-truncates-multiline-strings/16852/3
+        var messageEscaped = message
+            .Replace("%", "%25")
+            .Replace("\n", "%0A")
+            .Replace("\r", "%0D");
 
-        return $"::{label} {options}::{trimmedContent}";
+        return $"::{label} {options}::{messageEscaped}";
     }
 
     private static string FormatOptions(
         string? filePath = null,
         int? line = null,
-        int? column = null)
+        int? column = null,
+        string? title = null)
     {
         var options = new List<string>(3);
 
@@ -43,20 +44,25 @@ internal static class GitHubActions
         if (column is not null)
             options.Add($"col={column}");
 
+        if (!string.IsNullOrWhiteSpace(title))
+            options.Add($"title={title}");
+
         return string.Join(",", options);
     }
 
     public static string FormatError(
+        string title,
         string message,
         string? filePath = null,
         int? line = null,
         int? column = null) =>
-        FormatWorkflowCommand("error", message, FormatOptions(filePath, line, column));
+        FormatWorkflowCommand("error", message, FormatOptions(filePath, line, column, title));
 
     public static string FormatWarning(
+        string title,
         string message,
         string? filePath = null,
         int? line = null,
         int? column = null) =>
-        FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column));
+        FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column, title));
 }

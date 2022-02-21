@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace GitHubActionsTestLogger;
+
 // The main idea behind this logger is that it writes messages to console in a special format
 // that GitHub Actions runner recognizes as workflow commands.
 // We try to get the source information (file, line number) of the failed tests and
@@ -19,7 +20,7 @@ public class TestLogger : ITestLoggerWithParameters
 
     private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
     {
-        if (!GitHubActions.IsRunningInsideWorkflow())
+        if (!GitHubWorkflow.IsRunningOnAgent)
             Console.WriteLine("WARN: Not running inside GitHub Actions, but using GitHub Actions Test Logger.");
 
         Context = new TestLoggerContext(Console.Out, options);

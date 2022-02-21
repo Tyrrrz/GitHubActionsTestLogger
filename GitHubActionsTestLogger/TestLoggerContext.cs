@@ -112,15 +112,16 @@ public class TestLoggerContext
         var filePath = TryGetSourceFilePath(testResult, stackFrame);
         var line = TryGetSourceLine(testResult, stackFrame);
 
+        var title = testResult.TestCase.DisplayName;
         var message = Options.MessageFormat.Apply(testResult);
 
         if (testResult.Outcome == TestOutcome.Failed)
         {
-            Output.WriteLine(GitHubActions.FormatError(message, filePath, line));
+            Output.WriteLine(GitHubWorkflow.FormatError(title, message, filePath, line));
         }
         else if (Options.ReportWarnings)
         {
-            Output.WriteLine(GitHubActions.FormatWarning(message, filePath, line));
+            Output.WriteLine(GitHubWorkflow.FormatWarning(title, message, filePath, line));
         }
     }
 }

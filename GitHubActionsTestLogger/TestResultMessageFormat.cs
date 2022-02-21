@@ -54,5 +54,5 @@ public partial class TestResultMessageFormat
 
 public partial class TestResultMessageFormat
 {
-    public static TestResultMessageFormat Default { get; } = new($"{NameToken}: {OutcomeToken}");
+    public static TestResultMessageFormat Default { get; } = new($"{OutcomeToken}");
 }
