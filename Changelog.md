@@ -1,3 +1,9 @@
+### v1.3 (21-Feb-2022)
+
+- Improved formatting of GitHub workflow commands. Newlines are now properly escaped, allowing multiline error messages to be shown inside annotations.
+- Changed default annotation message format from `$name: $outcome` to just `$outcome`. Test name, which was previously included, is now displayed as annotation title instead.
+- Marked package as development dependency.
+
 ### v1.2 (22-Feb-2021)
 
 - Added a `format` option that allows customizing message format, with which the test results are reported. Refer to the readme for more information on how to use it.
