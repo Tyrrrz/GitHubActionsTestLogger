@@ -12,20 +12,22 @@ internal static class GitHubWorkflow
         StringComparison.OrdinalIgnoreCase
     );
 
+    private static string Escape(string value) =>
+        // URL-encode certain characters to escape them from being processed as command tokens
+        // https://pakstech.com/blog/github-actions-workflow-commands
+        value
+            .Replace("%", "%25")
+            .Replace("\n", "%0A")
+            .Replace("\r", "%0D")
+            .Replace(":", "%3A")
+            .Replace("=", "%3D")
+            .Replace(",", "%2C");
+
     private static string FormatWorkflowCommand(
         string label,
         string message,
-        string options)
-    {
-        // Escape linebreaks in message to allow multiline output
-        // https://github.community/t/set-output-truncates-multiline-strings/16852/3
-        var messageEscaped = message
-            .Replace("%", "%25")
-            .Replace("\n", "%0A")
-            .Replace("\r", "%0D");
-
-        return $"::{label} {options}::{messageEscaped}";
-    }
+        string options) =>
+        $"::{label} {options}::{Escape(message)}";
 
     private static string FormatOptions(
         string? filePath = null,
@@ -36,16 +38,16 @@ internal static class GitHubWorkflow
         var options = new List<string>(3);
 
         if (!string.IsNullOrWhiteSpace(filePath))
-            options.Add($"file={filePath}");
+            options.Add($"file={Escape(filePath)}");
 
         if (line is not null)
-            options.Add($"line={line}");
+            options.Add($"line={Escape(line.ToString())}");
 
         if (column is not null)
-            options.Add($"col={column}");
+            options.Add($"col={Escape(column.ToString())}");
 
         if (!string.IsNullOrWhiteSpace(title))
-            options.Add($"title={title}");
+            options.Add($"title={Escape(title)}");
 
         return string.Join(",", options);
     }

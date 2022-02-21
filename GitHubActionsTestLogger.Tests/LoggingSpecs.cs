@@ -12,7 +12,6 @@ public class LoggingSpecs
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
@@ -37,7 +36,6 @@ public class LoggingSpecs
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
@@ -68,7 +66,6 @@ public class LoggingSpecs
 
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
 
         var stackTrace = @"
@@ -114,7 +111,6 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
 
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
 
         var stackTrace = @"
@@ -161,7 +157,6 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
@@ -191,7 +186,6 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
@@ -218,7 +212,6 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(
             writer,
             new TestLoggerOptions(

@@ -12,7 +12,6 @@ public class ResultFormattingSpecs
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(
             writer,
             new TestLoggerOptions(
@@ -46,7 +45,6 @@ public class ResultFormattingSpecs
     {
         // Arrange
         using var writer = new StringWriter();
-
         var context = new TestLoggerContext(
             writer,
             new TestLoggerOptions(
