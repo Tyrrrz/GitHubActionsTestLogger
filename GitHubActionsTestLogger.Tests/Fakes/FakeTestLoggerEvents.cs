@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger.Tests.Fakes;
 
+#pragma warning disable CS0067
+
 public class FakeTestLoggerEvents : TestLoggerEvents
 {
     public override event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
