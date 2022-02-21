@@ -12,16 +12,12 @@ internal static class GitHubWorkflow
         StringComparison.OrdinalIgnoreCase
     );
 
-    private static string Escape(string value) =>
+    private static string Escape(string value) => value
         // URL-encode certain characters to escape them from being processed as command tokens
         // https://pakstech.com/blog/github-actions-workflow-commands
-        value
-            .Replace("%", "%25")
-            .Replace("\n", "%0A")
-            .Replace("\r", "%0D")
-            .Replace(":", "%3A")
-            .Replace("=", "%3D")
-            .Replace(",", "%2C");
+        .Replace("%", "%25")
+        .Replace("\n", "%0A")
+        .Replace("\r", "%0D");
 
     private static string FormatWorkflowCommand(
         string label,
