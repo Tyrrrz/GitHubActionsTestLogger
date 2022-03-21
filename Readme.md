@@ -1,12 +1,13 @@
 # GitHub Actions Test Logger
 
-[![Build](https://github.com/Tyrrrz/GitHubActionsTestLogger/workflows/main/badge.svg?branch=master)](https://github.com/Tyrrrz/GitHubActionsTestLogger/actions)
-[![Coverage](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger/branch/master/graph/badge.svg)](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger)
+[![Made in Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://vshymanskyy.github.io/StandWithUkraine)
+[![Build](https://img.shields.io/github/workflow/status/Tyrrrz/GitHubActionsTestLogger/CI/master)](https://github.com/Tyrrrz/GitHubActionsTestLogger/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/GitHubActionsTestLogger/master)](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger)
 [![Version](https://img.shields.io/nuget/v/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Downloads](https://img.shields.io/nuget/dt/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Discord](https://img.shields.io/discord/869237470565392384?label=discord)](https://discord.gg/2SUWKFnHSm)
-[![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
-[![Fuck Russia](https://img.shields.io/badge/fuck-russia-black.svg)](https://twitter.com/Tyrrrz/status/1495972128977571848)
+[![Donate](https://img.shields.io/badge/donate-$$$-8a2be2.svg)](https://tyrrrz.me/donate)
+[![Fuck Russia](https://img.shields.io/badge/fuck-russia-e4181c.svg?labelColor=000000)](https://twitter.com/tyrrrz/status/1495972128977571848)
 
 ✅ **Project status: active**<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
@@ -24,9 +25,9 @@ By using this project or its source code, for any purpose and in any shape or fo
 
 To learn more about the war and how you can help, [click here](https://tyrrrz.me). Glory to Ukraine! 🇺🇦
 
-## Download
+## Install
 
-📦 [NuGet](https://nuget.org/packages/GitHubActionsTestLogger): `dotnet add package GitHubActionsTestLogger`
+- 📦 [NuGet](https://nuget.org/packages/GitHubActionsTestLogger): `dotnet add package GitHubActionsTestLogger`
 
 ## Screenshots
 
@@ -83,9 +84,9 @@ Specifies the format used when logging test results to the console.
 
 The following replacement tokens are available:
 
-- `$test` -- replaced with the display name of the test
-- `$outcome` -- replaced with the error message (in case of an exception) or the outcome of the test
-- `$traits.TRAIT_NAME` -- replaced with the value of a trait named `TRAIT_NAME`
+- `$test` — replaced with the display name of the test
+- `$outcome` — replaced with the error message (in case of an exception) or the outcome of the test
+- `$traits.TRAIT_NAME` — replaced with the value of a trait named `TRAIT_NAME`
 
 Default: `$test: $outcome`.
 
