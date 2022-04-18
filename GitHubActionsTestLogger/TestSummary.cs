@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using GitHubActionsTestLogger.Utils.Extensions;
@@ -10,86 +11,119 @@ namespace GitHubActionsTestLogger;
 
 internal static class TestSummary
 {
-    public static string Generate(IReadOnlyList<TestResult> testResults)
+    public static string Generate(
+        IReadOnlyList<string> testSources,
+        IReadOnlyList<TestResult> testResults)
     {
+        var title = string.Join(", ", testSources.Select(s => Path.GetFileNameWithoutExtension(s)));
+
+        var overallOutcome = !testResults.Any(x => x.Outcome == TestOutcome.Failed)
+            ? TestOutcome.Passed
+            : TestOutcome.Failed;
+
+        var passedCount = testResults.Count(r => r.Outcome == TestOutcome.Passed);
+        var skippedCount = testResults.Count(r => r.Outcome == TestOutcome.Skipped);
+        var failedCount = testResults.Count(r => r.Outcome == TestOutcome.Failed);
+        var totalCount = testResults.Count;
+        var totalDuration = testResults.Sum(r => r.Duration.TotalSeconds).Pipe(TimeSpan.FromSeconds);
+
         var buffer = new StringBuilder();
 
         buffer
-            .AppendLine("# Test report")
+            .Append("## 🧪 ")
+            .AppendLine(title)
             .AppendLine();
 
-        // Summary
-        {
-            var passedCount = testResults.Count(r => r.Outcome == TestOutcome.Passed);
-            var failedCount = testResults.Count(r => r.Outcome == TestOutcome.Failed);
-            var skippedCount = testResults.Count(r => r.Outcome == TestOutcome.Skipped);
-            var totalCount = testResults.Count;
-            var totalDuration = testResults.Sum(r => r.Duration.TotalSeconds).Pipe(TimeSpan.FromSeconds);
+        buffer
+            .AppendLine("<table>")
+            .AppendLine("<tr>")
+            .AppendLine("<th width=\"99999\" align=\"center\">🟢 Passed</th>")
+            .AppendLine("<th width=\"99999\" align=\"center\">🟡 Skipped</th>")
+            .AppendLine("<th width=\"99999\" align=\"center\">🔴 Failed</th>")
+            .AppendLine("<th width=\"99999\" align=\"center\">🔵 Total</th>")
+            .AppendLine("<th width=\"99999\" align=\"center\">🕑 Elapsed</th>")
+            .AppendLine("</tr>");
 
+        buffer
+            .AppendLine("<tr>")
+            .Append("<td align=\"center\">")
+            .Append(
+                passedCount > 0
+                    ? passedCount.ToString("N0", CultureInfo.InvariantCulture)
+                    : "—"
+            )
+            .AppendLine("</td>")
+            .Append("<td align=\"center\">")
+            .Append(
+                skippedCount > 0
+                    ? skippedCount.ToString("N0", CultureInfo.InvariantCulture)
+                    : "—"
+            )
+            .AppendLine("</td>")
+            .Append("<td align=\"center\">")
+            .Append(
+                failedCount > 0
+                    ? failedCount.ToString("N0", CultureInfo.InvariantCulture)
+                    : "—"
+            )
+            .AppendLine("</td>")
+            .Append("<td align=\"center\">")
+            .Append(totalCount.ToString("N0", CultureInfo.InvariantCulture))
+            .AppendLine("</td>")
+            .Append("<td align=\"center\">")
+            .Append(totalDuration.ToHumanReadableString())
+            .AppendLine("</td>")
+            .AppendLine("</table>")
+            .AppendLine("<hr />");
+
+        foreach (var testResult in testResults)
+        {
             buffer
-                .AppendLine("## Summary")
+                .AppendLine("<details>")
+                .AppendLine("<summary>")
+                .Append(testResult.Outcome switch
+                {
+                    TestOutcome.Passed => "🟢",
+                    TestOutcome.Failed => "🔴",
+                    _ => "🟡"
+                })
+                .Append(' ')
+                .Append(testResult.TestCase.DisplayName)
+                .AppendLine("</summary>")
                 .AppendLine()
-                .Append("- 🟢 Passed: ")
-                .Append("**").Append(passedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
-                .Append("- 🟡 Skipped: ")
-                .Append("**").Append(skippedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
-                .Append("- 🔴 Failed: ")
-                .Append("**").Append(failedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
-                .Append("- 🔵 Total: ")
-                .Append("**").Append(totalCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
-                .Append("- 🕑 Elapsed: ")
-                .Append("**").Append(totalDuration.TotalSeconds.ToString("N3", CultureInfo.InvariantCulture)).AppendLine("s**")
                 .AppendLine();
-        }
 
-        // Results
-        {
             buffer
-                .AppendLine("## Results")
-                .AppendLine();
+                .Append("- **Full name**: ")
+                .Append('`').Append(testResult.TestCase.FullyQualifiedName).AppendLine("`")
+                .Append("- **Outcome**: ")
+                .AppendLine(testResult.Outcome.ToString())
+                .Append("- **Elapsed**: ")
+                .AppendLine(testResult.Duration.ToHumanReadableString());
 
-            foreach (var testResult in testResults)
+            if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
             {
                 buffer
-                    .Append("- ")
-                    .Append(testResult.Outcome switch
-                    {
-                        TestOutcome.Passed => "🟢",
-                        TestOutcome.Failed => "🔴",
-                        _ => "🟡",
-                    })
-                    .Append(" **")
-                    .Append(testResult.TestCase.DisplayName)
-                    .AppendLine("**")
-                    .AppendLine();
-
-                buffer
-                    .Append("  - **Full name**: ")
-                    .Append('`').Append(testResult.TestCase.FullyQualifiedName).AppendLine("`")
-                    .Append("  - **Outcome**: ")
-                    .AppendLine(testResult.Outcome.ToString())
-                    .Append("  - **Elapsed**: ")
-                    .Append(testResult.Duration.TotalSeconds.ToString("N3", CultureInfo.InvariantCulture)).AppendLine("s");
-
-                if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
-                {
-                    buffer
-                        .AppendLine("  - **Error**:")
-                        .AppendLine()
-                        .AppendLine("```")
-                        .AppendLine(testResult.ErrorMessage)
-                        .AppendLine(testResult.ErrorStackTrace)
-                        .AppendLine("```");
-                }
-
-                buffer.AppendLine();
+                    .AppendLine("- **Error**:")
+                    .AppendLine()
+                    .AppendLine("```")
+                    .AppendLine(testResult.ErrorMessage)
+                    .AppendLine(testResult.ErrorStackTrace)
+                    .AppendLine("```");
             }
+
+            buffer
+                .AppendLine()
+                .AppendLine("</details>");
         }
 
         buffer
-            .AppendLine()
-            .AppendLine("> [Summary generated by .NET GitHub Actions Test Logger](https://github.com/Tyrrrz/GitHubActionsTestLogger)")
-            .AppendLine();
+            .AppendLine("<hr />")
+            .AppendLine("<small>")
+            .Append("<a href=\"https://github.com/Tyrrrz/GitHubActionsTestLogger\">")
+            .Append("Summary generated by .NET GitHub Actions Test Logger")
+            .Append("</a>")
+            .AppendLine("</small>");
 
         return buffer.ToString();
     }

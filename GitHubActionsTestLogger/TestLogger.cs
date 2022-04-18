@@ -23,8 +23,10 @@ public class TestLogger : ITestLoggerWithParameters
             Console.WriteLine("WARN: Not running inside GitHub Actions, but using GitHub Actions Test Logger.");
 
         Context = new TestLoggerContext(Console.Out, options);
+
+        events.TestRunStart += (_, args) => Context.HandleTestRunStart(args.TestRunCriteria);
         events.TestResult += (_, args) => Context.HandleTestResult(args.Result);
-        events.TestRunComplete += (_, _) => Context.HandleTestRunCompletion();
+        events.TestRunComplete += (_, _) => Context.HandleTestRunComplete();
     }
 
     public void Initialize(TestLoggerEvents events, string testRunDirectory) =>

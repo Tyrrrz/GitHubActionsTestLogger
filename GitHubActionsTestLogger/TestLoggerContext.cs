@@ -2,6 +2,7 @@
 using System.IO;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace GitHubActionsTestLogger;
 
@@ -9,7 +10,8 @@ public class TestLoggerContext
 {
     private readonly object _lock = new();
     private readonly GitHubWorkflow _github;
-    private readonly List<TestResult> _handledTestResults = new();
+    private readonly List<string> _testSources = new();
+    private readonly List<TestResult> _testResults = new();
 
     public TextWriter Output { get; }
 
@@ -23,11 +25,19 @@ public class TestLoggerContext
         _github = new GitHubWorkflow(output);
     }
 
+    public void HandleTestRunStart(TestRunCriteria testRun)
+    {
+        lock (_lock)
+        {
+            _testSources.AddRange(testRun.Sources);
+        }
+    }
+
     public void HandleTestResult(TestResult testResult)
     {
         lock (_lock)
         {
-            _handledTestResults.Add(testResult);
+            _testResults.Add(testResult);
 
             // Only report tests that have not passed
             if (testResult.Outcome > TestOutcome.Passed)
@@ -49,12 +59,12 @@ public class TestLoggerContext
         }
     }
 
-    public void HandleTestRunCompletion()
+    public void HandleTestRunComplete()
     {
         lock (_lock)
         {
             _github.ReportSummary(
-                TestSummary.Generate(_handledTestResults)
+                TestSummary.Generate(_testSources, _testResults)
             );
         }
     }

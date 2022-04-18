@@ -20,17 +20,4 @@ public class FakeTestLoggerEvents : TestLoggerEvents
 
     public void TriggerTestResult(TestResult result) =>
         TestResult?.Invoke(this, new TestResultEventArgs(result));
-
-    public void TriggerTestRunComplete() =>
-        TestRunComplete?.Invoke(
-            this,
-            new TestRunCompleteEventArgs(
-                new TestRunStatistics(),
-                false,
-                false,
-                null,
-                null,
-                TimeSpan.Zero
-            )
-        );
 }
