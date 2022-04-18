@@ -207,6 +207,8 @@ public class TestLoggerContext
             }
         }
 
+        buffer.AppendLine();
+
         _github.ReportSummary(buffer.ToString());
     }
 }

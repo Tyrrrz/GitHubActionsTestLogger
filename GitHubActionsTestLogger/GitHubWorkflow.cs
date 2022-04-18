@@ -63,16 +63,16 @@ internal partial class GitHubWorkflow
         int? column = null) =>
         _output.WriteLine(FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column, title)));
 
-    public void ReportSummary(string content) =>
+    public void ReportSummary(string content)
+    {
+        var environmentFilePath = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
+        if (string.IsNullOrWhiteSpace(environmentFilePath))
+            return;
+
         // There can be multiple test runs in a single step, so make sure to preserve
         // previous summaries as well.
-        Environment.SetEnvironmentVariable(
-            "GITHUB_STEP_SUMMARY",
-            Environment.GetEnvironmentVariable("GITHUB_ACTIONS_SUMMARY") +
-            Environment.NewLine +
-            content,
-            EnvironmentVariableTarget.Machine
-        );
+        File.AppendAllText(environmentFilePath, content);
+    }
 }
 
 internal partial class GitHubWorkflow
