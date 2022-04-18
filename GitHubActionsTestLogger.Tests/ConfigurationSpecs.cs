@@ -20,7 +20,7 @@ public class ConfigurationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context!.Options.Should().Be(TestLoggerOptions.Default);
+        logger.Context?.Options.Should().Be(TestLoggerOptions.Default);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ConfigurationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context!.Options.MessageFormat.Template.Should().Be("$test -> $outcome");
-        logger.Context!.Options.ReportWarnings.Should().BeFalse();
+        logger.Context?.Options.MessageFormat.Template.Should().Be("$test -> $outcome");
+        logger.Context?.Options.ReportWarnings.Should().BeFalse();
     }
 }

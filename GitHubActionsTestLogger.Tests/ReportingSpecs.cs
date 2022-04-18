@@ -5,10 +5,10 @@ using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class LoggingSpecs
+public class ReportingSpecs
 {
     [Fact]
-    public void Passed_tests_do_not_get_logged()
+    public void Passed_tests_do_not_get_reported()
     {
         // Arrange
         using var writer = new StringWriter();
@@ -25,14 +25,14 @@ public class LoggingSpecs
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().BeEmpty();
     }
 
     [Fact]
-    public void Failed_tests_get_logged()
+    public void Failed_tests_get_reported()
     {
         // Arrange
         using var writer = new StringWriter();
@@ -50,16 +50,16 @@ public class LoggingSpecs
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().StartWith("::error ");
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
     }
 
     [Fact]
-    public void Failed_tests_get_logged_with_source_information_if_exception_was_thrown()
+    public void Failed_tests_get_reported_with_source_information_if_exception_was_thrown()
     {
         // .NET test platform never sends source information, so we can only
         // rely on exception stack traces to get it.
@@ -93,9 +93,9 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().StartWith("::error ");
         output.Should().Contain("file=/dir/CliWrap.Tests/CancellationSpecs.cs");
         output.Should().Contain("line=75");
@@ -104,7 +104,7 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
     }
 
     [Fact]
-    public void Failed_tests_get_logged_with_source_information_if_exception_was_thrown_in_an_async_method()
+    public void Failed_tests_get_reported_with_source_information_if_exception_was_thrown_in_an_async_method()
     {
         // .NET test platform never sends source information, so we can only
         // rely on exception stack traces to get it.
@@ -142,9 +142,9 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().StartWith("::error ");
         output.Should().Contain("file=/dir/Sentry.Tests/Internals/Http/HttpTransportTests.cs");
         output.Should().Contain("line=187");
@@ -153,7 +153,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     }
 
     [Fact]
-    public void Failed_tests_get_logged_with_approximate_source_information_if_exception_was_not_thrown()
+    public void Failed_tests_get_reported_with_approximate_source_information_if_exception_was_not_thrown()
     {
         // Arrange
         using var writer = new StringWriter();
@@ -162,7 +162,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         var testResult = new TestResult(new TestCase
         {
             DisplayName = "Test1",
-            Source = typeof(LoggingSpecs).Assembly.Location
+            Source = typeof(ReportingSpecs).Assembly.Location
         })
         {
             Outcome = TestOutcome.Failed,
@@ -172,9 +172,9 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().StartWith("::error ");
         output.Should().MatchRegex(@"file=.*?\.csproj");
         output.Should().Contain("Test1");
@@ -182,7 +182,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     }
 
     [Fact]
-    public void Skipped_tests_get_logged()
+    public void Skipped_tests_get_reported()
     {
         // Arrange
         using var writer = new StringWriter();
@@ -199,16 +199,16 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().StartWith("::warning ");
         output.Should().Contain("Test1");
         output.Should().Contain("Skipped");
     }
 
     [Fact]
-    public void Skipped_tests_do_not_get_logged_if_configured()
+    public void Skipped_tests_do_not_get_reported_if_configured()
     {
         // Arrange
         using var writer = new StringWriter();
@@ -231,9 +231,9 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().BeEmpty();
     }
 }

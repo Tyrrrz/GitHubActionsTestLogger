@@ -5,10 +5,10 @@ using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class ResultFormattingSpecs
+public class FormattingSpecs
 {
     [Fact]
-    public void Custom_format_can_be_used_when_writing_test_results()
+    public void Custom_format_can_be_used_for_writing_test_results()
     {
         // Arrange
         using var writer = new StringWriter();
@@ -32,9 +32,9 @@ public class ResultFormattingSpecs
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().Contain(
             "<Test1> -> ErrorMessage"
         );
@@ -70,9 +70,9 @@ public class ResultFormattingSpecs
         // Act
         context.HandleTestResult(testResult);
 
+        // Assert
         var output = writer.ToString().Trim();
 
-        // Assert
         output.Should().Contain(
             "[UI Test] <Test1> -> ErrorMessage"
         );

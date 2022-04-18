@@ -5,26 +5,20 @@ using System.IO;
 namespace GitHubActionsTestLogger;
 
 // Commands: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
-internal partial class GitHubWorkflow
+internal class GitHubWorkflow
 {
     private readonly TextWriter _output;
 
     public GitHubWorkflow(TextWriter output) => _output = output;
 
-    private static string Escape(string value) => value
+    private string Escape(string value) => value
         // URL-encode certain characters to escape them from being processed as command tokens
         // https://pakstech.com/blog/github-actions-workflow-commands
         .Replace("%", "%25")
         .Replace("\n", "%0A")
         .Replace("\r", "%0D");
 
-    private static string FormatWorkflowCommand(
-        string label,
-        string message,
-        string options) =>
-        $"::{label} {options}::{Escape(message)}";
-
-    private static string FormatOptions(
+    private string FormatOptions(
         string? filePath = null,
         int? line = null,
         int? column = null,
@@ -46,6 +40,12 @@ internal partial class GitHubWorkflow
 
         return string.Join(",", options);
     }
+
+    private string FormatWorkflowCommand(
+        string label,
+        string message,
+        string options) =>
+        $"::{label} {options}::{Escape(message)}";
 
     public void ReportError(
         string title,
@@ -73,13 +73,4 @@ internal partial class GitHubWorkflow
         // previous summaries as well.
         File.AppendAllText(environmentFilePath, content);
     }
-}
-
-internal partial class GitHubWorkflow
-{
-    public static bool IsRunningOnAgent => string.Equals(
-        Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
-        "true",
-        StringComparison.OrdinalIgnoreCase
-    );
 }

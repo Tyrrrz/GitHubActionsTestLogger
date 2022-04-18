@@ -30,12 +30,12 @@ public partial class TestLoggerOptions
 
     public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string> parameters) => new(
         messageFormat:
-        parameters.GetValueOrDefault("format")?.Pipe(s => new TestResultMessageFormat(s)) ??
-        Default.MessageFormat,
+            parameters.GetValueOrDefault("format")?.Pipe(s => new TestResultMessageFormat(s)) ??
+            Default.MessageFormat,
 
         reportWarnings:
-        parameters.GetValueOrDefault("report-warnings")?.TryParseBool() ??
-        Default.ReportWarnings
+            parameters.GetValueOrDefault("report-warnings")?.TryParseBool() ??
+            Default.ReportWarnings
     );
 }
 // ReSharper restore ArgumentsStyleOther
