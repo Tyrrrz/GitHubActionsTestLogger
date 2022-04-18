@@ -23,7 +23,7 @@ public class LoggingSpecs
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -48,7 +48,7 @@ public class LoggingSpecs
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -91,7 +91,7 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -140,7 +140,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -170,7 +170,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -197,7 +197,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -229,7 +229,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 

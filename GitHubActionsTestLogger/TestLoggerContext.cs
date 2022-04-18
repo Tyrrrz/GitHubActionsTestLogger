@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using GitHubActionsTestLogger.Utils;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -9,6 +12,9 @@ namespace GitHubActionsTestLogger;
 
 public class TestLoggerContext
 {
+    private readonly GitHubWorkflow _github;
+    private readonly List<TestResult> _handledTestResults = new();
+
     public TextWriter Output { get; }
 
     public TestLoggerOptions Options { get; }
@@ -17,6 +23,8 @@ public class TestLoggerContext
     {
         Output = output;
         Options = options;
+
+        _github = new GitHubWorkflow(output);
     }
 
     // We use this method as a last resort if we can't get source information from anywhere else.
@@ -103,8 +111,11 @@ public class TestLoggerContext
         return stackFrame?.Line;
     }
 
-    public void ProcessTestResult(TestResult testResult)
+    public void HandleTestResult(TestResult testResult)
     {
+        _handledTestResults.Add(testResult);
+
+        // Only produce errors and warnings for tests that have not passed
         if (testResult.Outcome <= TestOutcome.Passed)
             return;
 
@@ -117,11 +128,85 @@ public class TestLoggerContext
 
         if (testResult.Outcome == TestOutcome.Failed)
         {
-            Output.WriteLine(GitHubWorkflow.FormatError(title, message, filePath, line));
+            _github.ReportError(title, message, filePath, line);
         }
         else if (Options.ReportWarnings)
         {
-            Output.WriteLine(GitHubWorkflow.FormatWarning(title, message, filePath, line));
+            _github.ReportWarning(title, message, filePath, line);
         }
+    }
+
+    public void HandleTestRun()
+    {
+        var buffer = new StringBuilder();
+
+        buffer.AppendLine("# Test report").AppendLine();
+
+        // Summary
+        {
+            var passedCount = _handledTestResults.Count(r => r.Outcome == TestOutcome.Passed);
+            var failedCount = _handledTestResults.Count(r => r.Outcome == TestOutcome.Failed);
+            var skippedCount = _handledTestResults.Count(r => r.Outcome == TestOutcome.Skipped);
+            var totalCount = _handledTestResults.Count;
+            var totalDuration = _handledTestResults.Sum(r => r.Duration.TotalSeconds).Pipe(TimeSpan.FromSeconds);
+
+            buffer
+                .AppendLine("## Summary").AppendLine()
+                .Append("- 🟢 Passed: ")
+                .Append("**").Append(passedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
+                .Append("- 🟡 Skipped: ")
+                .Append("**").Append(skippedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
+                .Append("- 🔴 Failed: ")
+                .Append("**").Append(failedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
+                .Append("- 🔵 Total: ")
+                .Append("**").Append(totalCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
+                .Append("- 🕑 Elapsed: ")
+                .Append("**").Append(totalDuration.TotalSeconds.ToString("N3", CultureInfo.InvariantCulture)).AppendLine("s**")
+                .AppendLine();
+        }
+
+        // Results
+        {
+            buffer.AppendLine("## Results").AppendLine();
+
+            foreach (var testResult in _handledTestResults)
+            {
+                buffer
+                    .Append("- ##### ")
+                    .Append(testResult.Outcome switch
+                    {
+                        TestOutcome.Passed => "🟢",
+                        TestOutcome.Failed => "🔴",
+                        _ => "🟡",
+                    })
+                    .Append(' ')
+                    .Append(testResult.TestCase.DisplayName)
+                    .AppendLine()
+                    .AppendLine();
+
+                buffer
+                    .Append("  - **Full name**: ")
+                    .AppendLine(testResult.TestCase.FullyQualifiedName)
+                    .Append("  - **Outcome**: ")
+                    .AppendLine(testResult.Outcome.ToString())
+                    .Append("  - **Duration**: ")
+                    .Append(testResult.Duration.TotalSeconds.ToString("N3", CultureInfo.InvariantCulture)).AppendLine("s");
+
+                if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
+                {
+                    buffer
+                        .AppendLine("  - **Error**:")
+                        .AppendLine()
+                        .AppendLine("```")
+                        .AppendLine(testResult.ErrorMessage)
+                        .AppendLine(testResult.ErrorStackTrace)
+                        .AppendLine("```");
+                }
+
+                buffer.AppendLine();
+            }
+        }
+
+        _github.ReportSummary(buffer.ToString());
     }
 }

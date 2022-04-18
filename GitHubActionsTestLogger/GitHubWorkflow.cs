@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GitHubActionsTestLogger;
 
-// More info: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
-internal static class GitHubWorkflow
+// Commands: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+internal partial class GitHubWorkflow
 {
-    public static bool IsRunningOnAgent => string.Equals(
-        Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
-        "true",
-        StringComparison.OrdinalIgnoreCase
-    );
+    private readonly TextWriter _output;
+
+    public GitHubWorkflow(TextWriter output) => _output = output;
 
     private static string Escape(string value) => value
         // URL-encode certain characters to escape them from being processed as command tokens
@@ -48,19 +47,39 @@ internal static class GitHubWorkflow
         return string.Join(",", options);
     }
 
-    public static string FormatError(
+    public void ReportError(
         string title,
         string message,
         string? filePath = null,
         int? line = null,
         int? column = null) =>
-        FormatWorkflowCommand("error", message, FormatOptions(filePath, line, column, title));
+        _output.WriteLine(FormatWorkflowCommand("error", message, FormatOptions(filePath, line, column, title)));
 
-    public static string FormatWarning(
+    public void ReportWarning(
         string title,
         string message,
         string? filePath = null,
         int? line = null,
         int? column = null) =>
-        FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column, title));
+        _output.WriteLine(FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column, title)));
+
+    public void ReportSummary(string content) =>
+        // There can be multiple test runs in a single step, so make sure to preserve
+        // previous summaries as well.
+        Environment.SetEnvironmentVariable(
+            "GITHUB_STEP_SUMMARY",
+            Environment.GetEnvironmentVariable("GITHUB_ACTIONS_SUMMARY") +
+            Environment.NewLine +
+            content,
+            EnvironmentVariableTarget.Machine
+        );
+}
+
+internal partial class GitHubWorkflow
+{
+    public static bool IsRunningOnAgent => string.Equals(
+        Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
+        "true",
+        StringComparison.OrdinalIgnoreCase
+    );
 }

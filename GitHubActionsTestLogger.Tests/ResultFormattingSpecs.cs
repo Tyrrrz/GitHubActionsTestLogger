@@ -30,7 +30,7 @@ public class ResultFormattingSpecs
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
@@ -68,7 +68,7 @@ public class ResultFormattingSpecs
         };
 
         // Act
-        context.ProcessTestResult(testResult);
+        context.HandleTestResult(testResult);
 
         var output = writer.ToString().Trim();
 
