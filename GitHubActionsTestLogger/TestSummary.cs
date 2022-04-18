@@ -51,16 +51,16 @@ internal static class TestSummary
             foreach (var testResult in testResults)
             {
                 buffer
-                    .Append("- ### ")
+                    .Append("- ")
                     .Append(testResult.Outcome switch
                     {
                         TestOutcome.Passed => "🟢",
                         TestOutcome.Failed => "🔴",
                         _ => "🟡",
                     })
-                    .Append(' ')
+                    .Append(" **")
                     .Append(testResult.TestCase.DisplayName)
-                    .AppendLine()
+                    .AppendLine("**")
                     .AppendLine();
 
                 buffer
@@ -68,7 +68,7 @@ internal static class TestSummary
                     .Append('`').Append(testResult.TestCase.FullyQualifiedName).AppendLine("`")
                     .Append("  - **Outcome**: ")
                     .AppendLine(testResult.Outcome.ToString())
-                    .Append("  - **Duration**: ")
+                    .Append("  - **Elapsed**: ")
                     .Append(testResult.Duration.TotalSeconds.ToString("N3", CultureInfo.InvariantCulture)).AppendLine("s");
 
                 if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
