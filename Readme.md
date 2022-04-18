@@ -12,7 +12,10 @@
 > 🟢 **Project status**: active<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
 Custom logger for `dotnet test` that reports test results in a structured format that GitHub Actions understands.
-When using this logger, failed tests are listed in workflow annotations and highlighted in code diffs.
+When using this logger, failed tests are listed in job annotations, job summary, and highlighted in code diffs.
+
+> ⚠ Job summary is a new GitHub feature which is still in early preview.
+> If your account or organization doesn't have access to this feature, job summaries will not be available.
 
 ## Terms of use
 
@@ -32,6 +35,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 ## Screenshots
 
 ![diff](./.screenshots/diff.png)
+![summary](./.screenshots/summary.png)
 
 ## Usage
 
@@ -65,7 +69,7 @@ jobs:
 ```
 
 > ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **16.8.0** or higher.
-Older versions of this package may not work properly with custom test loggers.
+> Older versions of this package may not work properly with custom test loggers.
 
 > ⚠️ If you are using **.NET SDK v2.2 or lower**, you need to enable [`<CopyLocalLockFileAssemblies>`](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667) property in your test project.
 
