@@ -1,3 +1,7 @@
+### v1.4 (18-Apr-2022)
+
+- Added rudimentary support for GitHub Job Summaries (also known as Action Summaries or Step Summaries). Note that this feature is still in private preview and may not be available for your repository. See readme for more information.
+
 ### v1.3 (21-Feb-2022)
 
 - Improved formatting of GitHub workflow commands. Newlines are now properly escaped, allowing multiline error messages to be shown inside annotations.
