@@ -151,7 +151,8 @@ public class TestLoggerContext
             var totalDuration = _handledTestResults.Sum(r => r.Duration.TotalSeconds).Pipe(TimeSpan.FromSeconds);
 
             buffer
-                .AppendLine("## Summary").AppendLine()
+                .AppendLine("## Summary")
+                .AppendLine()
                 .Append("- 🟢 Passed: ")
                 .Append("**").Append(passedCount.ToString("N0", CultureInfo.InvariantCulture)).AppendLine("**")
                 .Append("- 🟡 Skipped: ")
@@ -172,7 +173,7 @@ public class TestLoggerContext
             foreach (var testResult in _handledTestResults)
             {
                 buffer
-                    .Append("- ##### ")
+                    .Append("- ### ")
                     .Append(testResult.Outcome switch
                     {
                         TestOutcome.Passed => "🟢",
@@ -186,7 +187,7 @@ public class TestLoggerContext
 
                 buffer
                     .Append("  - **Full name**: ")
-                    .AppendLine(testResult.TestCase.FullyQualifiedName)
+                    .Append('`').Append(testResult.TestCase.FullyQualifiedName).AppendLine("`")
                     .Append("  - **Outcome**: ")
                     .AppendLine(testResult.Outcome.ToString())
                     .Append("  - **Duration**: ")
