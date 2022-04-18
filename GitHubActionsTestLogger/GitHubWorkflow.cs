@@ -4,7 +4,8 @@ using System.IO;
 
 namespace GitHubActionsTestLogger;
 
-// Commands: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+// Commands: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
+// Summary: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-markdown-summary
 internal class GitHubWorkflow
 {
     private readonly TextWriter _output;
