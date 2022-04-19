@@ -25,7 +25,8 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
 
             var testResult = new TestResult(new TestCase
             {
-                DisplayName = "Test1"
+                DisplayName = "Test1",
+                FullyQualifiedName = "TestProject.SomeTests.Test1"
             })
             {
                 Outcome = TestOutcome.Failed,
@@ -56,7 +57,8 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
             {
                 new TestResult(new TestCase
                 {
-                    DisplayName = "Test1"
+                    DisplayName = "Test1",
+                    FullyQualifiedName = "TestProject.SomeTests.Test1"
                 })
                 {
                     Outcome = TestOutcome.Failed,
@@ -64,14 +66,16 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
                 },
                 new TestResult(new TestCase
                 {
-                    DisplayName = "Test2"
+                    DisplayName = "Test2",
+                    FullyQualifiedName = "TestProject.SomeTests.Test2"
                 })
                 {
                     Outcome = TestOutcome.Passed
                 },
                 new TestResult(new TestCase
                 {
-                    DisplayName = "Test3"
+                    DisplayName = "Test3",
+                    FullyQualifiedName = "TestProject.SomeTests.Test3"
                 })
                 {
                     Outcome = TestOutcome.Skipped
