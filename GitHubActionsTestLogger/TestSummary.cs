@@ -81,7 +81,8 @@ internal static class TestSummary
                 .FullyQualifiedName
                 .SubstringUntilLast(".")
                 .SubstringAfterLast(".")
-            );
+            )
+            .OrderBy(g => g.Key);
 
         foreach (var testResultGroup in testResultGroups)
         {
