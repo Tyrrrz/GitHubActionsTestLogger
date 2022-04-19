@@ -22,7 +22,7 @@ public class TestLoggerContext
         Output = output;
         Options = options;
 
-        _github = new GitHubWorkflow(output);
+        _github = new GitHubWorkflow(output, Options.SummaryFilePath);
     }
 
     public void HandleTestRunStart(TestRunCriteria testRun)

@@ -82,7 +82,8 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         var testResult = new TestResult(new TestCase
         {
             DisplayName = "I can execute a command with buffering and cancel it immediately",
-            FullyQualifiedName = "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
+            FullyQualifiedName =
+                "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
         })
         {
             Outcome = TestOutcome.Failed,
@@ -131,7 +132,8 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         var testResult = new TestResult(new TestCase
         {
             DisplayName = "SendEnvelopeAsync_ItemRateLimit_DropsItem",
-            FullyQualifiedName = "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
+            FullyQualifiedName =
+                "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
         })
         {
             Outcome = TestOutcome.Failed,
@@ -216,7 +218,8 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
             writer,
             new TestLoggerOptions(
                 TestLoggerOptions.Default.MessageFormat,
-                false
+                false,
+                TestLoggerOptions.Default.SummaryFilePath
             )
         );
 

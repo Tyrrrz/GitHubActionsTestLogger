@@ -15,30 +15,17 @@ internal static class TestSummary
         IReadOnlyList<string> testSources,
         IReadOnlyList<TestResult> testResults)
     {
-        var title = testSources.Any()
-            ? string.Join(", ", testSources.Select(s => Path.GetFileNameWithoutExtension(s)))
-            : "Test report";
+        var buffer = new StringBuilder();
 
-        var overallOutcome = !testResults.Any(x => x.Outcome == TestOutcome.Failed)
-            ? TestOutcome.Passed
-            : TestOutcome.Failed;
+        var title = testSources.Any()
+            ? string.Join(", ", testSources.Select(Path.GetFileNameWithoutExtension))
+            : "Test report";
 
         var passedCount = testResults.Count(r => r.Outcome == TestOutcome.Passed);
         var skippedCount = testResults.Count(r => r.Outcome == TestOutcome.Skipped);
         var failedCount = testResults.Count(r => r.Outcome == TestOutcome.Failed);
         var totalCount = testResults.Count;
         var totalDuration = testResults.Sum(r => r.Duration.TotalSeconds).Pipe(TimeSpan.FromSeconds);
-
-        var commonNamePrefix = testResults.Select(r => r.TestCase.FullyQualifiedName ?? "").GetLongestCommonPrefix();
-        var testResultGroups = testResults
-            .GroupBy(r => r
-                .TestCase
-                .FullyQualifiedName?
-                .Substring(commonNamePrefix.Length)
-                .SubstringUntilLast(".")
-            );
-
-        var buffer = new StringBuilder();
 
         buffer
             .Append("## 🧪 ")
@@ -87,6 +74,14 @@ internal static class TestSummary
             .AppendLine("</table>")
             .AppendLine("<hr />");
 
+        var testResultGroups = testResults
+            .GroupBy(r => r
+                .TestCase
+                .FullyQualifiedName
+                .SubstringUntilLast(".")
+                .SubstringAfterLast(".")
+            );
+
         foreach (var testResultGroup in testResultGroups)
         {
             buffer
@@ -95,7 +90,8 @@ internal static class TestSummary
                 .AppendLine();
 
             var groupTestResults = testResultGroup
-                .OrderByDescending(r => r.Outcome)
+                .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
+                .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
                 .ThenBy(r => r.TestCase.DisplayName)
                 .ToArray();
 

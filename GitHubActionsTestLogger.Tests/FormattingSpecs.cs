@@ -16,7 +16,8 @@ public class FormattingSpecs
             writer,
             new TestLoggerOptions(
                 new TestResultMessageFormat("<$test> -> $outcome"),
-                TestLoggerOptions.Default.ReportWarnings
+                TestLoggerOptions.Default.ReportWarnings,
+                TestLoggerOptions.Default.SummaryFilePath
             )
         );
 
@@ -49,7 +50,8 @@ public class FormattingSpecs
             writer,
             new TestLoggerOptions(
                 new TestResultMessageFormat("[$traits.Category] <$test> -> $outcome"),
-                TestLoggerOptions.Default.ReportWarnings
+                TestLoggerOptions.Default.ReportWarnings,
+                TestLoggerOptions.Default.SummaryFilePath
             )
         );
 

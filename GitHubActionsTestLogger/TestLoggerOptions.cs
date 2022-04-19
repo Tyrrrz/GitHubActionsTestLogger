@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger;
@@ -9,12 +10,16 @@ public partial class TestLoggerOptions
 
     public bool ReportWarnings { get; }
 
+    public string? SummaryFilePath { get; }
+
     public TestLoggerOptions(
         TestResultMessageFormat messageFormat,
-        bool reportWarnings)
+        bool reportWarnings,
+        string? summaryFilePath)
     {
         MessageFormat = messageFormat;
         ReportWarnings = reportWarnings;
+        SummaryFilePath = summaryFilePath;
     }
 }
 
@@ -25,7 +30,8 @@ public partial class TestLoggerOptions
 {
     public static TestLoggerOptions Default { get; } = new(
         messageFormat: TestResultMessageFormat.Default,
-        reportWarnings: true
+        reportWarnings: true,
+        summaryFilePath: Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY")
     );
 
     public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string> parameters) => new(
@@ -35,7 +41,11 @@ public partial class TestLoggerOptions
 
         reportWarnings:
             parameters.GetValueOrDefault("report-warnings")?.TryParseBool() ??
-            Default.ReportWarnings
+            Default.ReportWarnings,
+
+        summaryFilePath:
+            parameters.GetValueOrDefault("summary-file.path") ??
+            Default.SummaryFilePath
     );
 }
 // ReSharper restore ArgumentsStyleOther

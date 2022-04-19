@@ -9,8 +9,13 @@ namespace GitHubActionsTestLogger;
 internal class GitHubWorkflow
 {
     private readonly TextWriter _output;
+    private readonly string? _summaryFilePath;
 
-    public GitHubWorkflow(TextWriter output) => _output = output;
+    public GitHubWorkflow(TextWriter output, string? summaryFilePath)
+    {
+        _output = output;
+        _summaryFilePath = summaryFilePath;
+    }
 
     private string Escape(string value) => value
         // URL-encode certain characters to escape them from being processed as command tokens
@@ -66,12 +71,11 @@ internal class GitHubWorkflow
 
     public void ReportSummary(string content)
     {
-        var environmentFilePath = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
-        if (string.IsNullOrWhiteSpace(environmentFilePath))
+        if (string.IsNullOrWhiteSpace(_summaryFilePath))
             return;
 
         // There can be multiple test runs in a single step, so make sure to preserve
         // previous summaries as well.
-        File.AppendAllText(environmentFilePath, content);
+        File.AppendAllText(_summaryFilePath, content);
     }
 }
