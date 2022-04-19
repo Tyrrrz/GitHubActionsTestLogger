@@ -1,3 +1,7 @@
+### v1.4.1 (19-Apr-2022)
+
+- Improved test summary formatting and layout.
+
 ### v1.4 (18-Apr-2022)
 
 - Added rudimentary support for GitHub Job Summaries (also known as Action Summaries or Step Summaries). Note that this feature is still in private preview and may not be available for your repository. See readme for more information.
