@@ -72,7 +72,8 @@ internal static class TestSummary
             .Append(totalDuration.ToHumanReadableString())
             .AppendLine("</td>")
             .AppendLine("</table>")
-            .AppendLine("<hr />");
+            .AppendLine("<hr />")
+            .AppendLine();
 
         var testResultGroups = testResults
             .GroupBy(r => r
@@ -133,7 +134,8 @@ internal static class TestSummary
 
                 buffer
                     .AppendLine()
-                    .AppendLine("</details>");
+                    .AppendLine("</details>")
+                    .AppendLine();
             }
         }
 
