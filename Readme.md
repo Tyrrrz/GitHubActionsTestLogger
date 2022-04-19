@@ -85,7 +85,7 @@ dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 
 #### `format`
 
-Specifies the format used when logging test results to the console.
+Specifies the message format used when reporting test results in job annotations and code diffs.
 
 The following replacement tokens are available:
 
@@ -97,8 +97,8 @@ Default: `$test: $outcome`.
 
 Examples:
 
-- `$test: $outcome` -> `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
-- `[$traits.Category] $test: $outcome` -> `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
+- `$test: $outcome` → `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
+- `[$traits.Category] $test: $outcome` → `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
 
 #### `report-warnings`
 
