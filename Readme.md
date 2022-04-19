@@ -12,9 +12,10 @@
 > 🟢 **Project status**: active<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
 Custom logger for `dotnet test` that reports test results in a structured format that GitHub Actions understands.
-When using this logger, failed tests are listed in job annotations, job summary, and highlighted in code diffs.
+When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
+Additionally, this also generates a job summary that contains detailed information about the executed test run.
 
-> ⚠ Job summary is a new GitHub feature which is still in early preview.
+> ⚠ Job summary is a new GitHub feature which is still in preview.
 > If your account or organization doesn't have access to this feature, job summaries will not be available.
 
 ## Terms of use
