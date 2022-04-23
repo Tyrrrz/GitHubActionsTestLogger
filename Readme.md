@@ -45,7 +45,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 To use **GitHub Actions Test Logger**, follow these steps:
 
 1. Install **GitHubActionsTestLogger** package in your test project
-2. Install **Microsoft.NET.Test.Sdk** package in your test project (or update to latest)
+2. Update **Microsoft.NET.Test.Sdk** package in your test project to the latest version
 3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
@@ -58,12 +58,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.3
+        uses: actions/checkout@v3
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v1.7.2
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: 6.0.x
 
       - name: Build & test
         run: dotnet test --configuration Release --logger GitHubActions
@@ -93,9 +93,9 @@ The following replacement tokens are available:
 - `$outcome` — replaced with the error message (in case of an exception) or the outcome of the test
 - `$traits.TRAIT_NAME` — replaced with the value of a trait named `TRAIT_NAME`
 
-Default: `$test: $outcome`.
+**Default**: `$test: $outcome`.
 
-Examples:
+**Examples**:
 
 - `$test: $outcome` → `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
 - `[$traits.Category] $test: $outcome` → `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
@@ -107,4 +107,4 @@ If disabled, only failed tests will be reported.
 
 Can be set to either `true` or `false`.
 
-Default: `true`.
+**Default**: `true`.
