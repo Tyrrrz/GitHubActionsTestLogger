@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace GitHubActionsTestLogger;
@@ -17,41 +16,48 @@ internal class GitHubWorkflow
         _summaryFilePath = summaryFilePath;
     }
 
-    private string Escape(string value) => value
-        // URL-encode certain characters to escape them from being processed as command tokens
-        // https://pakstech.com/blog/github-actions-workflow-commands
-        .Replace("%", "%25")
-        .Replace("\n", "%0A")
-        .Replace("\r", "%0D");
-
-    private string FormatOptions(
+    private void WriteCommand(
+        string name,
+        string title,
+        string message,
         string? filePath = null,
         int? line = null,
-        int? column = null,
-        string? title = null)
+        int? column = null)
     {
-        var options = new List<string>(3);
+        static string Escape(string value) => value
+            // URL-encode certain characters to escape them from being processed as command tokens
+            // https://pakstech.com/blog/github-actions-workflow-commands
+            .Replace("%", "%25")
+            .Replace("\n", "%0A")
+            .Replace("\r", "%0D");
 
-        if (!string.IsNullOrWhiteSpace(filePath))
-            options.Add($"file={Escape(filePath)}");
+        string FormatOptions()
+        {
+            var options = new List<string>(3);
 
-        if (line is not null)
-            options.Add($"line={Escape(line.ToString())}");
+            if (!string.IsNullOrWhiteSpace(filePath))
+                options.Add($"file={Escape(filePath)}");
 
-        if (column is not null)
-            options.Add($"col={Escape(column.ToString())}");
+            if (line is not null)
+                options.Add($"line={Escape(line.ToString())}");
 
-        if (!string.IsNullOrWhiteSpace(title))
-            options.Add($"title={Escape(title)}");
+            if (column is not null)
+                options.Add($"col={Escape(column.ToString())}");
 
-        return string.Join(",", options);
+            if (!string.IsNullOrWhiteSpace(title))
+                options.Add($"title={Escape(title)}");
+
+            return string.Join(",", options);
+        }
+
+        // Command should start at the beginning of the line, so add a newline to make
+        // sure there is no leading text.
+        _output.WriteLine();
+
+        _output.WriteLine(
+            $"::{name} {FormatOptions()}::{Escape(message)}"
+        );
     }
-
-    private string FormatWorkflowCommand(
-        string label,
-        string message,
-        string options) =>
-        $"::{label} {options}::{Escape(message)}";
 
     public void ReportError(
         string title,
@@ -59,7 +65,7 @@ internal class GitHubWorkflow
         string? filePath = null,
         int? line = null,
         int? column = null) =>
-        _output.WriteLine(FormatWorkflowCommand("error", message, FormatOptions(filePath, line, column, title)));
+        WriteCommand("error", title, message, filePath, line, column);
 
     public void ReportWarning(
         string title,
@@ -67,7 +73,7 @@ internal class GitHubWorkflow
         string? filePath = null,
         int? line = null,
         int? column = null) =>
-        _output.WriteLine(FormatWorkflowCommand("warning", message, FormatOptions(filePath, line, column, title)));
+        WriteCommand("warning", title, message, filePath, line, column);
 
     public void ReportSummary(string content)
     {
