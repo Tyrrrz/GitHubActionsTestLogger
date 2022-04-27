@@ -3,6 +3,7 @@ using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Fixtures;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
@@ -18,14 +19,7 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
     {
         // Arrange
         var summaryFilePath = _tempOutput.GetTempFilePath();
-        var context = new TestLoggerContext(
-            TextWriter.Null,
-            new TestLoggerOptions(
-                TestLoggerOptions.Default.MessageFormat,
-                TestLoggerOptions.Default.ReportWarnings,
-                summaryFilePath
-            )
-        );
+        using var context = new TestLoggerContext(TextWriter.Null, summaryFilePath, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
         {
@@ -38,9 +32,11 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
         };
 
         // Act
-        context.HandleTestRunStart(new TestRunCriteria(new[] {"TestProject.dll"}, 100));
-        context.HandleTestResult(testResult);
-        context.HandleTestRunComplete();
+        context.HandleTestRunStart(
+            new TestRunStartEventArgs(new TestRunCriteria(new[] {"TestProject.dll"}, 100))
+        );
+
+        context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = File.ReadAllText(summaryFilePath);
@@ -52,14 +48,7 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
     {
         // Arrange
         var summaryFilePath = _tempOutput.GetTempFilePath();
-        var context = new TestLoggerContext(
-            TextWriter.Null,
-            new TestLoggerOptions(
-                TestLoggerOptions.Default.MessageFormat,
-                TestLoggerOptions.Default.ReportWarnings,
-                summaryFilePath
-            )
-        );
+        using var context = new TestLoggerContext(TextWriter.Null, summaryFilePath, TestLoggerOptions.Default);
 
         var testResults = new[]
         {
@@ -78,7 +67,7 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
                 FullyQualifiedName = "TestProject.SomeTests.Test2"
             })
             {
-                Outcome = TestOutcome.Passed
+                Outcome = TestOutcome.Failed
             },
             new TestResult(new TestCase
             {
@@ -86,17 +75,17 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
                 FullyQualifiedName = "TestProject.SomeTests.Test3"
             })
             {
-                Outcome = TestOutcome.Skipped
+                Outcome = TestOutcome.Failed
             }
         };
 
         // Act
-        context.HandleTestRunStart(new TestRunCriteria(new[] {"TestProject.dll"}, 100));
+        context.HandleTestRunStart(
+            new TestRunStartEventArgs(new TestRunCriteria(new[] {"TestProject.dll"}, 100))
+        );
 
         foreach (var testResult in testResults)
-            context.HandleTestResult(testResult);
-
-        context.HandleTestRunComplete();
+            context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = File.ReadAllText(summaryFilePath);

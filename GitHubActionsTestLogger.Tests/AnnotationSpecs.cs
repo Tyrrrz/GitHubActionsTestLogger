@@ -1,18 +1,19 @@
 using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class ReportingSpecs
+public class AnnotationSpecs
 {
     [Fact]
     public void Passed_tests_do_not_get_reported()
     {
         // Arrange
         using var writer = new StringWriter();
-        var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
         {
@@ -23,11 +24,33 @@ public class ReportingSpecs
         };
 
         // Act
-        context.HandleTestResult(testResult);
+        context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = writer.ToString().Trim();
+        output.Should().BeEmpty();
+    }
 
+    [Fact]
+    public void Skipped_tests_do_not_get_reported()
+    {
+        // Arrange
+        using var writer = new StringWriter();
+        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+
+        var testResult = new TestResult(new TestCase
+        {
+            DisplayName = "Test1"
+        })
+        {
+            Outcome = TestOutcome.Skipped
+        };
+
+        // Act
+        context.HandleTestResult(new TestResultEventArgs(testResult));
+
+        // Assert
+        var output = writer.ToString().Trim();
         output.Should().BeEmpty();
     }
 
@@ -36,7 +59,7 @@ public class ReportingSpecs
     {
         // Arrange
         using var writer = new StringWriter();
-        var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
         {
@@ -48,7 +71,7 @@ public class ReportingSpecs
         };
 
         // Act
-        context.HandleTestResult(testResult);
+        context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = writer.ToString().Trim();
@@ -66,7 +89,7 @@ public class ReportingSpecs
 
         // Arrange
         using var writer = new StringWriter();
-        var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
 
         var stackTrace = @"
 at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
@@ -92,7 +115,7 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         };
 
         // Act
-        context.HandleTestResult(testResult);
+        context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = writer.ToString().Trim();
@@ -112,7 +135,7 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
 
         // Arrange
         using var writer = new StringWriter();
-        var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
 
         var stackTrace = @"
 at System.Net.Http.HttpContent.CheckDisposed()
@@ -142,7 +165,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.HandleTestResult(testResult);
+        context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = writer.ToString().Trim();
@@ -159,12 +182,12 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     {
         // Arrange
         using var writer = new StringWriter();
-        var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
+        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
 
         var testResult = new TestResult(new TestCase
         {
             DisplayName = "Test1",
-            Source = typeof(ReportingSpecs).Assembly.Location
+            Source = typeof(AnnotationSpecs).Assembly.Location
         })
         {
             Outcome = TestOutcome.Failed,
@@ -172,7 +195,7 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.HandleTestResult(testResult);
+        context.HandleTestResult(new TestResultEventArgs(testResult));
 
         // Assert
         var output = writer.ToString().Trim();
@@ -181,62 +204,5 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         output.Should().MatchRegex(@"file=.*?\.csproj");
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
-    }
-
-    [Fact]
-    public void Skipped_tests_get_reported()
-    {
-        // Arrange
-        using var writer = new StringWriter();
-        var context = new TestLoggerContext(writer, TestLoggerOptions.Default);
-
-        var testResult = new TestResult(new TestCase
-        {
-            DisplayName = "Test1"
-        })
-        {
-            Outcome = TestOutcome.Skipped
-        };
-
-        // Act
-        context.HandleTestResult(testResult);
-
-        // Assert
-        var output = writer.ToString().Trim();
-
-        output.Should().StartWith("::warning ");
-        output.Should().Contain("Test1");
-        output.Should().Contain("Skipped");
-    }
-
-    [Fact]
-    public void Skipped_tests_do_not_get_reported_if_configured()
-    {
-        // Arrange
-        using var writer = new StringWriter();
-        var context = new TestLoggerContext(
-            writer,
-            new TestLoggerOptions(
-                TestLoggerOptions.Default.MessageFormat,
-                false,
-                TestLoggerOptions.Default.SummaryFilePath
-            )
-        );
-
-        var testResult = new TestResult(new TestCase
-        {
-            DisplayName = "Test1"
-        })
-        {
-            Outcome = TestOutcome.Skipped
-        };
-
-        // Act
-        context.HandleTestResult(testResult);
-
-        // Assert
-        var output = writer.ToString().Trim();
-
-        output.Should().BeEmpty();
     }
 }

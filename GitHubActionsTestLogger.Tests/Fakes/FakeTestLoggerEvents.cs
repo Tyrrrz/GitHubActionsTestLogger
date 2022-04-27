@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -17,7 +16,4 @@ public class FakeTestLoggerEvents : TestLoggerEvents
     public override event EventHandler<TestRunMessageEventArgs>? DiscoveryMessage;
     public override event EventHandler<DiscoveredTestsEventArgs>? DiscoveredTests;
     public override event EventHandler<DiscoveryCompleteEventArgs>? DiscoveryComplete;
-
-    public void TriggerTestResult(TestResult result) =>
-        TestResult?.Invoke(this, new TestResultEventArgs(result));
 }

@@ -1,12 +1,19 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace GitHubActionsTestLogger.Utils.Extensions;
 
 internal static class TestPlatformExtensions
 {
+    public static string? TryGetTargetFramework(this TestRunCriteria testRunCriteria) => (string?) XElement
+        .Parse(testRunCriteria.TestRunSettings)
+        .Element("RunConfiguration")?
+        .Element("TargetFrameworkVersion");
+
     // This method attempts to get the stack frame that represents the call to the test method.
     // Obviously, this only works if the test threw an exception.
     private static StackFrame? TryGetTestStackFrame(this TestResult testResult)

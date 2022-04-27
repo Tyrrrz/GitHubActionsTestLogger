@@ -1,53 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using GitHubActionsTestLogger.Utils.Extensions;
+﻿using System.Collections.Generic;
 
 namespace GitHubActionsTestLogger;
 
 public partial class TestLoggerOptions
 {
-    public TestResultMessageFormat MessageFormat { get; }
+    public string AnnotationTitleFormat { get; init; } = $"{TestResultFormat.NameToken}";
 
-    public bool ReportWarnings { get; }
-
-    public string? SummaryFilePath { get; }
-
-    public TestLoggerOptions(
-        TestResultMessageFormat messageFormat,
-        bool reportWarnings,
-        string? summaryFilePath)
-    {
-        MessageFormat = messageFormat;
-        ReportWarnings = reportWarnings;
-        SummaryFilePath = summaryFilePath;
-    }
+    public string AnnotationMessageFormat { get; init; } = $"{TestResultFormat.ErrorMessageToken}";
 }
 
-// ReSharper disable ArgumentsStyleOther
-// ReSharper disable ArgumentsStyleLiteral
-// ReSharper disable ArgumentsStyleNamedExpression
 public partial class TestLoggerOptions
 {
-    public static TestLoggerOptions Default { get; } = new(
-        messageFormat: TestResultMessageFormat.Default,
-        reportWarnings: true,
-        summaryFilePath: Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY")
-    );
+    public static TestLoggerOptions Default { get; } = new();
 
-    public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string> parameters) => new(
-        messageFormat:
-            parameters.GetValueOrDefault("format")?.Pipe(s => new TestResultMessageFormat(s)) ??
-            Default.MessageFormat,
+    public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string> parameters) => new()
+    {
+        AnnotationTitleFormat =
+            parameters.GetValueOrDefault("annotations.titleFormat") ??
+            Default.AnnotationTitleFormat,
 
-        reportWarnings:
-            parameters.GetValueOrDefault("report-warnings")?.TryParseBool() ??
-            Default.ReportWarnings,
-
-        summaryFilePath:
-            parameters.GetValueOrDefault("summary-file.path") ??
-            Default.SummaryFilePath
-    );
+        AnnotationMessageFormat =
+            parameters.GetValueOrDefault("annotations.messageFormat") ??
+            Default.AnnotationMessageFormat
+    };
 }
-// ReSharper restore ArgumentsStyleOther
-// ReSharper restore ArgumentsStyleLiteral
-// ReSharper restore ArgumentsStyleNamedExpression

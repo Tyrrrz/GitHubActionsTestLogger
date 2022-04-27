@@ -1,71 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger;
 
-public class TestLoggerContext
+public class TestLoggerContext : IDisposable
 {
-    private readonly object _lock = new();
-    private readonly GitHubWorkflow _github;
-    private readonly List<string> _testSources = new();
-    private readonly List<TestResult> _testResults = new();
+    private readonly GitHubWorkflow _workflow;
+    private readonly TestSummaryWriter? _summaryWriter;
 
-    public TextWriter Output { get; }
+    private TestRunCriteria? _testRunCriteria;
+    private readonly List<TestResult> _testResults = new();
 
     public TestLoggerOptions Options { get; }
 
-    public TestLoggerContext(TextWriter output, TestLoggerOptions options)
+    public TestLoggerContext(TextWriter output, string? summaryFilePath, TestLoggerOptions options)
     {
-        Output = output;
+        _workflow = new GitHubWorkflow(output);
+
+        if (!string.IsNullOrWhiteSpace(summaryFilePath))
+            _summaryWriter = new TestSummaryWriter(summaryFilePath);
+
         Options = options;
-
-        _github = new GitHubWorkflow(output, Options.SummaryFilePath);
     }
 
-    public void HandleTestRunStart(TestRunCriteria testRun)
+    public void HandleTestRunStart(TestRunStartEventArgs args)
     {
-        lock (_lock)
-        {
-            _testSources.AddRange(testRun.Sources);
-        }
+        _testRunCriteria = args.TestRunCriteria;
     }
 
-    public void HandleTestResult(TestResult testResult)
+    public void HandleTestResult(TestResultEventArgs args)
     {
-        lock (_lock)
+        var testResult = args.Result;
+
+        _testResults.Add(testResult);
+
+        if (testResult.Outcome == TestOutcome.Failed)
         {
-            _testResults.Add(testResult);
-
-            // Only report tests that have not passed
-            if (testResult.Outcome > TestOutcome.Passed)
-            {
-                var title = testResult.TestCase.DisplayName;
-                var message = Options.MessageFormat.Apply(testResult);
-                var filePath = testResult.TryGetSourceFilePath();
-                var line = testResult.TryGetSourceLine();
-
-                if (testResult.Outcome == TestOutcome.Failed)
-                {
-                    _github.ReportError(title, message, filePath, line);
-                }
-                else if (Options.ReportWarnings)
-                {
-                    _github.ReportWarning(title, message, filePath, line);
-                }
-            }
-        }
-    }
-
-    public void HandleTestRunComplete()
-    {
-        lock (_lock)
-        {
-            _github.ReportSummary(
-                TestSummary.Generate(_testSources, _testResults)
+            _workflow.ReportError(
+                TestResultFormat.Apply(Options.AnnotationTitleFormat, testResult),
+                TestResultFormat.Apply(Options.AnnotationMessageFormat, testResult),
+                testResult.TryGetSourceFilePath(),
+                testResult.TryGetSourceLine()
             );
         }
+
+        // We're updating summary on every test result because there is no reliable
+        // way to know when the test run has completed.
+        if (_testRunCriteria is not null)
+            _summaryWriter?.Update(_testRunCriteria, _testResults);
+    }
+
+    public void Dispose()
+    {
+        _summaryWriter?.Dispose();
     }
 }
