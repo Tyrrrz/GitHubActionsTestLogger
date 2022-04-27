@@ -19,29 +19,20 @@ public partial class TestResultMessageFormat
         var buffer = new StringBuilder(Template);
 
         // Name token
-        {
-            buffer.Replace(NameToken, testResult.TestCase.DisplayName);
-        }
+        buffer.Replace(NameToken, testResult.TestCase.DisplayName);
 
         // Outcome token
-        {
-            var outcome = !string.IsNullOrWhiteSpace(testResult.ErrorMessage)
-                ? testResult.ErrorMessage
-                : testResult.Outcome.ToString();
-
-            buffer.Replace(OutcomeToken, outcome);
-        }
+        buffer.Replace(OutcomeToken, !string.IsNullOrWhiteSpace(testResult.ErrorMessage)
+            ? testResult.ErrorMessage
+            : testResult.Outcome.ToString()
+        );
 
         // Traits tokens
+        foreach (var trait in testResult.Traits.Concat(testResult.TestCase.Traits).Distinct())
         {
-            var traits = testResult.Traits.Concat(testResult.TestCase.Traits).Distinct();
+            var traitToken = $"{TraitsToken}.{trait.Name}";
 
-            foreach (var trait in traits)
-            {
-                var traitToken = $"{TraitsToken}.{trait.Name}";
-
-                buffer.Replace(traitToken, trait.Value);
-            }
+            buffer.Replace(traitToken, trait.Value);
         }
 
         return buffer.ToString();
