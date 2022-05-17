@@ -25,9 +25,9 @@ internal static class TestSummary
             .Append("<summary>")
             .Append(testRunStatistics.GetFailedCount() <= 0 ? "✔" : "❌")
             .Append(" ")
-            .Append("<b>")
+            .Append("<h3>")
             .AppendJoin(", ", testRunCriteria.Sources.Select(Path.GetFileNameWithoutExtension))
-            .Append("</b>")
+            .Append("</h3>")
             .Append(" (")
             .Append(testRunCriteria.TryGetTargetFramework())
             .Append(")")
@@ -104,7 +104,6 @@ internal static class TestSummary
         }
 
         buffer
-            .Append("</br>")
             .Append("</details>")
             .AppendLine()
             .AppendLine();
