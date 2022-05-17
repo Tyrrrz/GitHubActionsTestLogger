@@ -10,23 +10,10 @@ public partial class GitHubWorkflow
     private readonly TextWriter _commandWriter;
     private readonly TextWriter _summaryWriter;
 
-    public bool IsRunningOnAgent =>
-        _commandWriter == Console.Out &&
-        string.Equals(
-            Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
-            "true",
-            StringComparison.OrdinalIgnoreCase
-        );
-
     public GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
     {
         _commandWriter = commandWriter;
         _summaryWriter = summaryWriter;
-    }
-
-    public GitHubWorkflow()
-        : this(Console.Out, GetSummaryWriter())
-    {
     }
 
     private void WriteCommand(
@@ -94,11 +81,12 @@ public partial class GitHubWorkflow
 
 public partial class GitHubWorkflow
 {
-    private static TextWriter GetSummaryWriter()
-    {
-        var filePath = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
-        return !string.IsNullOrWhiteSpace(filePath)
-            ? File.AppendText(filePath)
-            : TextWriter.Null;
-    }
+    public static bool IsRunningOnAgent => string.Equals(
+        Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
+        "true",
+        StringComparison.OrdinalIgnoreCase
+    );
+
+    public static string? SummaryFilePath =>
+        Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 }
