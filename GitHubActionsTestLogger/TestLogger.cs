@@ -6,43 +6,37 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 namespace GitHubActionsTestLogger;
 
 [FriendlyName("GitHubActions")]
-[ExtensionUri("logger://tyrrrz/ghactions/v1")]
-public class TestLogger : ITestLoggerWithParameters, IDisposable
+[ExtensionUri("logger://tyrrrz/ghactions/v2")]
+public class TestLogger : ITestLoggerWithParameters
 {
     public TestLoggerContext? Context { get; private set; }
 
     private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
     {
-        if (!GitHubEnvironment.IsActions)
+        var github = new GitHubWorkflow();
+
+        if (!github.IsRunningOnAgent)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Warning: Using GitHub Actions Test Logger, but not running on GitHub Actions.");
+            Console.WriteLine("Warning: using GitHub Actions Test Logger, but not running on GitHub Actions.");
             Console.ResetColor();
         }
 
-        Context?.Dispose();
-        Context = new TestLoggerContext(
-            Console.Out,
-            GitHubEnvironment.ActionSummaryFilePath,
-            options
+        var context = new TestLoggerContext(github, options);
+
+        events.TestRunStart += (_, args) => context.HandleTestRunStart(args.TestRunCriteria);
+        events.TestResult += (_, args) => context.HandleTestResult(args.Result);
+        events.TestRunComplete += (_, args) => context.HandleTestRunComplete(
+            args.TestRunStatistics,
+            args.ElapsedTimeInRunningTests
         );
 
-        events.TestRunStart += (_, args) => Context.HandleTestRunStart(args);
-        events.TestResult += (_, args) => Context.HandleTestResult(args);
-
-        // TestRunComplete event is very inconsistent and often doesn't trigger at all, so
-        // we can't rely on it for things like cleanup or finalizing the job summary.
-        // https://github.com/microsoft/vstest/issues/3121
+        Context = context;
     }
 
     public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
         Initialize(events, TestLoggerOptions.Default);
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters) =>
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters) =>
         Initialize(events, TestLoggerOptions.Resolve(parameters));
-
-    public void Dispose()
-    {
-        Context?.Dispose();
-    }
 }

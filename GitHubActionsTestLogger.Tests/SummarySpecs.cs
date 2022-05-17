@@ -1,25 +1,28 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
-using GitHubActionsTestLogger.Tests.Fixtures;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class SummarySpecs : IClassFixture<TempOutputFixture>
+public class SummarySpecs
 {
-    private readonly TempOutputFixture _tempOutput;
-
-    public SummarySpecs(TempOutputFixture tempOutput) => _tempOutput = tempOutput;
-
     [Fact]
     public void Test_summary_contains_project_name()
     {
         // Arrange
-        var summaryFilePath = _tempOutput.GetTempFilePath();
-        using var context = new TestLoggerContext(TextWriter.Null, summaryFilePath, TestLoggerOptions.Default);
+        using var summaryWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                TextWriter.Null,
+                summaryWriter
+            ),
+            TestLoggerOptions.Default
+        );
 
         var testResult = new TestResult(new TestCase
         {
@@ -32,14 +35,22 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
         };
 
         // Act
-        context.HandleTestRunStart(
-            new TestRunStartEventArgs(new TestRunCriteria(new[] {"TestProject.dll"}, 100))
+        context.HandleTestRunStart(new TestRunCriteria(new[] { "TestProject.dll" }, 100));
+
+        context.HandleTestResult(testResult);
+
+        context.HandleTestRunComplete(
+            new TestRunStatistics(new Dictionary<TestOutcome, long>
+            {
+                [TestOutcome.Failed] = 1,
+                [TestOutcome.Skipped] = 0,
+                [TestOutcome.Passed] = 0
+            }),
+            TimeSpan.FromSeconds(15)
         );
 
-        context.HandleTestResult(new TestResultEventArgs(testResult));
-
         // Assert
-        var output = File.ReadAllText(summaryFilePath);
+        var output = summaryWriter.ToString().Trim();
         output.Should().Contain("TestProject");
     }
 
@@ -47,8 +58,15 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
     public void Test_summary_contains_all_test_results()
     {
         // Arrange
-        var summaryFilePath = _tempOutput.GetTempFilePath();
-        using var context = new TestLoggerContext(TextWriter.Null, summaryFilePath, TestLoggerOptions.Default);
+        using var summaryWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                TextWriter.Null,
+                summaryWriter
+            ),
+            TestLoggerOptions.Default
+        );
 
         var testResults = new[]
         {
@@ -80,15 +98,23 @@ public class SummarySpecs : IClassFixture<TempOutputFixture>
         };
 
         // Act
-        context.HandleTestRunStart(
-            new TestRunStartEventArgs(new TestRunCriteria(new[] {"TestProject.dll"}, 100))
-        );
+        context.HandleTestRunStart(new TestRunCriteria(new[] { "TestProject.dll" }, 100));
 
         foreach (var testResult in testResults)
-            context.HandleTestResult(new TestResultEventArgs(testResult));
+            context.HandleTestResult(testResult);
+
+        context.HandleTestRunComplete(
+            new TestRunStatistics(new Dictionary<TestOutcome, long>
+            {
+                [TestOutcome.Failed] = 1,
+                [TestOutcome.Skipped] = 0,
+                [TestOutcome.Passed] = 0
+            }),
+            TimeSpan.FromSeconds(15)
+        );
 
         // Assert
-        var output = File.ReadAllText(summaryFilePath);
+        var output = summaryWriter.ToString().Trim();
 
         foreach (var testResult in testResults)
         {

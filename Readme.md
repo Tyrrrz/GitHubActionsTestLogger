@@ -15,9 +15,6 @@ Custom logger for `dotnet test` that reports test results in a structured format
 When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
 Additionally, this also generates a job summary that contains detailed information about the executed test run.
 
-> ⚠️ Job summary is a new GitHub feature which is still in preview.
-> If your account or organization doesn't have access to this feature, job summaries will not be available.
-
 ## Terms of use
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:

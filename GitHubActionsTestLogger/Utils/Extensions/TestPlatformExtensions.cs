@@ -9,16 +9,34 @@ namespace GitHubActionsTestLogger.Utils.Extensions;
 
 internal static class TestPlatformExtensions
 {
-    public static string? TryGetTargetFramework(this TestRunCriteria testRunCriteria) => (string?) XElement
-        .Parse(testRunCriteria.TestRunSettings)
-        .Element("RunConfiguration")?
-        .Element("TargetFrameworkVersion");
+    public static long GetPassedCount(this ITestRunStatistics testRunStatistics) =>
+        testRunStatistics[TestOutcome.Passed];
+
+    public static long GetFailedCount(this ITestRunStatistics testRunStatistics) =>
+        testRunStatistics[TestOutcome.Failed];
+
+    public static long GetSkippedCount(this ITestRunStatistics testRunStatistics) =>
+        testRunStatistics[TestOutcome.Skipped];
+
+    public static string? TryGetTargetFramework(this TestRunCriteria testRunCriteria)
+    {
+        if (string.IsNullOrWhiteSpace(testRunCriteria.TestRunSettings))
+            return null;
+
+        return (string?)XElement
+            .Parse(testRunCriteria.TestRunSettings)
+            .Element("RunConfiguration")?
+            .Element("TargetFrameworkVersion");
+    }
 
     // This method attempts to get the stack frame that represents the call to the test method.
     // Obviously, this only works if the test threw an exception.
     private static StackFrame? TryGetTestStackFrame(this TestResult testResult)
     {
         if (string.IsNullOrWhiteSpace(testResult.ErrorStackTrace))
+            return null;
+
+        if (string.IsNullOrWhiteSpace(testResult.TestCase.FullyQualifiedName))
             return null;
 
         var testMethodFullyQualifiedName = testResult.TestCase.FullyQualifiedName.SubstringUntil(
@@ -31,7 +49,8 @@ internal static class TestPlatformExtensions
             StringComparison.OrdinalIgnoreCase
         );
 
-        var matchingStackFrames = StackFrame.ParseMany(testResult.ErrorStackTrace)
+        var matchingStackFrames = StackFrame
+            .ParseMany(testResult.ErrorStackTrace)
             .Where(f =>
                 // Sync method call
                 // e.g. MyTests.EnsureOnePlusOneEqualsTwo()

@@ -1,7 +1,6 @@
 using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
@@ -12,8 +11,15 @@ public class AnnotationSpecs
     public void Passed_tests_do_not_get_reported()
     {
         // Arrange
-        using var writer = new StringWriter();
-        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
 
         var testResult = new TestResult(new TestCase
         {
@@ -24,10 +30,10 @@ public class AnnotationSpecs
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
         output.Should().BeEmpty();
     }
 
@@ -35,8 +41,15 @@ public class AnnotationSpecs
     public void Skipped_tests_do_not_get_reported()
     {
         // Arrange
-        using var writer = new StringWriter();
-        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
 
         var testResult = new TestResult(new TestCase
         {
@@ -47,10 +60,10 @@ public class AnnotationSpecs
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
         output.Should().BeEmpty();
     }
 
@@ -58,8 +71,15 @@ public class AnnotationSpecs
     public void Failed_tests_get_reported()
     {
         // Arrange
-        using var writer = new StringWriter();
-        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
 
         var testResult = new TestResult(new TestCase
         {
@@ -71,10 +91,10 @@ public class AnnotationSpecs
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
 
         output.Should().StartWith("::error ");
         output.Should().Contain("Test1");
@@ -88,8 +108,15 @@ public class AnnotationSpecs
         // rely on exception stack traces to get it.
 
         // Arrange
-        using var writer = new StringWriter();
-        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
 
         var stackTrace = @"
 at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
@@ -115,10 +142,10 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
 
         output.Should().StartWith("::error ");
         output.Should().Contain("file=/dir/CliWrap.Tests/CancellationSpecs.cs");
@@ -134,8 +161,15 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
         // rely on exception stack traces to get it.
 
         // Arrange
-        using var writer = new StringWriter();
-        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
 
         var stackTrace = @"
 at System.Net.Http.HttpContent.CheckDisposed()
@@ -165,10 +199,10 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
 
         output.Should().StartWith("::error ");
         output.Should().Contain("file=/dir/Sentry.Tests/Internals/Http/HttpTransportTests.cs");
@@ -181,8 +215,15 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
     public void Failed_tests_get_reported_with_approximate_source_information_if_exception_was_not_thrown()
     {
         // Arrange
-        using var writer = new StringWriter();
-        using var context = new TestLoggerContext(writer, null, TestLoggerOptions.Default);
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
 
         var testResult = new TestResult(new TestCase
         {
@@ -195,10 +236,10 @@ at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotifi
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
 
         output.Should().StartWith("::error ");
         output.Should().MatchRegex(@"file=.*?\.csproj");

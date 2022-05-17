@@ -1,14 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace GitHubActionsTestLogger;
 
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
-internal class GitHubWorkflow
+public partial class GitHubWorkflow
 {
-    private readonly TextWriter _writer;
+    private readonly TextWriter _commandWriter;
+    private readonly TextWriter _summaryWriter;
 
-    public GitHubWorkflow(TextWriter writer) => _writer = writer;
+    public bool IsRunningOnAgent =>
+        _commandWriter == Console.Out &&
+        string.Equals(
+            Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
+            "true",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+    public GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
+    {
+        _commandWriter = commandWriter;
+        _summaryWriter = summaryWriter;
+    }
+
+    public GitHubWorkflow()
+        : this(Console.Out, GetSummaryWriter())
+    {
+    }
 
     private void WriteCommand(
         string name,
@@ -44,16 +63,18 @@ internal class GitHubWorkflow
             return string.Join(",", options);
         }
 
-        // Command should start at the beginning of the line, so add a newline to make
-        // sure there is no leading text.
-        _writer.WriteLine();
+        // Command should start at the beginning of the line, so add a newline to make sure there is no leading text.
+        // This is required, for example, when .NET CLI is running with ANSI color codes enabled.
+        _commandWriter.WriteLine();
 
-        _writer.WriteLine(
+        _commandWriter.WriteLine(
             $"::{name} {FormatOptions()}::{Escape(message)}"
         );
 
         // This newline is just for symmetry
-        _writer.WriteLine();
+        _commandWriter.WriteLine();
+
+        _commandWriter.Flush();
     }
 
     public void ReportError(
@@ -63,4 +84,21 @@ internal class GitHubWorkflow
         int? line = null,
         int? column = null) =>
         WriteCommand("error", title, message, filePath, line, column);
+
+    public void ReportSummary(string markdown)
+    {
+        _summaryWriter.WriteLine(markdown);
+        _summaryWriter.Flush();
+    }
+}
+
+public partial class GitHubWorkflow
+{
+    private static TextWriter GetSummaryWriter()
+    {
+        var filePath = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
+        return !string.IsNullOrWhiteSpace(filePath)
+            ? File.AppendText(filePath)
+            : TextWriter.Null;
+    }
 }

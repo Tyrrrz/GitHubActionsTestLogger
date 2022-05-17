@@ -1,22 +1,23 @@
 ﻿using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class AnnotationFormattingSpecs
+public class AnnotationFormatSpecs
 {
     [Fact]
     public void Custom_format_can_be_used_for_annotation_title()
     {
         // Arrange
-        using var writer = new StringWriter();
+        using var commandWriter = new StringWriter();
 
-        using var context = new TestLoggerContext(
-            writer,
-            null,
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<$test>"
@@ -34,10 +35,10 @@ public class AnnotationFormattingSpecs
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
         output.Should().Contain("<Test1>");
     }
 
@@ -45,11 +46,13 @@ public class AnnotationFormattingSpecs
     public void Custom_format_can_be_used_for_annotation_message()
     {
         // Arrange
-        using var writer = new StringWriter();
+        using var commandWriter = new StringWriter();
 
-        using var context = new TestLoggerContext(
-            writer,
-            null,
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
             new TestLoggerOptions
             {
                 AnnotationMessageFormat = "$error\\n$trace"
@@ -67,22 +70,24 @@ public class AnnotationFormattingSpecs
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
-        output.Should().Contain("ErrorMessage\nErrorStackTrace");
+        var output = commandWriter.ToString().Trim();
+        output.Should().Contain("ErrorMessage%0D%0AErrorStackTrace");
     }
 
     [Fact]
     public void Custom_format_can_reference_test_traits()
     {
         // Arrange
-        using var writer = new StringWriter();
+        using var commandWriter = new StringWriter();
 
-        using var context = new TestLoggerContext(
-            writer,
-            null,
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "[$traits.Category] $test"
@@ -104,10 +109,10 @@ public class AnnotationFormattingSpecs
         };
 
         // Act
-        context.HandleTestResult(new TestResultEventArgs(testResult));
+        context.HandleTestResult(testResult);
 
         // Assert
-        var output = writer.ToString().Trim();
+        var output = commandWriter.ToString().Trim();
         output.Should().Contain("[UI Test] Test1");
     }
 }

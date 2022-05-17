@@ -13,7 +13,7 @@ public partial class TestLoggerOptions
 {
     public static TestLoggerOptions Default { get; } = new();
 
-    public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string> parameters) => new()
+    public static TestLoggerOptions Resolve(IReadOnlyDictionary<string, string?> parameters) => new()
     {
         AnnotationTitleFormat =
             parameters.GetValueOrDefault("annotations.titleFormat") ??
