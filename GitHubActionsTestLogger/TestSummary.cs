@@ -31,8 +31,7 @@ internal static class TestSummary
             .Append(" (")
             .Append(testRunCriteria.TryGetTargetFramework())
             .Append(")")
-            .Append("</summary>")
-            .Append("</br>");
+            .Append("</summary>");
 
         // Overview
         buffer
@@ -85,6 +84,7 @@ internal static class TestSummary
             .Append("</td>")
             .Append("</tr>")
             .Append("</table>")
+            .Append("<br/>")
             .AppendLine()
             .AppendLine();
 
