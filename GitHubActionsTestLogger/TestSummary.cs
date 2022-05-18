@@ -23,15 +23,16 @@ internal static class TestSummary
         buffer
             .Append("<details>")
             .Append("<summary>")
-            .Append(testRunStatistics.GetFailedCount() <= 0 ? "✔" : "❌")
+            .Append(testRunStatistics.GetFailedCount() <= 0 ? "🟢" : "🔴")
             .Append(" ")
-            .Append("<h3>")
+            .Append("<b>")
             .AppendJoin(", ", testRunCriteria.Sources.Select(Path.GetFileNameWithoutExtension))
-            .Append("</h3>")
+            .Append("</b>")
             .Append(" (")
             .Append(testRunCriteria.TryGetTargetFramework())
             .Append(")")
-            .Append("</summary>");
+            .Append("</summary>")
+            .Append("<br/>");
 
         // Overview
         buffer
@@ -99,7 +100,6 @@ internal static class TestSummary
             .Append("</td>")
             .Append("</tr>")
             .Append("</table>")
-            .Append("<br/>")
             .AppendLine()
             .AppendLine();
 
@@ -119,6 +119,7 @@ internal static class TestSummary
         }
 
         buffer
+            .Append("<br/>")
             .Append("</details>")
             .AppendLine()
             .AppendLine();
