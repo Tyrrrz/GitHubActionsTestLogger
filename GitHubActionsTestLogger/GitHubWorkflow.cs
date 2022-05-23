@@ -50,8 +50,10 @@ public partial class GitHubWorkflow
             return string.Join(",", options);
         }
 
-        // Command should start at the beginning of the line, so add a newline to make sure there is no leading text.
-        // This is required, for example, when .NET CLI is running with ANSI color codes enabled.
+        // Command should start at the beginning of the line, so add a newline
+        // to make sure there is no preceding text.
+        // Preceding text may sometimes appear if the .NET CLI is running with
+        // ANSI color codes enabled.
         _commandWriter.WriteLine();
 
         _commandWriter.WriteLine(
@@ -72,9 +74,9 @@ public partial class GitHubWorkflow
         int? column = null) =>
         WriteCommand("error", title, message, filePath, line, column);
 
-    public void ReportSummary(string markdown)
+    public void ReportSummary(string content)
     {
-        _summaryWriter.WriteLine(markdown);
+        _summaryWriter.WriteLine(content);
         _summaryWriter.Flush();
     }
 }

@@ -23,24 +23,26 @@ public class TestLogger : ITestLoggerWithParameters
             Console.ResetColor();
         }
 
+        // Commands are written to the standard output
         var commandWriter = Console.Out;
 
+        // Summary is written to the file specified by an environment variable.
         // We may need to write to the summary file from multiple test suites in parallel, so we should:
-        // 1. Delay acquiring the file lock until the very end
+        // 1. Delay acquiring the file lock until the very last moment
         // 2. Employ retry logic to handle potential race conditions
         var summaryWriter =
-            GitHubWorkflow.SummaryFilePath?.Pipe(s => new LazyTextWriter(() => File.AppendText(s))) ??
+            GitHubWorkflow
+                .SummaryFilePath?
+                .Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
+                .Pipe(s => new StreamWriter(s)) ??
             TextWriter.Null;
 
         var github = new GitHubWorkflow(commandWriter, summaryWriter);
         var context = new TestLoggerContext(github, options);
 
-        events.TestRunStart += (_, args) => context.HandleTestRunStart(args.TestRunCriteria);
-        events.TestResult += (_, args) => context.HandleTestResult(args.Result);
-        events.TestRunComplete += (_, args) => context.HandleTestRunComplete(
-            args.TestRunStatistics,
-            args.ElapsedTimeInRunningTests
-        );
+        events.TestRunStart += (_, args) => context.HandleTestRunStart(args);
+        events.TestResult += (_, args) => context.HandleTestResult(args);
+        events.TestRunComplete += (_, args) => context.HandleTestRunComplete(args);
 
         Context = context;
     }

@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using FluentAssertions;
+using GitHubActionsTestLogger.Tests.Utils;
+using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
 
@@ -24,18 +26,13 @@ public class AnnotationFormatSpecs
             }
         );
 
-        var testResult = new TestResult(new TestCase
-        {
-            DisplayName = "Test1"
-        })
-        {
-            Outcome = TestOutcome.Failed,
-            ErrorMessage = "ErrorMessage",
-            ErrorStackTrace = "ErrorStackTrace"
-        };
-
         // Act
-        context.HandleTestResult(testResult);
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
 
         // Assert
         var output = commandWriter.ToString().Trim();
@@ -59,18 +56,16 @@ public class AnnotationFormatSpecs
             }
         );
 
-        var testResult = new TestResult(new TestCase
-        {
-            DisplayName = "Test1"
-        })
-        {
-            Outcome = TestOutcome.Failed,
-            ErrorMessage = "ErrorMessage",
-            ErrorStackTrace = "ErrorStackTrace"
-        };
-
         // Act
-        context.HandleTestResult(testResult);
+        context.SimulateTestRun(
+            "FakeTests.dll",
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorMessage("ErrorMessage")
+                .SetErrorStackTrace("ErrorStackTrace")
+                .Build()
+        );
 
         // Assert
         var output = commandWriter.ToString().Trim();
@@ -94,22 +89,16 @@ public class AnnotationFormatSpecs
             }
         );
 
-        var testResult = new TestResult(new TestCase
-        {
-            DisplayName = "Test1",
-            Traits =
-            {
-                {"Category", "UI Test"},
-                {"Document", "SS01"}
-            }
-        })
-        {
-            Outcome = TestOutcome.Failed,
-            ErrorMessage = "ErrorMessage"
-        };
-
         // Act
-        context.HandleTestResult(testResult);
+        context.SimulateTestRun(
+            "FakeTests.dll",
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetTrait("Category", "UI Test")
+                .SetTrait("Document", "SS01")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
 
         // Assert
         var output = commandWriter.ToString().Trim();

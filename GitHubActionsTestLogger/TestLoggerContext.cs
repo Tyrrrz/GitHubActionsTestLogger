@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger;
 
@@ -21,34 +21,37 @@ public class TestLoggerContext
         Options = options;
     }
 
-    public void HandleTestRunStart(TestRunCriteria testRunCriteria) =>
-        _testRunCriteria = testRunCriteria;
+    public void HandleTestRunStart(TestRunStartEventArgs args) =>
+        _testRunCriteria = args.TestRunCriteria;
 
-    public void HandleTestResult(TestResult testResult)
+    public void HandleTestResult(TestResultEventArgs args)
     {
-        _testResults.Add(testResult);
-
-        if (testResult.Outcome == TestOutcome.Failed)
+        // Report failed test results to GitHub annotations
+        if (args.Result.Outcome == TestOutcome.Failed)
         {
             _github.ReportError(
-                TestResultFormat.Apply(Options.AnnotationTitleFormat, testResult),
-                TestResultFormat.Apply(Options.AnnotationMessageFormat, testResult),
-                testResult.TryGetSourceFilePath(),
-                testResult.TryGetSourceLine()
+                TestResultFormat.Apply(Options.AnnotationTitleFormat, args.Result),
+                TestResultFormat.Apply(Options.AnnotationMessageFormat, args.Result),
+                args.Result.TryGetSourceFilePath(),
+                args.Result.TryGetSourceLine()
             );
         }
+
+        // Record all test results to write them to summary later
+        _testResults.Add(args.Result);
     }
 
-    public void HandleTestRunComplete(ITestRunStatistics testRunStatistics, TimeSpan testRunElapsedTime)
+    public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
+        // This is expected to have been set when the test run started
         if (_testRunCriteria is null)
             return;
 
         _github.ReportSummary(
             TestSummary.Generate(
                 _testRunCriteria,
-                testRunStatistics,
-                testRunElapsedTime,
+                args.TestRunStatistics,
+                args.ElapsedTimeInRunningTests,
                 _testResults
             )
         );

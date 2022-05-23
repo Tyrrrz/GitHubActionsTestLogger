@@ -6,7 +6,7 @@ namespace GitHubActionsTestLogger.Tests.Fakes;
 
 #pragma warning disable CS0067
 
-public class FakeTestLoggerEvents : TestLoggerEvents
+internal class FakeTestLoggerEvents : TestLoggerEvents
 {
     public override event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
     public override event EventHandler<TestRunStartEventArgs>? TestRunStart;
