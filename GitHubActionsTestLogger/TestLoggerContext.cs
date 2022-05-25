@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -45,8 +43,9 @@ public class TestLoggerContext
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
-        // This is expected to have been set when the test run started
-        var testRunCriteria = _testRunCriteria ?? new TestRunCriteria(new[] { "UnknownTestProject.dll" }, 1);
+        // TestRunStart event sometimes doesn't fire, which means that _testRunCriteria can be null
+        // https://github.com/microsoft/vstest/issues/3121
+        var testRunCriteria = _testRunCriteria ?? new TestRunCriteria(new[] { "Unknown Test Suite" }, 1);
 
         _github.ReportSummary(
             TestSummary.Generate(
