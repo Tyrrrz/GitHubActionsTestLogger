@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace GitHubActionsTestLogger;
 
-// Commands: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
-// Summary: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-markdown-summary
-internal class GitHubWorkflow
+// https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
+public partial class GitHubWorkflow
 {
-    private readonly TextWriter _output;
-    private readonly string? _summaryFilePath;
+    private readonly TextWriter _commandWriter;
+    private readonly TextWriter _summaryWriter;
 
-    public GitHubWorkflow(TextWriter output, string? summaryFilePath)
+    public GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
     {
-        _output = output;
-        _summaryFilePath = summaryFilePath;
+        _commandWriter = commandWriter;
+        _summaryWriter = summaryWriter;
     }
 
     private void WriteCommand(
@@ -24,9 +24,9 @@ internal class GitHubWorkflow
         int? line = null,
         int? column = null)
     {
+        // URL-encode certain characters to escape them from being processed as command tokens
+        // https://pakstech.com/blog/github-actions-workflow-commands
         static string Escape(string value) => value
-            // URL-encode certain characters to escape them from being processed as command tokens
-            // https://pakstech.com/blog/github-actions-workflow-commands
             .Replace("%", "%25")
             .Replace("\n", "%0A")
             .Replace("\r", "%0D");
@@ -50,13 +50,20 @@ internal class GitHubWorkflow
             return string.Join(",", options);
         }
 
-        // Command should start at the beginning of the line, so add a newline to make
-        // sure there is no leading text.
-        _output.WriteLine();
+        // Command should start at the beginning of the line, so add a newline
+        // to make sure there is no preceding text.
+        // Preceding text may sometimes appear if the .NET CLI is running with
+        // ANSI color codes enabled.
+        _commandWriter.WriteLine();
 
-        _output.WriteLine(
+        _commandWriter.WriteLine(
             $"::{name} {FormatOptions()}::{Escape(message)}"
         );
+
+        // This newline is just for symmetry
+        _commandWriter.WriteLine();
+
+        _commandWriter.Flush();
     }
 
     public void ReportError(
@@ -67,21 +74,21 @@ internal class GitHubWorkflow
         int? column = null) =>
         WriteCommand("error", title, message, filePath, line, column);
 
-    public void ReportWarning(
-        string title,
-        string message,
-        string? filePath = null,
-        int? line = null,
-        int? column = null) =>
-        WriteCommand("warning", title, message, filePath, line, column);
-
     public void ReportSummary(string content)
     {
-        if (string.IsNullOrWhiteSpace(_summaryFilePath))
-            return;
-
-        // There can be multiple test runs in a single step, so make sure to preserve
-        // previous summaries as well.
-        File.AppendAllText(_summaryFilePath, content);
+        _summaryWriter.WriteLine(content);
+        _summaryWriter.Flush();
     }
+}
+
+public partial class GitHubWorkflow
+{
+    public static bool IsRunningOnAgent => string.Equals(
+        Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
+        "true",
+        StringComparison.OrdinalIgnoreCase
+    );
+
+    public static string? SummaryFilePath =>
+        Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 }

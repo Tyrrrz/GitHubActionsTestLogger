@@ -5,13 +5,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger.Utils.Extensions;
 
-internal static class TestPlatformExtensions
+internal static class TestResultExtensions
 {
     // This method attempts to get the stack frame that represents the call to the test method.
     // Obviously, this only works if the test threw an exception.
     private static StackFrame? TryGetTestStackFrame(this TestResult testResult)
     {
         if (string.IsNullOrWhiteSpace(testResult.ErrorStackTrace))
+            return null;
+
+        if (string.IsNullOrWhiteSpace(testResult.TestCase.FullyQualifiedName))
             return null;
 
         var testMethodFullyQualifiedName = testResult.TestCase.FullyQualifiedName.SubstringUntil(
@@ -24,7 +27,8 @@ internal static class TestPlatformExtensions
             StringComparison.OrdinalIgnoreCase
         );
 
-        var matchingStackFrames = StackFrame.ParseMany(testResult.ErrorStackTrace)
+        var matchingStackFrames = StackFrame
+            .ParseMany(testResult.ErrorStackTrace)
             .Where(f =>
                 // Sync method call
                 // e.g. MyTests.EnsureOnePlusOneEqualsTwo()

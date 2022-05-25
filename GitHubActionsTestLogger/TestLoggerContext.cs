@@ -1,71 +1,59 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger;
 
 public class TestLoggerContext
 {
-    private readonly object _lock = new();
     private readonly GitHubWorkflow _github;
-    private readonly List<string> _testSources = new();
-    private readonly List<TestResult> _testResults = new();
 
-    public TextWriter Output { get; }
+    private TestRunCriteria? _testRunCriteria;
+    private readonly List<TestResult> _testResults = new();
 
     public TestLoggerOptions Options { get; }
 
-    public TestLoggerContext(TextWriter output, TestLoggerOptions options)
+    public TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
     {
-        Output = output;
+        _github = github;
         Options = options;
-
-        _github = new GitHubWorkflow(output, Options.SummaryFilePath);
     }
 
-    public void HandleTestRunStart(TestRunCriteria testRun)
+    public void HandleTestRunStart(TestRunStartEventArgs args) =>
+        _testRunCriteria = args.TestRunCriteria;
+
+    public void HandleTestResult(TestResultEventArgs args)
     {
-        lock (_lock)
+        // Report failed test results to job annotations
+        if (args.Result.Outcome == TestOutcome.Failed)
         {
-            _testSources.AddRange(testRun.Sources);
-        }
-    }
-
-    public void HandleTestResult(TestResult testResult)
-    {
-        lock (_lock)
-        {
-            _testResults.Add(testResult);
-
-            // Only report tests that have not passed
-            if (testResult.Outcome > TestOutcome.Passed)
-            {
-                var title = testResult.TestCase.DisplayName;
-                var message = Options.MessageFormat.Apply(testResult);
-                var filePath = testResult.TryGetSourceFilePath();
-                var line = testResult.TryGetSourceLine();
-
-                if (testResult.Outcome == TestOutcome.Failed)
-                {
-                    _github.ReportError(title, message, filePath, line);
-                }
-                else if (Options.ReportWarnings)
-                {
-                    _github.ReportWarning(title, message, filePath, line);
-                }
-            }
-        }
-    }
-
-    public void HandleTestRunComplete()
-    {
-        lock (_lock)
-        {
-            _github.ReportSummary(
-                TestSummary.Generate(_testSources, _testResults)
+            _github.ReportError(
+                TestResultFormat.Apply(Options.AnnotationTitleFormat, args.Result),
+                TestResultFormat.Apply(Options.AnnotationMessageFormat, args.Result),
+                args.Result.TryGetSourceFilePath(),
+                args.Result.TryGetSourceLine()
             );
         }
+
+        // Record all test results to write them to summary later
+        _testResults.Add(args.Result);
+    }
+
+    public void HandleTestRunComplete(TestRunCompleteEventArgs args)
+    {
+        // TestRunStart event sometimes doesn't fire, which means that _testRunCriteria can be null
+        // https://github.com/microsoft/vstest/issues/3121
+        var testRunCriteria = _testRunCriteria ?? new TestRunCriteria(new[] { "Unknown Test Suite" }, 1);
+
+        _github.ReportSummary(
+            TestSummary.Generate(
+                testRunCriteria,
+                args.TestRunStatistics,
+                args.ElapsedTimeInRunningTests,
+                _testResults
+            )
+        );
     }
 }

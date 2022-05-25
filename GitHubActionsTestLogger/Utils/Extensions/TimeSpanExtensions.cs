@@ -1,20 +1,20 @@
-using System;
+﻿using System;
 
 namespace GitHubActionsTestLogger.Utils.Extensions;
 
 internal static class TimeSpanExtensions
 {
-    public static string ToHumanReadableString(this TimeSpan timeSpan)
+    public static string ToHumanString(this TimeSpan timeSpan)
     {
         if (timeSpan.TotalSeconds <= 1)
-            return $"{timeSpan:s\\.ff} seconds";
+            return timeSpan.Milliseconds + "ms";
 
         if (timeSpan.TotalMinutes <= 1)
-            return $"{timeSpan:%s} seconds";
+            return timeSpan.Seconds + "s";
 
         if (timeSpan.TotalHours <= 1)
-            return $"{timeSpan:%m} minutes";
+            return timeSpan.Minutes + "m " + timeSpan.Seconds + "s";
 
-        return $"{timeSpan:%h} hours";
+        return timeSpan.Hours + "h " + timeSpan.Minutes + "m";
     }
 }

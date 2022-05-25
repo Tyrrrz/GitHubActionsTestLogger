@@ -15,9 +15,6 @@ Custom logger for `dotnet test` that reports test results in a structured format
 When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
 Additionally, this also generates a job summary that contains detailed information about the executed test run.
 
-> ⚠️ Job summary is a new GitHub feature which is still in preview.
-> If your account or organization doesn't have access to this feature, job summaries will not be available.
-
 ## Terms of use
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:
@@ -76,35 +73,35 @@ jobs:
 
 ### Options
 
-**GitHub Actions Test Logger** has a few options that you can override to customize its behavior.
+**GitHub Actions Test Logger** has options that you can override to customize its behavior.
 In order to pass an option to the logger, include it as an additional parameter inside `--logger`:
 
-```sh
+```powershell
 dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 ```
 
-#### `format`
+#### `annotations.messageFormat`
 
-Specifies the message format used when reporting test results in job annotations and code diffs.
+Specifies the format of the annotation message used when reporting test failures.
 
 The following replacement tokens are available:
 
-- `$test` — replaced with the display name of the test
-- `$outcome` — replaced with the error message (in case of an exception) or the outcome of the test
-- `$traits.TRAIT_NAME` — replaced with the value of a trait named `TRAIT_NAME`
+- `$test` — replaced with the test's display name
+- `$traits.TRAIT_NAME` — replaced with the value of the trait named `TRAIT_NAME`
+- `$error` — replaced with the error message associated with the test result
+- `$trace` — replaced with the stack trace associated with the test result
 
-**Default**: `$test: $outcome`.
+**Default**: `$error`.
 
 **Examples**:
 
-- `$test: $outcome` → `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
-- `[$traits.Category] $test: $outcome` → `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
+- `$error` → `AssertionException: Expected 'true' but found 'false'`
+- `$test: $error` → `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
+- `[$traits.Category] $test: $error` → `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
 
-#### `report-warnings`
+#### `annotations.titleFormat`
 
-Specifies whether to additionally report warnings for tests that have neither failed nor succeeded (i.e. skipped or inconclusive).
-If disabled, only failed tests will be reported.
+Specifies the format of the annotation title used when reporting test failures.
+Supports the same replacement tokens as [`annotations.messageFormat`](#annotationsmessageformat).
 
-Can be set to either `true` or `false`.
-
-**Default**: `true`.
+**Default**: `$test`.

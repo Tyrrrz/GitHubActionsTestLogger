@@ -6,7 +6,7 @@ using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class ConfigurationSpecs
+public class InitializationSpecs
 {
     [Fact]
     public void Logger_can_be_used_with_default_configuration()
@@ -30,10 +30,10 @@ public class ConfigurationSpecs
         var logger = new TestLogger();
 
         var events = new FakeTestLoggerEvents();
-        var parameters = new Dictionary<string, string>
+        var parameters = new Dictionary<string, string?>
         {
-            ["format"] = "$test -> $outcome",
-            ["report-warnings"] = "false"
+            ["annotations.titleFormat"] = "TitleFormat",
+            ["annotations.messageFormat"] = "MessageFormat"
         };
 
         // Act
@@ -41,7 +41,7 @@ public class ConfigurationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context?.Options.MessageFormat.Template.Should().Be("$test -> $outcome");
-        logger.Context?.Options.ReportWarnings.Should().BeFalse();
+        logger.Context?.Options.AnnotationTitleFormat.Should().Be("TitleFormat");
+        logger.Context?.Options.AnnotationMessageFormat.Should().Be("MessageFormat");
     }
 }
