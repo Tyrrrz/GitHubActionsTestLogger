@@ -14,15 +14,8 @@ public class TestLogger : ITestLoggerWithParameters
 {
     public TestLoggerContext? Context { get; private set; }
 
-    private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
+    private static TestLoggerContext CreateContext(TestLoggerEvents events, TestLoggerOptions options)
     {
-        if (!GitHubWorkflow.IsRunningOnAgent)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Warning: using GitHub Actions Test Logger, but not running on GitHub Actions.");
-            Console.ResetColor();
-        }
-
         // Commands are written to the standard output
         var commandWriter = Console.Out;
 
@@ -44,7 +37,19 @@ public class TestLogger : ITestLoggerWithParameters
         events.TestResult += (_, args) => context.HandleTestResult(args);
         events.TestRunComplete += (_, args) => context.HandleTestRunComplete(args);
 
-        Context = context;
+        return context;
+    }
+
+    private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
+    {
+        if (!GitHubWorkflow.IsRunningOnAgent)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Warning: using GitHub Actions Test Logger, but not running on GitHub Actions.");
+            Console.ResetColor();
+        }
+
+        Context = CreateContext(events, options);
     }
 
     public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
