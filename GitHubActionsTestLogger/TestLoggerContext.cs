@@ -44,11 +44,15 @@ public class TestLoggerContext
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
-        Console.WriteLine("Test1");
+        if (TestLogger.IsGood)
+            Console.WriteLine("test1");
+
         // This is expected to have been set when the test run started
         if (_testRunCriteria is null)
             return;
-        Console.WriteLine("Test2");
+
+        if (TestLogger.IsGood)
+            Console.WriteLine("test2");
 
         _github.ReportSummary(
             TestSummary.Generate(
