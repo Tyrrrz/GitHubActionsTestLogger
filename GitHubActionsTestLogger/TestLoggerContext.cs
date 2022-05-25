@@ -46,7 +46,7 @@ public class TestLoggerContext
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
         // This is expected to have been set when the test run started
-        var testRunCriteria = _testRunCriteria ?? new TestRunCriteria(new[] { "Unknown Test Project" }, 100);
+        var testRunCriteria = _testRunCriteria ?? new TestRunCriteria(new[] { "UnknownTestProject.dll" }, 1);
 
         _github.ReportSummary(
             TestSummary.Generate(
