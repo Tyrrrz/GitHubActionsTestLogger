@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -43,9 +44,11 @@ public class TestLoggerContext
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
+        Console.WriteLine("Test1");
         // This is expected to have been set when the test run started
         if (_testRunCriteria is null)
             return;
+        Console.WriteLine("Test2");
 
         _github.ReportSummary(
             TestSummary.Generate(
