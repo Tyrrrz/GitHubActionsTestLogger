@@ -83,12 +83,31 @@ public partial class GitHubWorkflow
 
 public partial class GitHubWorkflow
 {
-    public static bool IsRunningOnAgent => string.Equals(
+    public static bool IsRunningOnAgent { get; } = string.Equals(
         Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
         "true",
         StringComparison.OrdinalIgnoreCase
     );
 
-    public static string? SummaryFilePath =>
-        Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
+    public static string? SummaryFilePath { get; } = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
+
+    public static string? TryGetFilePermalink(string filePath, int? line)
+    {
+        var serverUrl = Environment.GetEnvironmentVariable("GITHUB_SERVER_URL");
+        var repository = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
+        var commitHash = Environment.GetEnvironmentVariable("GITHUB_SHA");
+
+        if (string.IsNullOrWhiteSpace(serverUrl) ||
+            string.IsNullOrWhiteSpace(repository) ||
+            string.IsNullOrWhiteSpace(commitHash))
+            return null;
+
+        var filePathNormalized = Uri.EscapeDataString(filePath.Replace("\\", "/"));
+
+        var lineMarker = line is not null
+            ? $"#L{line}"
+            : null;
+
+        return $"{serverUrl}/{repository}/blob/{commitHash}/{filePathNormalized}{lineMarker}";
+    }
 }

@@ -106,11 +106,23 @@ internal static class TestSummary
         // Failed tests
         foreach (var testResult in testResults.Where(r => r.Outcome == TestOutcome.Failed))
         {
+            // Generate permalink
+            var filePath = testResult.TryGetSourceFilePath();
+            var fileLine = testResult.TryGetSourceLine();
+            var url = !string.IsNullOrWhiteSpace(filePath) && fileLine is not null
+                ? GitHubWorkflow.TryGetFilePermalink(filePath, fileLine)
+                : null;
+
             buffer
                 .Append("- Fail: ")
+                .Append("[")
                 .Append("**")
                 .Append(testResult.TestCase.DisplayName)
                 .Append("**")
+                .Append("]")
+                .Append("(")
+                .Append(url ?? "#")
+                .Append(")")
                 .AppendLine()
                 .AppendLine("```")
                 .AppendLine(testResult.ErrorMessage)
