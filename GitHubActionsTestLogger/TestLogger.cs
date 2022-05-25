@@ -52,11 +52,8 @@ public class TestLogger : ITestLoggerWithParameters
         Context = CreateContext(events, options);
     }
 
-    public void Initialize(TestLoggerEvents events, string testRunDirectory)
-    {
-        Console.WriteLine(testRunDirectory);
+    public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
         Initialize(events, TestLoggerOptions.Default);
-    }
 
     public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters) =>
         Initialize(events, TestLoggerOptions.Resolve(parameters));

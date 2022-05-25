@@ -1,34 +1,12 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace GitHubActionsTestLogger.Utils.Extensions;
 
-internal static class TestPlatformExtensions
+internal static class TestResultExtensions
 {
-    public static long GetPassedCount(this ITestRunStatistics testRunStatistics) =>
-        testRunStatistics[TestOutcome.Passed];
-
-    public static long GetFailedCount(this ITestRunStatistics testRunStatistics) =>
-        testRunStatistics[TestOutcome.Failed];
-
-    public static long GetSkippedCount(this ITestRunStatistics testRunStatistics) =>
-        testRunStatistics[TestOutcome.Skipped];
-
-    public static string? TryGetTargetFramework(this TestRunCriteria testRunCriteria)
-    {
-        if (string.IsNullOrWhiteSpace(testRunCriteria.TestRunSettings))
-            return null;
-
-        return (string?)XElement
-            .Parse(testRunCriteria.TestRunSettings)
-            .Element("RunConfiguration")?
-            .Element("TargetFrameworkVersion");
-    }
-
     // This method attempts to get the stack frame that represents the call to the test method.
     // Obviously, this only works if the test threw an exception.
     private static StackFrame? TryGetTestStackFrame(this TestResult testResult)
