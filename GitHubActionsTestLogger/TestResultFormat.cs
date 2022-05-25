@@ -18,8 +18,8 @@ internal static class TestResultFormat
     {
         var buffer = new StringBuilder(template);
 
-        // New line token
-        buffer.Replace(NewlineToken, Environment.NewLine);
+        // New line token (don't include caret return for consistency across platforms)
+        buffer.Replace(NewlineToken, "\n");
 
         // Name token
         buffer.Replace(NameToken, testResult.TestCase.DisplayName);

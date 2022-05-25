@@ -10,7 +10,7 @@ namespace GitHubActionsTestLogger.Tests;
 public class AnnotationFormatSpecs
 {
     [Fact]
-    public void Custom_format_can_be_used_for_annotation_title()
+    public void Custom_format_can_reference_test_name()
     {
         // Arrange
         using var commandWriter = new StringWriter();
@@ -22,7 +22,8 @@ public class AnnotationFormatSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "<$test>"
+                AnnotationTitleFormat = "<$test>",
+                AnnotationMessageFormat = "[$test]"
             }
         );
 
@@ -36,40 +37,9 @@ public class AnnotationFormatSpecs
 
         // Assert
         var output = commandWriter.ToString().Trim();
+
         output.Should().Contain("<Test1>");
-    }
-
-    [Fact]
-    public void Custom_format_can_be_used_for_annotation_message()
-    {
-        // Arrange
-        using var commandWriter = new StringWriter();
-
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
-            new TestLoggerOptions
-            {
-                AnnotationMessageFormat = "$error\\n$trace"
-            }
-        );
-
-        // Act
-        context.SimulateTestRun(
-            "FakeTests.dll",
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
-                .SetErrorMessage("ErrorMessage")
-                .SetErrorStackTrace("ErrorStackTrace")
-                .Build()
-        );
-
-        // Assert
-        var output = commandWriter.ToString().Trim();
-        output.Should().Contain("ErrorMessage%0D%0AErrorStackTrace");
+        output.Should().Contain("[Test1]");
     }
 
     [Fact]
@@ -85,13 +55,13 @@ public class AnnotationFormatSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "[$traits.Category] $test"
+                AnnotationTitleFormat = "<$traits.Category -> $test>",
+                AnnotationMessageFormat = "[$traits.Category -> $test]"
             }
         );
 
         // Act
         context.SimulateTestRun(
-            "FakeTests.dll",
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
@@ -102,6 +72,106 @@ public class AnnotationFormatSpecs
 
         // Assert
         var output = commandWriter.ToString().Trim();
-        output.Should().Contain("[UI Test] Test1");
+
+        output.Should().Contain("<UI Test -> Test1>");
+        output.Should().Contain("[UI Test -> Test1]");
+    }
+
+    [Fact]
+    public void Custom_format_can_reference_test_error_message()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test: $error>",
+                AnnotationMessageFormat = "[$test: $error]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorMessage("ErrorMessage")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1: ErrorMessage>");
+        output.Should().Contain("[Test1: ErrorMessage]");
+    }
+
+    [Fact]
+    public void Custom_format_can_reference_test_error_stacktrace()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test: $trace>",
+                AnnotationMessageFormat = "[$test: $trace]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorStackTrace("ErrorStackTrace")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1: ErrorStackTrace>");
+        output.Should().Contain("[Test1: ErrorStackTrace]");
+    }
+
+    [Fact]
+    public void Custom_format_can_contain_newlines()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationMessageFormat = "foo\\nbar"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+        output.Should().Contain("foo%0Abar");
     }
 }
