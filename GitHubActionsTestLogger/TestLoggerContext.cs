@@ -26,7 +26,7 @@ public class TestLoggerContext
 
     public void HandleTestResult(TestResultEventArgs args)
     {
-        // Report failed test results to GitHub annotations
+        // Report failed test results to job annotations
         if (args.Result.Outcome == TestOutcome.Failed)
         {
             _github.ReportError(

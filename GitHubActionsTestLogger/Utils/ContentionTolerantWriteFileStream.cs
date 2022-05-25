@@ -46,7 +46,8 @@ internal class ContentionTolerantWriteFileStream : Stream
             }
             catch (IOException) when (retry < 10)
             {
-                Thread.Sleep(1000);
+                // Variance in delay to avoid overlapping back-offs
+                Thread.Sleep(RandomEx.Shared.Next(200, 1000));
             }
         }
     }
