@@ -12,14 +12,10 @@ namespace GitHubActionsTestLogger;
 [ExtensionUri("logger://tyrrrz/ghactions/v2")]
 public class TestLogger : ITestLoggerWithParameters
 {
-    public static bool IsGood { get; set; } = false;
-
     public TestLoggerContext? Context { get; private set; }
 
     private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
     {
-        IsGood = true;
-
         if (!GitHubWorkflow.IsRunningOnAgent)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
