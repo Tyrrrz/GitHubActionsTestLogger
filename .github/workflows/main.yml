@@ -4,16 +4,10 @@ on: [push, pull_request]
 
 jobs:
   main:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: ${{ inputs.dotnet-version }}
-
-      - name: Run tests
-        run: dotnet test --configuration Release --logger GitHubActions --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+    uses: Tyrrrz/.github/.github/workflows/nuget.yml@master
+    with:
+      dotnet-version: 6.0.x
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
