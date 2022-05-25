@@ -45,12 +45,12 @@ public class TestLoggerContext
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
+        if (!_testRunCriteria!.Sources.Any(s => s.Contains("Fake")) && !_testRunCriteria.Sources.Any(s => s.Contains("Project")))
+            Console.WriteLine("test");
+
         // This is expected to have been set when the test run started
         if (_testRunCriteria is null)
             return;
-
-        if (!_testRunCriteria.Sources.Any(s => s.Contains("Fake")) && !_testRunCriteria.Sources.Any(s => s.Contains("Project")))
-            Console.WriteLine("test");
 
         _github.ReportSummary(
             TestSummary.Generate(
