@@ -45,7 +45,7 @@ public class TestLoggerContext
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
-            Console.WriteLine(_testRunCriteria?.Sources.First() + " foobar");
+        Console.WriteLine(_testRunCriteria?.Sources.First() + " foobar");
 
         // This is expected to have been set when the test run started
         if (_testRunCriteria is null)
