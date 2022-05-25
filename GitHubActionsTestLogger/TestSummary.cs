@@ -29,7 +29,7 @@ internal static class TestSummary
             .AppendJoin(", ", testRunCriteria.Sources.Select(Path.GetFileNameWithoutExtension))
             .Append("</b>")
             .Append(" (")
-            .Append(testRunCriteria.TryGetTargetFramework())
+            .Append(testRunCriteria.TryGetTargetFramework() ?? "Unknown Target Framework")
             .Append(")")
             .Append("</summary>")
             .Append("<br/>");
