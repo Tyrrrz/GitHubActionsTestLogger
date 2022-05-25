@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
 
     <!-- Set this to 'true' in order to run tests -->
-    <IsTestProject>true</IsTestProject>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
