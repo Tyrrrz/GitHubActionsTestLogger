@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger;
 
@@ -95,18 +96,20 @@ public partial class GitHubWorkflow
     {
         var serverUrl = Environment.GetEnvironmentVariable("GITHUB_SERVER_URL");
         var repository = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
+        var workspaceDirPath = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
         var commitHash = Environment.GetEnvironmentVariable("GITHUB_SHA");
 
         if (string.IsNullOrWhiteSpace(serverUrl) ||
             string.IsNullOrWhiteSpace(repository) ||
+            string.IsNullOrWhiteSpace(workspaceDirPath) ||
             string.IsNullOrWhiteSpace(commitHash))
             return null;
 
-        var filePathNormalized = Uri.EscapeDataString(filePath.Replace("\\", "/"));
+        var filePathNormalized = filePath.Substring(0, workspaceDirPath.Length)
+            .Pipe(s => s.Replace("\\", "/"))
+            .Pipe(Uri.EscapeDataString);
 
-        var lineMarker = line is not null
-            ? $"#L{line}"
-            : null;
+        var lineMarker = line?.Pipe(l => $"#L{l}");
 
         return $"{serverUrl}/{repository}/blob/{commitHash}/{filePathNormalized}{lineMarker}";
     }
