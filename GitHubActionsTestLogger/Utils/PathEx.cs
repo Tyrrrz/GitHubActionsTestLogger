@@ -16,8 +16,8 @@ internal static class PathEx
     // members, so we'll just use this one on all targets.
     public static string GetRelativePath(string basePath, string path)
     {
-        var basePathSegments = basePath.Split(Path.PathSeparator, Path.AltDirectorySeparatorChar);
-        var pathSegments = path.Split(Path.PathSeparator, Path.AltDirectorySeparatorChar);
+        var basePathSegments = basePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var pathSegments = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         var commonSegments = 0;
         for (var i = 0; i < basePathSegments.Length && i < pathSegments.Length; i++)
