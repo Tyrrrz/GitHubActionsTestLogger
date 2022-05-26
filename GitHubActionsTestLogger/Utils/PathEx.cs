@@ -8,9 +8,8 @@ internal static class PathEx
     // members, so we'll just use this one on all targets.
     public static string GetRelativePath(string basePath, string path)
     {
-        // Without using System
-        var basePathUri = new Uri(basePath);
-        var pathUri = new Uri(path);
+        var basePathUri = new Uri(basePath, UriKind.Absolute);
+        var pathUri = new Uri(path, UriKind.Absolute);
 
         return Uri.UnescapeDataString(
             basePathUri

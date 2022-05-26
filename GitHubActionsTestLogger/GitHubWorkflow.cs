@@ -91,7 +91,8 @@ public partial class GitHubWorkflow
         StringComparison.OrdinalIgnoreCase
     );
 
-    public static string? SummaryFilePath { get; } = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
+    public static string? SummaryFilePath { get; } =
+        Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 
     public static string? TryGenerateFilePermalink(string filePath, int? line)
     {
@@ -106,7 +107,11 @@ public partial class GitHubWorkflow
             string.IsNullOrWhiteSpace(commitHash))
             return null;
 
-        var filePathNormalized = PathEx.GetRelativePath(workspacePath, filePath).Replace("\\", "/").Trim('/');
+        var filePathNormalized = PathEx
+            .GetRelativePath(workspacePath.EnsureEndsWith("/"), filePath)
+            .Replace("\\", "/")
+            .Trim('/');
+
         var lineMarker = line?.Pipe(l => $"#L{l}");
 
         return $"{serverUrl}/{repositorySlug}/blob/{commitHash}/{filePathNormalized}{lineMarker}";
