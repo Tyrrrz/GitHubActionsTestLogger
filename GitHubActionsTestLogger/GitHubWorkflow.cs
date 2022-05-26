@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using GitHubActionsTestLogger.Utils;
 using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger;
@@ -92,22 +93,22 @@ public partial class GitHubWorkflow
 
     public static string? SummaryFilePath { get; } = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 
-    public static string? TryResolveFilePermalink(string filePath, int? line)
+    public static string? TryGenerateFilePermalink(string filePath, int? line)
     {
         var serverUrl = Environment.GetEnvironmentVariable("GITHUB_SERVER_URL");
-        var repository = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
-        var workspaceDirPath = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+        var repositorySlug = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
+        var workspacePath = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
         var commitHash = Environment.GetEnvironmentVariable("GITHUB_SHA");
 
         if (string.IsNullOrWhiteSpace(serverUrl) ||
-            string.IsNullOrWhiteSpace(repository) ||
-            string.IsNullOrWhiteSpace(workspaceDirPath) ||
+            string.IsNullOrWhiteSpace(repositorySlug) ||
+            string.IsNullOrWhiteSpace(workspacePath) ||
             string.IsNullOrWhiteSpace(commitHash))
             return null;
 
-        var filePathNormalized = filePath.Substring(workspaceDirPath.Length).Replace("\\", "/");
+        var filePathNormalized = PathEx.GetRelativePath(workspacePath, filePath).Replace("\\", "/").Trim('/');
         var lineMarker = line?.Pipe(l => $"#L{l}");
 
-        return $"{serverUrl}/{repository}/blob/{commitHash}/{filePathNormalized}{lineMarker}";
+        return $"{serverUrl}/{repositorySlug}/blob/{commitHash}/{filePathNormalized}{lineMarker}";
     }
 }

@@ -1,35 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace GitHubActionsTestLogger;
 
 internal static class TestSummary
 {
     public static string Generate(
-        TestRunCriteria testRunCriteria,
-        ITestRunStatistics testRunStatistics,
-        TimeSpan testRunElapsedTime,
+        string suiteName,
+        string frameworkName,
         IReadOnlyList<TestResult> testResults)
     {
+        var passedCount = testResults.Count(t => t.Outcome == TestOutcome.Passed);
+        var failedCount = testResults.Count(t => t.Outcome == TestOutcome.Failed);
+        var skippedCount = testResults.Count(t => t.Outcome == TestOutcome.Skipped);
+        var totalCount = testResults.Count;
+        var totalDuration = TimeSpan.FromMilliseconds(testResults.Sum(t => t.Duration.TotalMilliseconds));
+
         var buffer = new StringBuilder();
 
         // Header
         buffer
             .Append("<details>")
             .Append("<summary>")
-            .Append(testRunStatistics.GetFailedCount() <= 0 ? "🟢" : "🔴")
+            .Append(failedCount <= 0 ? "🟢" : "🔴")
             .Append(" ")
             .Append("<b>")
-            .AppendJoin(", ", testRunCriteria.Sources.Select(Path.GetFileNameWithoutExtension))
+            .Append(suiteName)
             .Append("</b>")
-            .Append(" (")
-            .Append(testRunCriteria.TryGetTargetFramework() ?? "Unknown Target Framework")
+            .Append(" ")
+            .Append("(")
+            .Append(frameworkName)
             .Append(")")
             .Append("</summary>")
             .Append("<br/>");
@@ -37,7 +41,6 @@ internal static class TestSummary
         // Overview
         buffer
             // Table header
-            // Use symbols instead of emoji here to avoid visual collision with the header
             .Append("<table>")
             .Append("<th width=\"99999\">")
             .Append("✓")
@@ -73,30 +76,30 @@ internal static class TestSummary
             .Append("<tr>")
             .Append("<td align=\"center\">")
             .Append(
-                testRunStatistics.GetPassedCount() > 0
-                    ? testRunStatistics.GetPassedCount().ToString()
+                passedCount > 0
+                    ? passedCount.ToString()
                     : "—"
             )
             .Append("</td>")
             .Append("<td align=\"center\">")
             .Append(
-                testRunStatistics.GetFailedCount() > 0
-                    ? testRunStatistics.GetFailedCount().ToString()
+                failedCount > 0
+                    ? failedCount.ToString()
                     : "—"
             )
             .Append("</td>")
             .Append("<td align=\"center\">")
             .Append(
-                testRunStatistics.GetSkippedCount() > 0
-                    ? testRunStatistics.GetSkippedCount().ToString()
+                skippedCount > 0
+                    ? skippedCount.ToString()
                     : "—"
             )
             .Append("</td>")
             .Append("<td align=\"center\">")
-            .Append(testRunStatistics.ExecutedTests)
+            .Append(totalCount)
             .Append("</td>")
             .Append("<td align=\"center\">")
-            .Append(testRunElapsedTime.ToHumanString())
+            .Append(totalDuration.ToHumanString())
             .Append("</td>")
             .Append("</tr>")
             .Append("</table>")
@@ -109,8 +112,8 @@ internal static class TestSummary
             // Generate permalink
             var filePath = testResult.TryGetSourceFilePath();
             var fileLine = testResult.TryGetSourceLine();
-            var url = !string.IsNullOrWhiteSpace(filePath) && fileLine is not null
-                ? GitHubWorkflow.TryResolveFilePermalink(filePath, fileLine)
+            var url = !string.IsNullOrWhiteSpace(filePath)
+                ? GitHubWorkflow.TryGenerateFilePermalink(filePath, fileLine)
                 : null;
 
             buffer
