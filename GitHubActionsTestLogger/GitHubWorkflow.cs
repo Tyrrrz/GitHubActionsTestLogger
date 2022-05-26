@@ -92,7 +92,7 @@ public partial class GitHubWorkflow
 
     public static string? SummaryFilePath { get; } = Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 
-    public static string? TryGetFilePermalink(string filePath, int? line)
+    public static string? TryResolveFilePermalink(string filePath, int? line)
     {
         var serverUrl = Environment.GetEnvironmentVariable("GITHUB_SERVER_URL");
         var repository = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
@@ -105,10 +105,7 @@ public partial class GitHubWorkflow
             string.IsNullOrWhiteSpace(commitHash))
             return null;
 
-        var filePathNormalized = filePath.Substring(0, workspaceDirPath.Length)
-            .Pipe(s => s.Replace("\\", "/"))
-            .Pipe(Uri.EscapeDataString);
-
+        var filePathNormalized = filePath.Substring(workspaceDirPath.Length).Replace("\\", "/");
         var lineMarker = line?.Pipe(l => $"#L{l}");
 
         return $"{serverUrl}/{repository}/blob/{commitHash}/{filePathNormalized}{lineMarker}";

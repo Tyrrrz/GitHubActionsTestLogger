@@ -110,7 +110,7 @@ internal static class TestSummary
             var filePath = testResult.TryGetSourceFilePath();
             var fileLine = testResult.TryGetSourceLine();
             var url = !string.IsNullOrWhiteSpace(filePath) && fileLine is not null
-                ? GitHubWorkflow.TryGetFilePermalink(filePath, fileLine)
+                ? GitHubWorkflow.TryResolveFilePermalink(filePath, fileLine)
                 : null;
 
             buffer
@@ -131,7 +131,6 @@ internal static class TestSummary
         }
 
         buffer
-            .Append("<br/>")
             .Append("</details>")
             .AppendLine()
             .AppendLine();
