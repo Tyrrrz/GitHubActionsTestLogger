@@ -68,7 +68,7 @@ public partial class GitHubWorkflow
         _commandWriter.Flush();
     }
 
-    public void ReportError(
+    public void CreateErrorAnnotation(
         string title,
         string message,
         string? filePath = null,
@@ -76,7 +76,7 @@ public partial class GitHubWorkflow
         int? column = null) =>
         WriteCommand("error", title, message, filePath, line, column);
 
-    public void ReportSummary(string content)
+    public void CreateSummary(string content)
     {
         _summaryWriter.WriteLine(content);
         _summaryWriter.Flush();

@@ -146,6 +146,42 @@ public class AnnotationFormatSpecs
     }
 
     [Fact]
+    public void Custom_format_can_reference_test_target_framework_name()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test ($framework)>",
+                AnnotationMessageFormat = "[$test ($framework)]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            "FakeTests.dll",
+            "FakeTargetFramework",
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorStackTrace("ErrorStackTrace")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1 (FakeTargetFramework)>");
+        output.Should().Contain("[Test1 (FakeTargetFramework)]");
+    }
+
+    [Fact]
     public void Custom_format_can_contain_newlines()
     {
         // Arrange

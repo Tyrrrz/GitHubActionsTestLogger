@@ -80,28 +80,34 @@ In order to pass an option to the logger, include it as an additional parameter 
 dotnet test --logger "GitHubActions;option1=foo;option2=bar"
 ```
 
-#### `annotations.messageFormat`
+#### `annotations.titleFormat`
 
-Specifies the format of the annotation message used when reporting test failures.
+Specifies the format of the annotation title used when reporting test failures.
 
 The following replacement tokens are available:
 
 - `$test` — replaced with the test's display name
 - `$traits.TRAIT_NAME` — replaced with the value of the trait named `TRAIT_NAME`
-- `$error` — replaced with the error message associated with the test result
-- `$trace` — replaced with the stack trace associated with the test result
+- `$error` — replaced with the error message
+- `$trace` — replaced with the stack trace
+- `$framework` — replaced with the target framework
+
+**Default**: `$test`.
+
+**Examples**:
+
+- `$test` → `MyTests.Test1`
+- `[$traits.Category] $test` → `[UI Tests] MyTests.Test1`
+- `$test ($framework)` → `MyTests.Test1 (.NETCoreApp,Version=v6.0)`
+
+#### `annotations.messageFormat`
+
+Specifies the format of the annotation message used when reporting test failures.
+Supports the same replacement tokens as [`annotations.titleFormat`](#annotationstitleformat).
 
 **Default**: `$error`.
 
 **Examples**:
 
 - `$error` → `AssertionException: Expected 'true' but found 'false'`
-- `$test: $error` → `MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
-- `[$traits.Category] $test: $error` → `[UI Tests] MyTests.Test1: AssertionException: Expected 'true' but found 'false'`
-
-#### `annotations.titleFormat`
-
-Specifies the format of the annotation title used when reporting test failures.
-Supports the same replacement tokens as [`annotations.messageFormat`](#annotationsmessageformat).
-
-**Default**: `$test`.
+- `$error\n$trace` → `AssertionException: Expected 'true' but found 'false'`, followed by stacktrace on the next line

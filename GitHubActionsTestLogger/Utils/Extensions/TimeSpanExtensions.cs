@@ -4,17 +4,11 @@ namespace GitHubActionsTestLogger.Utils.Extensions;
 
 internal static class TimeSpanExtensions
 {
-    public static string ToHumanString(this TimeSpan timeSpan)
+    public static string ToHumanString(this TimeSpan timeSpan) => timeSpan switch
     {
-        if (timeSpan.TotalSeconds <= 1)
-            return timeSpan.Milliseconds + "ms";
-
-        if (timeSpan.TotalMinutes <= 1)
-            return timeSpan.Seconds + "s";
-
-        if (timeSpan.TotalHours <= 1)
-            return timeSpan.Minutes + "m " + timeSpan.Seconds + "s";
-
-        return timeSpan.Hours + "h " + timeSpan.Minutes + "m";
-    }
+        { TotalSeconds: <= 1 } t => t.Milliseconds + "ms",
+        { TotalMinutes: <= 1 } t => t.Seconds + "s",
+        { TotalHours: <= 1 } t => t.Minutes + "m" + t.Seconds + "s",
+        var t => t.Hours + "h " + t.Minutes + "m"
+    };
 }

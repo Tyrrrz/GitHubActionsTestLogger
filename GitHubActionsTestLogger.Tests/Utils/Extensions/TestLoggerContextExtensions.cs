@@ -12,12 +12,22 @@ internal static class TestLoggerContextExtensions
 {
     public static void SimulateTestRun(
         this TestLoggerContext context,
-        string suiteFilePath,
+        string testSuiteFilePath,
+        string targetFrameworkName,
         params TestResult[] testResults)
     {
+        var testSettings = @$"
+<?xml version=""1.0"" encoding=""utf-8""?>
+<RunSettings>
+    <RunConfiguration>
+        <TargetFrameworkVersion>{targetFrameworkName}</TargetFrameworkVersion>
+    </RunConfiguration>
+</RunSettings>
+".Trim();
+
         context.HandleTestRunStart(
             new TestRunStartEventArgs(
-                new TestRunCriteria(new[] { suiteFilePath }, 1)
+                new TestRunCriteria(new[] { testSuiteFilePath }, 1, true, testSettings)
             )
         );
 
@@ -42,6 +52,14 @@ internal static class TestLoggerContextExtensions
         );
     }
 
-    public static void SimulateTestRun(this TestLoggerContext context, params TestResult[] testResults) =>
+    public static void SimulateTestRun(
+        this TestLoggerContext context,
+        string testSuiteName,
+        params TestResult[] testResults) =>
+        context.SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
+
+    public static void SimulateTestRun(
+        this TestLoggerContext context,
+        params TestResult[] testResults) =>
         context.SimulateTestRun("FakeTests.dll", testResults);
 }

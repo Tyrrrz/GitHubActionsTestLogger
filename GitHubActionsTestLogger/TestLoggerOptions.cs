@@ -4,9 +4,9 @@ namespace GitHubActionsTestLogger;
 
 public partial class TestLoggerOptions
 {
-    public string AnnotationTitleFormat { get; init; } = $"{TestResultFormat.NameToken}";
+    public string AnnotationTitleFormat { get; init; } = "$test";
 
-    public string AnnotationMessageFormat { get; init; } = $"{TestResultFormat.ErrorMessageToken}";
+    public string AnnotationMessageFormat { get; init; } = "$error";
 }
 
 public partial class TestLoggerOptions

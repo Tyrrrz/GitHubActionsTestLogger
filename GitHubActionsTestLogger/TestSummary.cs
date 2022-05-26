@@ -10,8 +10,8 @@ namespace GitHubActionsTestLogger;
 internal static class TestSummary
 {
     public static string Generate(
-        string suiteName,
-        string frameworkName,
+        string testSuiteName,
+        string targetFrameworkName,
         IReadOnlyList<TestResult> testResults)
     {
         var passedCount = testResults.Count(t => t.Outcome == TestOutcome.Passed);
@@ -29,11 +29,11 @@ internal static class TestSummary
             .Append(failedCount <= 0 ? "🟢" : "🔴")
             .Append(" ")
             .Append("<b>")
-            .Append(suiteName)
+            .Append(testSuiteName)
             .Append("</b>")
             .Append(" ")
             .Append("(")
-            .Append(frameworkName)
+            .Append(targetFrameworkName)
             .Append(")")
             .Append("</summary>")
             .Append("<br/>");
