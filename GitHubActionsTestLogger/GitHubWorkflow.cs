@@ -108,7 +108,7 @@ public partial class GitHubWorkflow
             return null;
 
         var filePathNormalized = PathEx
-            .GetRelativePath(workspacePath.EnsureEndsWith("/"), filePath)
+            .GetRelativePath(workspacePath, filePath)
             .Replace("\\", "/")
             .Trim('/');
 

@@ -39,10 +39,4 @@ internal static class StringExtensions
 
         return builder;
     }
-
-    public static string EnsureEndsWith(
-        this string str,
-        string end,
-        StringComparison comparison = StringComparison.Ordinal) =>
-        !str.EndsWith(end, comparison) ? str + end : str;
 }
