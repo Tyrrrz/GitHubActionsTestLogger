@@ -11,9 +11,9 @@
 
 > 🟢 **Project status**: active<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
-Custom logger for `dotnet test` that reports test results in a structured format that GitHub Actions understands.
+Custom logger for `dotnet test` that integrates with GitHub Actions.
 When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
-Additionally, this also generates a job summary that contains detailed information about the executed test run.
+Additionally, this logger also generates a job summary that contains detailed information about the executed test run.
 
 ## Terms of use
 
@@ -66,7 +66,7 @@ jobs:
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
-> ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **16.8.0** or higher.
+> ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **17.2.0** or higher.
 > Older versions of this package may not work properly with custom test loggers.
 
 > ⚠️ If you are using **.NET SDK v2.2 or lower**, you need to enable [`<CopyLocalLockFileAssemblies>`](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667) property in your test project.
@@ -77,7 +77,7 @@ jobs:
 In order to pass an option to the logger, include it as an additional parameter inside `--logger`:
 
 ```powershell
-dotnet test --logger "GitHubActions;option1=foo;option2=bar"
+dotnet test --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
 ```
 
 #### `annotations.titleFormat`
@@ -86,7 +86,7 @@ Specifies the format of the annotation title used when reporting test failures.
 
 The following replacement tokens are available:
 
-- `$test` — replaced with the test's display name
+- `$test` — replaced with the display name of the test
 - `$traits.TRAIT_NAME` — replaced with the value of the trait named `TRAIT_NAME`
 - `$error` — replaced with the error message
 - `$trace` — replaced with the stack trace
