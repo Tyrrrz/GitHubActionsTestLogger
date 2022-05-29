@@ -7,6 +7,9 @@ jobs:
     uses: Tyrrrz/.github/.github/workflows/nuget.yml@master
     with:
       dotnet-version: 6.0.x
+      # Don't use the default logger (which is GitHubActionsTestLogger) because that
+      # causes contention issues since we're literally building and testing that logger.
+      dotnet-test-logger: console
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
