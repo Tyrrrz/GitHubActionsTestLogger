@@ -1,3 +1,13 @@
+### v2.0 (29-May-2022)
+
+- Test summary now only displays failed tests instead of all executed tests. Displaying all tests made the summary very hard to navigate and caused severe performance issues in repositories with large test suites.
+- Failed tests in test summary now link to the file and the exact code line where the error happened. This link is static and is bound to the commit hash that triggered the workflow.
+- Redesigned the test summary to be more visually appealing and easier to read.
+- Removed the `report-warnings` option. Skipped tests are no longer reported in annotations. The new default (and only) behavior is equivalent to setting `report-warnings=false` in the previous versions of the logger.
+- Renamed the `format` option to `annotations.titleFormat` to better reflect its purpose. This option can be used to specify the format of the annotation title (the header of the alert box shown in diffs and job overviews).
+- Added the `annotations.messageFormat` option that can be used to specify the format of the annotation message (the body of the alert box shown in diffs and job overviews).
+- Added `$framework` replacement token that can be used in `annotations.titleFormat` and `annotations.messageFormat` to display the target framework of the associated test.
+
 ### v1.4.1 (19-Apr-2022)
 
 - Improved test summary formatting and layout.
