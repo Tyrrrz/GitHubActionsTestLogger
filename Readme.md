@@ -32,7 +32,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ## Screenshots
 
-![diff](.assets/diff.png)
+![annotations](.assets/annotations.png)
 ![summary](.assets/summary.png)
 
 ## Usage
