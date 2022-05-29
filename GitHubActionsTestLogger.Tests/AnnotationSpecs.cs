@@ -33,6 +33,7 @@ public class AnnotationSpecs
 
         // Assert
         var output = commandWriter.ToString().Trim();
+
         output.Should().BeEmpty();
     }
 
@@ -60,6 +61,7 @@ public class AnnotationSpecs
 
         // Assert
         var output = commandWriter.ToString().Trim();
+
         output.Should().BeEmpty();
     }
 

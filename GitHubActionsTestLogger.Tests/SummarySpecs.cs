@@ -28,6 +28,7 @@ public class SummarySpecs
 
         // Assert
         var output = summaryWriter.ToString().Trim();
+
         output.Should().Contain("TestProject");
     }
 

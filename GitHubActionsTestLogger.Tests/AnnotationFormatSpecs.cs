@@ -208,6 +208,37 @@ public class AnnotationFormatSpecs
 
         // Assert
         var output = commandWriter.ToString().Trim();
+
         output.Should().Contain("foo%0Abar");
+    }
+
+    [Fact]
+    public void Default_format_references_test_name_and_error_message()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            TestLoggerOptions.Default
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorMessage("ErrorMessage")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("Test1");
+        output.Should().Contain("ErrorMessage");
     }
 }

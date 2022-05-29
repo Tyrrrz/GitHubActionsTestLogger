@@ -33,17 +33,17 @@ public class TestLoggerContext
         buffer.Replace("\\n", "\n");
 
         // Name token
-        buffer.Replace("$test", testResult.TestCase.DisplayName);
+        buffer.Replace("$test", testResult.TestCase.DisplayName ?? "");
 
         // Traits tokens
         foreach (var trait in testResult.Traits.Union(testResult.TestCase.Traits))
             buffer.Replace($"$traits.{trait.Name}", trait.Value);
 
         // Error message
-        buffer.Replace("$error", testResult.ErrorMessage);
+        buffer.Replace("$error", testResult.ErrorMessage ?? "");
 
         // Error trace
-        buffer.Replace("$trace", testResult.ErrorStackTrace);
+        buffer.Replace("$trace", testResult.ErrorStackTrace ?? "");
 
         // Target framework
         buffer.Replace("$framework", _testRunCriteria?.TryGetTargetFramework() ?? "");
@@ -91,6 +91,8 @@ public class TestLoggerContext
         {
             // TestRunStart event sometimes doesn't fire, which means _testRunCriteria may be null
             // https://github.com/microsoft/vstest/issues/3121
+            // Note: it might be an issue only on this repo, when using coverlet with the logger
+            // https://twitter.com/Tyrrrz/status/1530141770788610048
 
             var testSuiteName =
                 _testRunCriteria?.Sources.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
