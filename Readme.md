@@ -15,7 +15,7 @@ Custom logger for `dotnet test` that integrates with GitHub Actions.
 When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
 Additionally, this logger also generates a job summary that contains detailed information about the executed test run.
 
-## Terms of use
+## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:
 
