@@ -66,10 +66,12 @@ jobs:
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
-> ⚠️ Ensure that your test project references **Microsoft.NET.Test.Sdk** version **17.2.0** or higher.
+> **Warning**:
+> Ensure that your test project references **Microsoft.NET.Test.Sdk** version **17.2.0** or higher.
 > Older versions of this package may not work properly with custom test loggers.
 
-> ⚠️ If you are using **.NET SDK v2.2 or lower**, you need to enable [`<CopyLocalLockFileAssemblies>`](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667) property in your test project.
+> **Warning**:
+> If you are using **.NET SDK v2.2 or lower**, you need to enable [`<CopyLocalLockFileAssemblies>`](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667) property in your test project.
 
 ### Options
 
