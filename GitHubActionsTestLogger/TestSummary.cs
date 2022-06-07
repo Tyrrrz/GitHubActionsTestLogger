@@ -35,6 +35,10 @@ internal static class TestSummary
             .Append("(")
             .Append(targetFrameworkName)
             .Append(")")
+            .Append(" ")
+            .Append("(")
+            .Append(totalTestDuration.ToHumanString())
+            .Append(")")
             .Append("</summary>")
             .Append("<br/>");
 
@@ -66,12 +70,6 @@ internal static class TestSummary
             .Append("&nbsp;")
             .Append("Total")
             .Append("</th>")
-            .Append("<th width=\"99999\">")
-            .Append("⧗")
-            .Append("&nbsp;")
-            .Append("&nbsp;")
-            .Append("Elapsed")
-            .Append("</th>")
             // Table body
             .Append("<tr>")
             .Append("<td align=\"center\">")
@@ -97,9 +95,6 @@ internal static class TestSummary
             .Append("</td>")
             .Append("<td align=\"center\">")
             .Append(totalTestCount)
-            .Append("</td>")
-            .Append("<td align=\"center\">")
-            .Append(totalTestDuration.ToHumanString())
             .Append("</td>")
             .Append("</tr>")
             .Append("</table>")
