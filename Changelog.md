@@ -1,3 +1,7 @@
+### v2.0.1 (10-Jun-2022)
+
+- Fixed an issue where the test summary showed incorrect value under the "Elapsed" column. The value shown previously was a sum of all test durations, which didn't account for parallelization.
+
 ### v2.0 (29-May-2022)
 
 - Test summary now only displays failed tests instead of all executed tests. Displaying all tests made the summary very hard to navigate and caused severe performance issues in repositories with large test suites.
