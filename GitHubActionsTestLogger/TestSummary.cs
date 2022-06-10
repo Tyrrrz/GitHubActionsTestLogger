@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using GitHubActionsTestLogger.Utils.Extensions;
@@ -12,21 +11,16 @@ internal static class TestSummary
     public static string Generate(
         string testSuiteName,
         string targetFrameworkName,
+        TestRunStatistics testRunStatistics,
         IReadOnlyList<TestResult> testResults)
     {
-        var passedTestCount = testResults.Count(t => t.Outcome == TestOutcome.Passed);
-        var failedTestCount = testResults.Count(t => t.Outcome == TestOutcome.Failed);
-        var skippedTestCount = testResults.Count(t => t.Outcome == TestOutcome.Skipped);
-        var totalTestCount = testResults.Count;
-        var totalTestDuration = TimeSpan.FromMilliseconds(testResults.Sum(t => t.Duration.TotalMilliseconds));
-
         var buffer = new StringBuilder();
 
         // Spoiler header
         buffer
             .Append("<details>")
             .Append("<summary>")
-            .Append(failedTestCount <= 0 ? "🟢" : "🔴")
+            .Append(testRunStatistics.FailedTestCount <= 0 ? "🟢" : "🔴")
             .Append(" ")
             .Append("<b>")
             .Append(testSuiteName)
@@ -76,30 +70,30 @@ internal static class TestSummary
             .Append("<tr>")
             .Append("<td align=\"center\">")
             .Append(
-                passedTestCount > 0
-                    ? passedTestCount.ToString()
+                testRunStatistics.PassedTestCount > 0
+                    ? testRunStatistics.PassedTestCount.ToString()
                     : "—"
             )
             .Append("</td>")
             .Append("<td align=\"center\">")
             .Append(
-                failedTestCount > 0
-                    ? failedTestCount.ToString()
+                testRunStatistics.FailedTestCount > 0
+                    ? testRunStatistics.FailedTestCount.ToString()
                     : "—"
             )
             .Append("</td>")
             .Append("<td align=\"center\">")
             .Append(
-                skippedTestCount > 0
-                    ? skippedTestCount.ToString()
+                testRunStatistics.SkippedTestCount > 0
+                    ? testRunStatistics.SkippedTestCount.ToString()
                     : "—"
             )
             .Append("</td>")
             .Append("<td align=\"center\">")
-            .Append(totalTestCount)
+            .Append(testRunStatistics.TotalTestCount)
             .Append("</td>")
             .Append("<td align=\"center\">")
-            .Append(totalTestDuration.ToHumanString())
+            .Append(testRunStatistics.ElapsedDuration.ToHumanString())
             .Append("</td>")
             .Append("</tr>")
             .Append("</table>")
