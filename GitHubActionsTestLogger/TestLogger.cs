@@ -21,8 +21,9 @@ public class TestLogger : ITestLoggerWithParameters
 
         // Summary is written to the file specified by an environment variable.
         // We may need to write to the summary file from multiple test suites in parallel, so we should:
-        // 1. Delay acquiring the file lock until the very last moment
-        // 2. Employ retry logic to handle potential race conditions
+        // 1. Delay acquiring the file lock until the very last moment.
+        // 2. Employ retry logic to handle potential race conditions.
+        // These requirements are handled by the ContentionTolerantWriteFileStream class.
         var summaryWriter =
             GitHubWorkflow
                 .SummaryFilePath?

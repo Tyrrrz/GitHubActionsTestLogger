@@ -80,7 +80,7 @@ public class TestLoggerContext
                 );
             }
 
-            // Record all test results to write them to summary later
+            // Record all test results to write them to the summary later
             _testResults.Add(args.Result);
         }
     }
@@ -95,7 +95,7 @@ public class TestLoggerContext
             // https://twitter.com/Tyrrrz/status/1530141770788610048
 
             var testSuiteName =
-                _testRunCriteria?.Sources.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
+                _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
                 "Unknown Test Suite";
 
             var targetFrameworkName =
@@ -103,10 +103,10 @@ public class TestLoggerContext
                 "Unknown Target Framework";
 
             var testRunStatistics = new TestRunStatistics(
-                args.TestRunStatistics[TestOutcome.Passed],
-                args.TestRunStatistics[TestOutcome.Failed],
-                args.TestRunStatistics[TestOutcome.Skipped],
-                args.TestRunStatistics.ExecutedTests,
+                args.TestRunStatistics?[TestOutcome.Passed] ?? 0,
+                args.TestRunStatistics?[TestOutcome.Failed] ?? 0,
+                args.TestRunStatistics?[TestOutcome.Skipped] ?? 0,
+                args.TestRunStatistics?.ExecutedTests ?? 0,
                 args.ElapsedTimeInRunningTests
             );
 

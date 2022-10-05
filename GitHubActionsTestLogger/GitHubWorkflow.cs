@@ -26,7 +26,7 @@ public partial class GitHubWorkflow
         int? line = null,
         int? column = null)
     {
-        // URL-encode certain characters to escape them from being processed as command tokens
+        // URL-encode certain characters to ensure they don't get parsed as command tokens
         // https://pakstech.com/blog/github-actions-workflow-commands
         static string Escape(string value) => value
             .Replace("%", "%25")
@@ -94,7 +94,7 @@ public partial class GitHubWorkflow
     public static string? SummaryFilePath { get; } =
         Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 
-    public static string? TryGenerateFilePermalink(string filePath, int? line)
+    public static string? TryGenerateFilePermalink(string filePath, int? line = null)
     {
         var serverUrl = Environment.GetEnvironmentVariable("GITHUB_SERVER_URL");
         var repositorySlug = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");

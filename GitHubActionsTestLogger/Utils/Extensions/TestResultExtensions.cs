@@ -66,11 +66,11 @@ internal static class TestResultExtensions
             return null;
         }
 
-        // See if test runner provided it (never actually happens)
+        // See if the test runner provided it (never actually happens)
         if (!string.IsNullOrWhiteSpace(testResult.TestCase.CodeFilePath))
             return testResult.TestCase.CodeFilePath;
 
-        // Try to extract it from stack trace (works only if there was an exception)
+        // Try to extract it from the stack trace (works only if there was an exception)
         var stackFrame = testResult.TryGetTestStackFrame();
         if (!string.IsNullOrWhiteSpace(stackFrame?.FilePath))
             return stackFrame.FilePath;
@@ -88,11 +88,11 @@ internal static class TestResultExtensions
 
     public static int? TryGetSourceLine(this TestResult testResult)
     {
-        // See if test runner provided it (never actually happens)
+        // See if the test runner provided it (never actually happens)
         if (testResult.TestCase.LineNumber > 0)
             return testResult.TestCase.LineNumber;
 
-        // Try to extract it from stack trace (works only if there was an exception)
+        // Try to extract it from the stack trace (works only if there was an exception)
         return testResult.TryGetTestStackFrame()?.Line;
     }
 }

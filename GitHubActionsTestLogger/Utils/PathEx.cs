@@ -12,7 +12,7 @@ internal static class PathEx
             ? StringComparison.OrdinalIgnoreCase
             : StringComparison.Ordinal;
 
-    // This method exists on .NET5+ but it's impossible to polyfill static
+    // This method exists on .NET 5+ but it's impossible to polyfill static
     // members, so we'll just use this one on all targets.
     public static string GetRelativePath(string basePath, string path)
     {
