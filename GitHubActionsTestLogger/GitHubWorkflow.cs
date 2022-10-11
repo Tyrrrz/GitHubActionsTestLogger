@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using GitHubActionsTestLogger.Utils;
 using GitHubActionsTestLogger.Utils.Extensions;
 
@@ -18,13 +19,10 @@ public partial class GitHubWorkflow
         _summaryWriter = summaryWriter;
     }
 
-    private void WriteCommand(
-        string name,
-        string title,
+    private void InvokeCommand(
+        string command,
         string message,
-        string? filePath = null,
-        int? line = null,
-        int? column = null)
+        IReadOnlyDictionary<string, string>? options = null)
     {
         // URL-encode certain characters to ensure they don't get parsed as command tokens
         // https://pakstech.com/blog/github-actions-workflow-commands
@@ -33,24 +31,9 @@ public partial class GitHubWorkflow
             .Replace("\n", "%0A")
             .Replace("\r", "%0D");
 
-        string FormatOptions()
-        {
-            var options = new List<string>(3);
-
-            if (!string.IsNullOrWhiteSpace(filePath))
-                options.Add($"file={Escape(filePath)}");
-
-            if (line is not null)
-                options.Add($"line={Escape(line.ToString())}");
-
-            if (column is not null)
-                options.Add($"col={Escape(column.ToString())}");
-
-            if (!string.IsNullOrWhiteSpace(title))
-                options.Add($"title={Escape(title)}");
-
-            return string.Join(",", options);
-        }
+        var formattedOptions = options?
+            .Select(kvp => Escape(kvp.Key) + '=' + Escape(kvp.Value))
+            .Pipe(s => string.Join(",", s));
 
         // Command should start at the beginning of the line, so add a newline
         // to make sure there is no preceding text.
@@ -59,7 +42,7 @@ public partial class GitHubWorkflow
         _commandWriter.WriteLine();
 
         _commandWriter.WriteLine(
-            $"::{name} {FormatOptions()}::{Escape(message)}"
+            $"::{command} {formattedOptions}::{Escape(message)}"
         );
 
         // This newline is just for symmetry
@@ -73,8 +56,24 @@ public partial class GitHubWorkflow
         string message,
         string? filePath = null,
         int? line = null,
-        int? column = null) =>
-        WriteCommand("error", title, message, filePath, line, column);
+        int? column = null)
+    {
+        var options = new Dictionary<string, string>
+        {
+            ["title"] = title
+        };
+
+        if (!string.IsNullOrWhiteSpace(filePath))
+            options["file"] = filePath;
+
+        if (line is not null)
+            options["line"] = line.ToString();
+
+        if (column is not null)
+            options["col"] = column.ToString();
+
+        InvokeCommand("error", message, options);
+    }
 
     public void CreateSummary(string content)
     {
