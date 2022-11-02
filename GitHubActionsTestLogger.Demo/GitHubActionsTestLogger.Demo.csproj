@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 
-    <!-- Set this to 'true' in order to run tests -->
+    <!-- Prevent these tests from running by default, since they are intended to fail by design -->
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 

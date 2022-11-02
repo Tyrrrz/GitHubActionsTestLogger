@@ -2,9 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net451</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <Authors>$(Company)</Authors>
     <Description>Custom test logger that reports test results in a structured format that GitHub Actions understands</Description>
-    <IsPackable>true</IsPackable>
     <PackageTags>github actions test logger</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/GitHubActionsTestLogger</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/blob/master/Changelog.md</PackageReleaseNotes>
