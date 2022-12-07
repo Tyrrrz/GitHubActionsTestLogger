@@ -1,7 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable InconsistentNaming
 
-#if NETSTANDARD2_0 || NET451
+#if NETSTANDARD2_0 || NET462
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,27 +19,6 @@ namespace System.Collections.Generic
     {
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key!, out var result) ? result! : default!;
-    }
-}
-#endif
-
-#if NET451
-namespace System.Runtime.InteropServices
-{
-    internal enum OSPlatform
-    {
-        Windows,
-        Linux,
-        OSX,
-        FreeBSD,
-        NetBSD,
-        Solaris,
-        Unknown
-    }
-
-    internal static class RuntimeInformation
-    {
-        public static bool IsOSPlatform(OSPlatform osPlatform) => osPlatform == OSPlatform.Windows;
     }
 }
 #endif
