@@ -122,16 +122,17 @@ public class AnnotationSpecs
                 )
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
-                .SetErrorStackTrace(@"
-at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
-at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
-at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
-at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
-at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
-at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
-at FluentAssertions.Primitives.BooleanAssertions.BeFalse(String because, Object[] becauseArgs)
-at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately() in /dir/CliWrap.Tests/CancellationSpecs.cs:line 75
-"
+                .SetErrorStackTrace(
+                    """
+                    at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+                    at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+                    at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+                    at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+                    at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+                    at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+                    at FluentAssertions.Primitives.BooleanAssertions.BeFalse(String because, Object[] becauseArgs)
+                    at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately() in /dir/CliWrap.Tests/CancellationSpecs.cs:line 75
+                    """
                 )
                 .Build()
         );
@@ -172,20 +173,21 @@ at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_ca
                 )
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
-                .SetErrorStackTrace(@"
-at System.Net.Http.HttpContent.CheckDisposed()
-at System.Net.Http.HttpContent.ReadAsStringAsync()
-at Sentry.Tests.Internals.Http.HttpTransportTests.<SendEnvelopeAsync_ItemRateLimit_DropsItem>d__3.MoveNext() in /dir/Sentry.Tests/Internals/Http/HttpTransportTests.cs:line 187
---- End of stack trace from previous location where exception was thrown ---
-at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
---- End of stack trace from previous location where exception was thrown ---
-at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
---- End of stack trace from previous location where exception was thrown ---
-at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-"
+                .SetErrorStackTrace(
+                    """
+                    at System.Net.Http.HttpContent.CheckDisposed()
+                    at System.Net.Http.HttpContent.ReadAsStringAsync()
+                    at Sentry.Tests.Internals.Http.HttpTransportTests.<SendEnvelopeAsync_ItemRateLimit_DropsItem>d__3.MoveNext() in /dir/Sentry.Tests/Internals/Http/HttpTransportTests.cs:line 187
+                    --- End of stack trace from previous location where exception was thrown ---
+                    at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                    --- End of stack trace from previous location where exception was thrown ---
+                    at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                    --- End of stack trace from previous location where exception was thrown ---
+                    at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+                    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+                    """
                 )
                 .Build()
         );
