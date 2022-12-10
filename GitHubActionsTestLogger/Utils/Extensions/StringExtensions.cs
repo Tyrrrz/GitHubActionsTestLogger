@@ -12,7 +12,7 @@ internal static class StringExtensions
         var index = str.IndexOf(sub, comparison);
         return index < 0
             ? str
-            : str.Substring(0, index);
+            : str[..index];
     }
 
     public static string SubstringAfterLast(this string str, string sub,
@@ -34,7 +34,7 @@ internal static class StringExtensions
         while (builder.Length > 0 && char.IsWhiteSpace(builder[0]))
             builder.Remove(0, 1);
 
-        while (builder.Length > 0 && char.IsWhiteSpace(builder[builder.Length - 1]))
+        while (builder.Length > 0 && char.IsWhiteSpace(builder[^1]))
             builder.Remove(builder.Length - 1, 1);
 
         return builder;
