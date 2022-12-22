@@ -76,16 +76,15 @@ jobs:
 
 ### Options
 
-**GitHub Actions Test Logger** has options that you can override to customize its behavior.
-In order to pass an option to the logger, include it as an additional parameter inside `--logger`:
+When running `dotnet test`, you can customize the logger's behavior by passing additional options:
 
 ```powershell
 dotnet test --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
 ```
 
-#### `annotations.titleFormat`
+#### Custom annotation title
 
-Specifies the format of the annotation title used when reporting test failures.
+Use the `annotations.titleFormat` option to specify the annotation title format used for reporting test failures.
 
 The following replacement tokens are available:
 
@@ -103,10 +102,10 @@ The following replacement tokens are available:
 - `[$traits.Category] $test` → `[UI Tests] MyTests.Test1`
 - `$test ($framework)` → `MyTests.Test1 (.NETCoreApp,Version=v6.0)`
 
-#### `annotations.messageFormat`
+#### Custom annotation message
 
-Specifies the format of the annotation message used when reporting test failures.
-Supports the same replacement tokens as [`annotations.titleFormat`](#annotationstitleformat).
+Use the `annotations.messageFormat` option to specify the annotation message format used for reporting test failures.
+Supports the same replacement tokens as [`annotations.titleFormat`](#custom-annotation-title).
 
 **Default**: `$error`.
 
