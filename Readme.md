@@ -11,7 +11,7 @@
 
 > 🟡 **Project status**: maintenance mode<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
-Custom logger for `dotnet test` that integrates with GitHub Actions.
+**GitHub Actions Test Logger** is a custom logger for `dotnet test` that integrates with GitHub Actions.
 When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
 Additionally, this logger also generates a job summary that contains detailed information about the executed test run.
 
