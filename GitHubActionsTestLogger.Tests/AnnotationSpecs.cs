@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Utils;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
@@ -219,7 +220,7 @@ public class AnnotationSpecs
         // Act
         context.SimulateTestRun(
             new TestResultBuilder()
-                .SetSource(typeof(AnnotationSpecs).Assembly.Location)
+                .SetSource(Assembly.GetExecutingAssembly().Location)
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
