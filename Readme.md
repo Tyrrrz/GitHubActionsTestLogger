@@ -24,7 +24,7 @@ By using this project or its source code, for any purpose and in any shape or fo
 - You **support Ukraine's territorial integrity, including its claims over temporarily occupied territories of Crimea and Donbas**
 - You **reject false narratives perpetuated by Russian state propaganda**
 
-To learn more about the war and how you can help, [click here](https://tyrrrz.me). Glory to Ukraine! 🇺🇦
+To learn more about the war and how you can help, [click here](https://tyrrrz.me/ukraine). Glory to Ukraine! 🇺🇦
 
 ## Install
 
@@ -37,8 +37,6 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ## Usage
 
-### Installation
-
 To use **GitHub Actions Test Logger**, follow these steps:
 
 1. Install **GitHubActionsTestLogger** package in your test project
@@ -46,7 +44,7 @@ To use **GitHub Actions Test Logger**, follow these steps:
 3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
-name: CI
+name: main
 on: [push, pull_request]
 
 jobs:
@@ -74,11 +72,11 @@ jobs:
 > If you are using **.NET SDK v2.2 or lower**, you need to set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project.
 > [Learn more](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
-### Options
+### Customizing behavior
 
 When running `dotnet test`, you can customize the logger's behavior by passing additional options:
 
-```powershell
+```sh
 dotnet test --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
 ```
 
