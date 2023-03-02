@@ -77,7 +77,7 @@ jobs:
 When running `dotnet test`, you can customize the logger's behavior by passing additional options:
 
 ```sh
-dotnet test --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
+$ dotnet test --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
 ```
 
 #### Custom annotation title
