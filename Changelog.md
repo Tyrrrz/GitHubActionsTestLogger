@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.2 (27-Apr-2023)
+
+- Improved execution performance of the logger when running multiple test suites in parallel.
+
 ## v2.0.1 (10-Jun-2022)
 
 - Fixed an issue where the test summary showed incorrect value under the "Elapsed" column. The value shown previously was a sum of all test durations, which didn't account for parallelization.
