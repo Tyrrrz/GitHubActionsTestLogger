@@ -106,13 +106,19 @@ public partial class GitHubWorkflow
             string.IsNullOrWhiteSpace(commitHash))
             return null;
 
-        var filePathNormalized = PathEx
-            .GetRelativePath(workspacePath, filePath)
-            .Replace("\\", "/")
-            .Trim('/');
+        var filePathRelative =
+            // If the file path starts with /_/ but the workspace path is not /_/,
+            // then it's safe to assume that the file path has already been normalized
+            // by the deterministic build feature of the .NET CLI.
+            // In this case, we only need to remove the leading /_/ from the file path
+            // to get the correct relative path.
+            filePath.StartsWith("/_/") && !workspacePath.Equals("/_/")
+                ? filePath[3..]
+                : PathEx.GetRelativePath(workspacePath, filePath);
 
+        var filePathRoute = filePathRelative.Replace('\\', '/').Trim('/');
         var lineMarker = line?.Pipe(l => $"#L{l}");
 
-        return $"{serverUrl}/{repositorySlug}/blob/{commitHash}/{filePathNormalized}{lineMarker}";
+        return $"{serverUrl}/{repositorySlug}/blob/{commitHash}/{filePathRoute}{lineMarker}";
     }
 }
