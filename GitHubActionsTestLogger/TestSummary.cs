@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using GitHubActionsTestLogger.Utils.Extensions;
@@ -108,7 +109,8 @@ internal static class TestSummary
         // Test results
         var testResultsOrdered = testResults
             .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
-            .ThenByDescending(r => r.Outcome == TestOutcome.Passed);
+            .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
+            .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal);
 
         foreach (var testResult in testResultsOrdered)
         {
