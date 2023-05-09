@@ -6,7 +6,9 @@ namespace GitHubActionsTestLogger.Utils.Extensions;
 
 internal static class StringExtensions
 {
-    public static string SubstringUntil(this string str, string sub,
+    public static string SubstringUntil(
+        this string str,
+        string sub,
         StringComparison comparison = StringComparison.Ordinal)
     {
         var index = str.IndexOf(sub, comparison);
@@ -15,7 +17,9 @@ internal static class StringExtensions
             : str[..index];
     }
 
-    public static string SubstringAfterLast(this string str, string sub,
+    public static string SubstringAfterLast(
+        this string str,
+        string sub,
         StringComparison comparison = StringComparison.Ordinal)
     {
         var index = str.LastIndexOf(sub, comparison);

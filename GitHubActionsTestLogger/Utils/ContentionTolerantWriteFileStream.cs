@@ -38,13 +38,13 @@ internal class ContentionTolerantWriteFileStream : Stream
     // Backoff and retry if the file is locked
     private FileStream CreateInnerStream()
     {
-        for (var retry = 0;; retry++)
+        for (var retriesRemaining = 10;; retriesRemaining--)
         {
             try
             {
                 return new FileStream(_filePath, _fileMode);
             }
-            catch (IOException) when (retry < 10)
+            catch (IOException) when (retriesRemaining > 0)
             {
                 // Variance in delay to avoid overlapping back-offs
                 Thread.Sleep(RandomEx.Shared.Next(200, 1000));

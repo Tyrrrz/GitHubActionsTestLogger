@@ -5,8 +5,8 @@ using System.Text.RegularExpressions;
 using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger.Utils;
-// Adapted from https://github.com/atifaziz/StackTraceParser
 
+// Adapted from https://github.com/atifaziz/StackTraceParser
 internal partial class StackFrame
 {
     public string MethodCall { get; }
