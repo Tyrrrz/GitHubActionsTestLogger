@@ -9,7 +9,7 @@ namespace GitHubActionsTestLogger.Tests;
 public class InitializationSpecs
 {
     [Fact]
-    public void Logger_can_be_used_with_default_configuration()
+    public void I_can_use_the_logger_with_the_default_configuration()
     {
         // Arrange
         var logger = new TestLogger();
@@ -24,7 +24,7 @@ public class InitializationSpecs
     }
 
     [Fact]
-    public void Logger_can_be_used_with_custom_configuration()
+    public void I_can_use_the_logger_with_a_custom_configuration()
     {
         // Arrange
         var logger = new TestLogger();

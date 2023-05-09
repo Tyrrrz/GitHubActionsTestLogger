@@ -17,63 +17,7 @@ public class AnnotationSpecs
         _testOutput = testOutput;
 
     [Fact]
-    public void Passed_tests_do_not_get_reported()
-    {
-        // Arrange
-        using var commandWriter = new StringWriter();
-
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
-            TestLoggerOptions.Default
-        );
-
-        // Act
-        context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Passed)
-                .Build()
-        );
-
-        // Assert
-        var output = commandWriter.ToString().Trim();
-
-        output.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Skipped_tests_do_not_get_reported()
-    {
-        // Arrange
-        using var commandWriter = new StringWriter();
-
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
-            TestLoggerOptions.Default
-        );
-
-        // Act
-        context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Skipped)
-                .Build()
-        );
-
-        // Assert
-        var output = commandWriter.ToString().Trim();
-
-        output.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Failed_tests_get_reported()
+    public void I_can_use_the_logger_to_produce_annotations_for_failed_tests()
     {
         // Arrange
         using var commandWriter = new StringWriter();
@@ -92,6 +36,14 @@ public class AnnotationSpecs
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
+                .Build(),
+            new TestResultBuilder()
+                .SetDisplayName("Test2")
+                .SetOutcome(TestOutcome.Passed)
+                .Build(),
+            new TestResultBuilder()
+                .SetDisplayName("Test3")
+                .SetOutcome(TestOutcome.Skipped)
                 .Build()
         );
 
@@ -102,11 +54,14 @@ public class AnnotationSpecs
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
 
+        output.Should().NotContain("Test2");
+        output.Should().NotContain("Test3");
+
         _testOutput.WriteLine(output);
     }
 
     [Fact]
-    public void Failed_tests_get_reported_with_source_information_if_exception_was_thrown()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information()
     {
         // .NET test platform never sends source information, so we can only
         // rely on exception stack traces to get it.
@@ -159,7 +114,7 @@ public class AnnotationSpecs
     }
 
     [Fact]
-    public void Failed_tests_get_reported_with_source_information_if_exception_was_thrown_in_an_async_method()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_for_async_tests()
     {
         // .NET test platform never sends source information, so we can only
         // rely on exception stack traces to get it.
@@ -216,7 +171,7 @@ public class AnnotationSpecs
     }
 
     [Fact]
-    public void Failed_tests_get_reported_with_approximate_source_information_if_exception_was_not_thrown()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_approximate_source_information_as_fallback()
     {
         // Arrange
         using var commandWriter = new StringWriter();
@@ -246,6 +201,221 @@ public class AnnotationSpecs
         output.Should().MatchRegex(@"file=.*?\.csproj");
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
+
+        _testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_annotations_that_include_the_test_name()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test>",
+                AnnotationMessageFormat = "[$test]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1>");
+        output.Should().Contain("[Test1]");
+
+        _testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_annotations_that_include_test_traits()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$traits.Category -> $test>",
+                AnnotationMessageFormat = "[$traits.Category -> $test]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetTrait("Category", "UI Test")
+                .SetTrait("Document", "SS01")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<UI Test -> Test1>");
+        output.Should().Contain("[UI Test -> Test1]");
+
+        _testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_annotations_that_include_the_error_message()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test: $error>",
+                AnnotationMessageFormat = "[$test: $error]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorMessage("ErrorMessage")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1: ErrorMessage>");
+        output.Should().Contain("[Test1: ErrorMessage]");
+
+        _testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_annotations_that_include_the_error_stacktrace()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test: $trace>",
+                AnnotationMessageFormat = "[$test: $trace]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorStackTrace("ErrorStackTrace")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1: ErrorStackTrace>");
+        output.Should().Contain("[Test1: ErrorStackTrace]");
+
+        _testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_annotations_that_include_the_target_framework_version()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationTitleFormat = "<$test ($framework)>",
+                AnnotationMessageFormat = "[$test ($framework)]"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            "FakeTests.dll",
+            "FakeTargetFramework",
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .SetErrorStackTrace("ErrorStackTrace")
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("<Test1 (FakeTargetFramework)>");
+        output.Should().Contain("[Test1 (FakeTargetFramework)]");
+
+        _testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_annotations_that_include_line_breaks()
+    {
+        // Arrange
+        using var commandWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(
+                commandWriter,
+                TextWriter.Null
+            ),
+            new TestLoggerOptions
+            {
+                AnnotationMessageFormat = "foo\\nbar"
+            }
+        );
+
+        // Act
+        context.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
+
+        // Assert
+        var output = commandWriter.ToString().Trim();
+
+        output.Should().Contain("foo%0Abar");
 
         _testOutput.WriteLine(output);
     }
