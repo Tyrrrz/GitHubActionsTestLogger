@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1 (09-May-2023)
+
+- Added `summary.includePassedTests` and `summary.includeSkippedTests` options to extend the test summary with the list of passed and skipped tests, respectively. These options are set to `false` by default to match the previous behavior.
+- Fixed an issue where the test summary had invalid links to test definitions when running with `ContinuousIntegrationBuild` MSBuild property enabled.
+
 ## v2.0.2 (27-Apr-2023)
 
 - Improved execution performance of the logger when running multiple test suites in parallel.
