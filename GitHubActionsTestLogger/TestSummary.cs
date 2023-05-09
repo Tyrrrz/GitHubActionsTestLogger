@@ -20,7 +20,12 @@ internal static class TestSummary
         buffer
             .Append("<details>")
             .Append("<summary>")
-            .Append(testRunStatistics.FailedTestCount <= 0 ? "🟢" : "🔴")
+            .Append(testRunStatistics.OverallOutcome switch
+            {
+                TestOutcome.Passed => "🟢",
+                TestOutcome.Failed => "🔴",
+                _ => "🟡"
+            })
             .Append(" ")
             .Append("<b>")
             .Append(testSuiteName)
@@ -100,35 +105,62 @@ internal static class TestSummary
             .AppendLine()
             .AppendLine();
 
-        // List of failed tests
-        foreach (var testResult in testResults.Where(r => r.Outcome == TestOutcome.Failed))
+        // Test results
+        var testResultsOrdered = testResults
+            .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
+            .ThenByDescending(r => r.Outcome == TestOutcome.Passed);
+
+        foreach (var testResult in testResultsOrdered)
         {
-            // Generate permalink for the test
+            // Generate permalink for the test source
             var filePath = testResult.TryGetSourceFilePath();
             var fileLine = testResult.TryGetSourceLine();
-            var url = !string.IsNullOrWhiteSpace(filePath)
-                ? GitHubWorkflow.TryGenerateFilePermalink(filePath, fileLine)
-                : null;
+            var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
 
             buffer
-                .Append("- Fail: ")
-                .Append("[")
+                .Append("- ")
+                .Append(testResult.Outcome switch
+                {
+                    TestOutcome.Passed => "🟢",
+                    TestOutcome.Failed => "🔴",
+                    _ => "🟡"
+                })
+                .Append(" ");
+
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                buffer
+                    .Append("[");
+            }
+
+            buffer
                 .Append("**")
                 .Append(testResult.TestCase.DisplayName)
-                .Append("**")
-                .Append("]")
-                .Append("(")
-                .Append(url ?? "#")
-                .Append(")")
-                .AppendLine()
+                .Append("**");
+
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                buffer
+                    .Append("]")
+                    .Append("(")
+                    .Append(url)
+                    .Append(")");
+            }
+
+            buffer.AppendLine();
+
+            if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
+            {
                 // YAML syntax highlighting works really well for exception messages and stack traces
-                .AppendLine("```yml")
-                .AppendLine(testResult.ErrorMessage)
-                .AppendLine(testResult.ErrorStackTrace)
-                .AppendLine("```");
+                buffer
+                    .Append("   ").AppendLine("```yml")
+                    .Append("   ").AppendLine(testResult.ErrorMessage)
+                    .Append("   ").AppendLine(testResult.ErrorStackTrace)
+                    .Append("   ").AppendLine("```");
+            }
         }
 
-        // Spoiler closing tags
+        // Spoiler closing tag
         buffer
             .Append("</details>")
             .AppendLine()

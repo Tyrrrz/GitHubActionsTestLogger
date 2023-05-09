@@ -5,11 +5,17 @@ using GitHubActionsTestLogger.Tests.Utils;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace GitHubActionsTestLogger.Tests;
 
 public class AnnotationSpecs
 {
+    private readonly ITestOutputHelper _testOutput;
+
+    public AnnotationSpecs(ITestOutputHelper testOutput) =>
+        _testOutput = testOutput;
+
     [Fact]
     public void Passed_tests_do_not_get_reported()
     {
@@ -95,6 +101,8 @@ public class AnnotationSpecs
         output.Should().StartWith("::error ");
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -146,6 +154,8 @@ public class AnnotationSpecs
         output.Should().Contain("line=75");
         output.Should().Contain("I can execute a command with buffering and cancel it immediately");
         output.Should().Contain("ErrorMessage");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -201,6 +211,8 @@ public class AnnotationSpecs
         output.Should().Contain("line=187");
         output.Should().Contain("SendEnvelopeAsync_ItemRateLimit_DropsItem");
         output.Should().Contain("ErrorMessage");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -234,5 +246,7 @@ public class AnnotationSpecs
         output.Should().MatchRegex(@"file=.*?\.csproj");
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
+
+        _testOutput.WriteLine(output);
     }
 }

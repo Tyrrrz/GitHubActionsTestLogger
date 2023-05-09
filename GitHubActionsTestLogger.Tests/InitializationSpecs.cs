@@ -33,7 +33,9 @@ public class InitializationSpecs
         var parameters = new Dictionary<string, string?>
         {
             ["annotations.titleFormat"] = "TitleFormat",
-            ["annotations.messageFormat"] = "MessageFormat"
+            ["annotations.messageFormat"] = "MessageFormat",
+            ["summary.includePassedTests"] = "true",
+            ["summary.includeSkippedTests"] = "true"
         };
 
         // Act
@@ -43,5 +45,7 @@ public class InitializationSpecs
         logger.Context.Should().NotBeNull();
         logger.Context?.Options.AnnotationTitleFormat.Should().Be("TitleFormat");
         logger.Context?.Options.AnnotationMessageFormat.Should().Be("MessageFormat");
+        logger.Context?.Options.SummaryIncludePassedTests.Should().BeTrue();
+        logger.Context?.Options.SummaryIncludeSkippedTests.Should().BeTrue();
     }
 }

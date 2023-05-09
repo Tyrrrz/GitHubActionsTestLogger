@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger;
 
@@ -7,6 +8,10 @@ public partial class TestLoggerOptions
     public string AnnotationTitleFormat { get; init; } = "$test";
 
     public string AnnotationMessageFormat { get; init; } = "$error";
+
+    public bool SummaryIncludePassedTests { get; init; }
+
+    public bool SummaryIncludeSkippedTests { get; init; }
 }
 
 public partial class TestLoggerOptions
@@ -21,6 +26,14 @@ public partial class TestLoggerOptions
 
         AnnotationMessageFormat =
             parameters.GetValueOrDefault("annotations.messageFormat") ??
-            Default.AnnotationMessageFormat
+            Default.AnnotationMessageFormat,
+
+        SummaryIncludePassedTests =
+            parameters.GetValueOrDefault("summary.includePassedTests")?.Pipe(bool.Parse) ??
+            Default.SummaryIncludePassedTests,
+
+        SummaryIncludeSkippedTests =
+            parameters.GetValueOrDefault("summary.includeSkippedTests")?.Pipe(bool.Parse) ??
+            Default.SummaryIncludeSkippedTests,
     };
 }

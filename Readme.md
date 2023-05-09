@@ -39,8 +39,8 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 To use **GitHub Actions Test Logger**, follow these steps:
 
-1. Install **GitHubActionsTestLogger** package in your test project
-2. Update **Microsoft.NET.Test.Sdk** package in your test project to the latest version
+1. Install the **GitHubActionsTestLogger** package in your test project
+2. Update the **Microsoft.NET.Test.Sdk** package in your test project to the latest version
 3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
@@ -111,3 +111,23 @@ Supports the same replacement tokens as [`annotations.titleFormat`](#custom-anno
 
 - `$error` → `AssertionException: Expected 'true' but found 'false'`
 - `$error\n$trace` → `AssertionException: Expected 'true' but found 'false'`, followed by stacktrace on the next line
+
+#### Include passed tests in summary
+
+Use the `summary.includePassedTests` option to specify whether passed tests should be included in the summary.
+
+**Default**: `false`.
+
+> **Warning**:
+> GitHub job summaries are limited to `1MB` worth of content for each workflow step.
+> If your project has a large number of tests, you may want to keep this option disabled to avoid hitting the limit.
+
+#### Include skipped tests in summary
+
+Use the `summary.includeSkippedTests` option to specify whether skipped tests should be included in the summary.
+
+**Default**: `false`.
+
+> **Warning**:
+> GitHub job summaries are limited to `1MB` worth of content for each workflow step.
+> If your project has a large number of tests, you may want to keep this option disabled to avoid hitting the limit.

@@ -25,7 +25,7 @@ public class TestLoggerContext
         Options = options;
     }
 
-    private string ApplyAnnotationFormat(string format, TestResult testResult)
+    private string FormatAnnotation(string format, TestResult testResult)
     {
         var buffer = new StringBuilder(format);
 
@@ -35,7 +35,7 @@ public class TestLoggerContext
         // Name token
         buffer.Replace("$test", testResult.TestCase.DisplayName ?? "");
 
-        // Traits tokens
+        // Trait tokens
         foreach (var trait in testResult.Traits.Union(testResult.TestCase.Traits))
             buffer.Replace($"$traits.{trait.Name}", trait.Value);
 
@@ -51,11 +51,11 @@ public class TestLoggerContext
         return buffer.Trim().ToString();
     }
 
-    private string ApplyAnnotationTitleFormat(TestResult testResult) =>
-        ApplyAnnotationFormat(Options.AnnotationTitleFormat, testResult);
+    private string FormatAnnotationTitle(TestResult testResult) =>
+        FormatAnnotation(Options.AnnotationTitleFormat, testResult);
 
-    private string ApplyAnnotationMessageFormat(TestResult testResult) =>
-        ApplyAnnotationFormat(Options.AnnotationMessageFormat, testResult);
+    private string FormatAnnotationMessage(TestResult testResult) =>
+        FormatAnnotation(Options.AnnotationMessageFormat, testResult);
 
     public void HandleTestRunStart(TestRunStartEventArgs args)
     {
@@ -73,8 +73,8 @@ public class TestLoggerContext
             if (args.Result.Outcome == TestOutcome.Failed)
             {
                 _github.CreateErrorAnnotation(
-                    ApplyAnnotationTitleFormat(args.Result),
-                    ApplyAnnotationMessageFormat(args.Result),
+                    FormatAnnotationTitle(args.Result),
+                    FormatAnnotationMessage(args.Result),
                     args.Result.TryGetSourceFilePath(),
                     args.Result.TryGetSourceLine()
                 );
@@ -103,19 +103,34 @@ public class TestLoggerContext
                 "Unknown Target Framework";
 
             var testRunStatistics = new TestRunStatistics(
-                args.TestRunStatistics?[TestOutcome.Passed] ?? 0,
-                args.TestRunStatistics?[TestOutcome.Failed] ?? 0,
-                args.TestRunStatistics?[TestOutcome.Skipped] ?? 0,
-                args.TestRunStatistics?.ExecutedTests ?? 0,
+                args.TestRunStatistics?[TestOutcome.Passed] ??
+                _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+
+                args.TestRunStatistics?[TestOutcome.Failed] ??
+                _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+
+                args.TestRunStatistics?[TestOutcome.Skipped] ??
+                _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+
+                args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
+
                 args.ElapsedTimeInRunningTests
             );
+
+            var testResults = _testResults
+                .Where(r =>
+                    r.Outcome == TestOutcome.Failed ||
+                    r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
+                    r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
+                )
+                .ToArray();
 
             _github.CreateSummary(
                 TestSummary.Generate(
                     testSuiteName,
                     targetFrameworkName,
                     testRunStatistics,
-                    _testResults
+                    testResults
                 )
             );
         }

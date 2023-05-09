@@ -4,11 +4,17 @@ using GitHubActionsTestLogger.Tests.Utils;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace GitHubActionsTestLogger.Tests;
 
 public class AnnotationFormatSpecs
 {
+    private readonly ITestOutputHelper _testOutput;
+
+    public AnnotationFormatSpecs(ITestOutputHelper testOutput) =>
+        _testOutput = testOutput;
+
     [Fact]
     public void Custom_format_can_reference_test_name()
     {
@@ -40,6 +46,8 @@ public class AnnotationFormatSpecs
 
         output.Should().Contain("<Test1>");
         output.Should().Contain("[Test1]");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -75,6 +83,8 @@ public class AnnotationFormatSpecs
 
         output.Should().Contain("<UI Test -> Test1>");
         output.Should().Contain("[UI Test -> Test1]");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -109,6 +119,8 @@ public class AnnotationFormatSpecs
 
         output.Should().Contain("<Test1: ErrorMessage>");
         output.Should().Contain("[Test1: ErrorMessage]");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -143,6 +155,8 @@ public class AnnotationFormatSpecs
 
         output.Should().Contain("<Test1: ErrorStackTrace>");
         output.Should().Contain("[Test1: ErrorStackTrace]");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -179,6 +193,8 @@ public class AnnotationFormatSpecs
 
         output.Should().Contain("<Test1 (FakeTargetFramework)>");
         output.Should().Contain("[Test1 (FakeTargetFramework)]");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -210,6 +226,8 @@ public class AnnotationFormatSpecs
         var output = commandWriter.ToString().Trim();
 
         output.Should().Contain("foo%0Abar");
+
+        _testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -240,5 +258,7 @@ public class AnnotationFormatSpecs
 
         output.Should().Contain("Test1");
         output.Should().Contain("ErrorMessage");
+
+        _testOutput.WriteLine(output);
     }
 }
