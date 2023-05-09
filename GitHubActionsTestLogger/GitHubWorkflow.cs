@@ -107,12 +107,13 @@ public partial class GitHubWorkflow
             return null;
 
         var filePathRelative =
-            // If the file path starts with /_/ but the workspace path is not /_/,
+            // If the file path starts with /_/ but the workspace path doesn't,
             // then it's safe to assume that the file path has already been normalized
-            // by the deterministic build feature of the .NET CLI.
+            // by the deterministic build feature.
             // In this case, we only need to remove the leading /_/ from the file path
             // to get the correct relative path.
-            filePath.StartsWith("/_/") && !workspacePath.Equals("/_/")
+            filePath.StartsWith("/_/", StringComparison.Ordinal) &&
+            !workspacePath.StartsWith("/_/", StringComparison.Ordinal)
                 ? filePath[3..]
                 : PathEx.GetRelativePath(workspacePath, filePath);
 
