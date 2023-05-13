@@ -171,41 +171,6 @@ public class AnnotationSpecs
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_annotations_that_include_approximate_source_information_as_fallback()
-    {
-        // Arrange
-        using var commandWriter = new StringWriter();
-
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
-            TestLoggerOptions.Default
-        );
-
-        // Act
-        context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetSource(Assembly.GetExecutingAssembly().Location)
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
-                .SetErrorMessage("ErrorMessage")
-                .Build()
-        );
-
-        // Assert
-        var output = commandWriter.ToString().Trim();
-
-        output.Should().StartWith("::error ");
-        output.Should().MatchRegex(@"file=.*?\.csproj");
-        output.Should().Contain("Test1");
-        output.Should().Contain("ErrorMessage");
-
-        _testOutput.WriteLine(output);
-    }
-
-    [Fact]
     public void I_can_use_the_logger_to_produce_annotations_that_include_the_test_name()
     {
         // Arrange

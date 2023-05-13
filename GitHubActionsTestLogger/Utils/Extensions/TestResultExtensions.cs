@@ -43,29 +43,6 @@ internal static class TestResultExtensions
 
     public static string? TryGetSourceFilePath(this TestResult testResult)
     {
-        // We use this method as a last resort if we can't get source information from anywhere else.
-        // This will hopefully give us the file path of the project that contains the test,
-        // which is not ideal but still better than nothing.
-        static string? TryGetProjectFilePath(string startPath)
-        {
-            var dirPath = !File.Exists(startPath)
-                ? startPath
-                : Path.GetDirectoryName(startPath);
-
-            // Recursively ascend up
-            while (!string.IsNullOrWhiteSpace(dirPath))
-            {
-                // *.csproj/*.fsproj/*.vbproj
-                var projectFilePath = Directory.EnumerateFiles(dirPath, "*.??proj").FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(projectFilePath))
-                    return projectFilePath;
-
-                dirPath = Path.GetDirectoryName(dirPath);
-            }
-
-            return null;
-        }
-
         // See if the test runner provided it (never actually happens)
         if (!string.IsNullOrWhiteSpace(testResult.TestCase.CodeFilePath))
             return testResult.TestCase.CodeFilePath;
@@ -74,14 +51,6 @@ internal static class TestResultExtensions
         var stackFrame = testResult.TryGetTestStackFrame();
         if (!string.IsNullOrWhiteSpace(stackFrame?.FilePath))
             return stackFrame.FilePath;
-
-        // Get the project file path instead (not ideal, but the best we can do)
-        if (!string.IsNullOrWhiteSpace(testResult.TestCase.Source))
-        {
-            var projectFilePath = TryGetProjectFilePath(testResult.TestCase.Source);
-            if (!string.IsNullOrWhiteSpace(projectFilePath))
-                return projectFilePath;
-        }
 
         return null;
     }
