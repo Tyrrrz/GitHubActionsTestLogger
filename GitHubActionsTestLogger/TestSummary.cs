@@ -17,55 +17,64 @@ internal static class TestSummary
     {
         var buffer = new StringBuilder();
 
-        // Spoiler header
+        // Header
         buffer
-            .Append("<details>")
-            .Append("<summary>")
+            .Append("##")
+            // Outcome
+            .Append(" ")
             .Append(testRunStatistics.OverallOutcome switch
             {
                 TestOutcome.Passed => "🟢",
                 TestOutcome.Failed => "🔴",
                 _ => "🟡"
             })
+            // Suite name
             .Append(" ")
-            .Append("<b>")
             .Append(testSuiteName)
-            .Append("</b>")
+            // Framework name & version
             .Append(" ")
+            .Append("<sub>")
+            .Append("<sup>")
             .Append("(")
             .Append(targetFrameworkName)
             .Append(")")
-            .Append("</summary>")
-            .Append("<br/>");
+            .Append("</sub>")
+            .Append("</sup>")
+            .AppendLine();
 
-        // Overview table
+        // Overview
         buffer
             // Table header
             .Append("<table>")
+            // Passed
             .Append("<th width=\"99999\">")
             .Append("✓")
             .Append("&nbsp;")
             .Append("&nbsp;")
             .Append("Passed")
             .Append("</th>")
+            // Failed
             .Append("<th width=\"99999\">")
             .Append("✘")
             .Append("&nbsp;")
             .Append("&nbsp;")
             .Append("Failed")
             .Append("</th>")
+            // Skipped
             .Append("<th width=\"99999\">")
             .Append("↷")
             .Append("&nbsp;")
             .Append("&nbsp;")
             .Append("Skipped")
             .Append("</th>")
+            // Total
             .Append("<th width=\"99999\">")
             .Append("∑")
             .Append("&nbsp;")
             .Append("&nbsp;")
             .Append("Total")
             .Append("</th>")
+            // Elapsed
             .Append("<th width=\"99999\">")
             .Append("⧗")
             .Append("&nbsp;")
@@ -74,6 +83,7 @@ internal static class TestSummary
             .Append("</th>")
             // Table body
             .Append("<tr>")
+            // Passed
             .Append("<td align=\"center\">")
             .Append(
                 testRunStatistics.PassedTestCount > 0
@@ -81,6 +91,7 @@ internal static class TestSummary
                     : "—"
             )
             .Append("</td>")
+            // Failed
             .Append("<td align=\"center\">")
             .Append(
                 testRunStatistics.FailedTestCount > 0
@@ -88,6 +99,7 @@ internal static class TestSummary
                     : "—"
             )
             .Append("</td>")
+            // Skipped
             .Append("<td align=\"center\">")
             .Append(
                 testRunStatistics.SkippedTestCount > 0
@@ -95,9 +107,11 @@ internal static class TestSummary
                     : "—"
             )
             .Append("</td>")
+            // Total
             .Append("<td align=\"center\">")
             .Append(testRunStatistics.TotalTestCount)
             .Append("</td>")
+            // Elapsed
             .Append("<td align=\"center\">")
             .Append(testRunStatistics.ElapsedDuration.ToHumanString())
             .Append("</td>")
@@ -107,64 +121,122 @@ internal static class TestSummary
             .AppendLine();
 
         // Test results
-        var testResultsOrdered = testResults
-            .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
-            .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
-            .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal);
+        var testResultGroups = testResults
+            .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
+            .Select(g => new
+            {
+                TypeFullyQualifiedName = g.Key,
+                TypeName = g.First().TestCase.GetTypeMinimallyQualifiedName(),
+                TestResults = g
+                    .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
+                    .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
+                    .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal)
+                    .ToArray()
+            })
+            .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
+            .ThenByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Passed))
+            .ThenBy(g => g.TypeName, StringComparer.Ordinal);
 
-        foreach (var testResult in testResultsOrdered)
+        foreach (var testResultGroup in testResultGroups)
         {
-            // Generate permalink for the test source
-            var filePath = testResult.TryGetSourceFilePath();
-            var fileLine = testResult.TryGetSourceLine();
-            var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
-
+            // Test group spoiler
             buffer
-                .Append("- ")
-                .Append(testResult.Outcome switch
+                .Append("<details>")
+                .Append("<summary>")
+                // Group name
+                .Append("<b>")
+                .Append(testResultGroup.TypeName)
+                .Append("</b>");
+
+                // Failed test count
+                if (testResultGroup.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
                 {
-                    TestOutcome.Passed => "🟢",
-                    TestOutcome.Failed => "🔴",
-                    _ => "🟡"
-                })
-                .Append(" ");
+                    buffer
+                        .Append(" ")
+                        .Append("<i>")
+                        .Append("(")
+                        .Append(testResultGroup.TestResults.Count(r => r.Outcome == TestOutcome.Failed))
+                        .Append(" ")
+                        .Append("failed")
+                        .Append(")")
+                        .Append("</i>");
+                }
 
-            if (!string.IsNullOrWhiteSpace(url))
+                buffer
+                .Append("</summary>")
+                .AppendLine()
+                .AppendLine();
+
+            foreach (var testResult in testResultGroup.TestResults)
             {
                 buffer
-                    .Append("[");
+                    .Append("  - ")
+                    // Outcome
+                    .Append(testResult.Outcome switch
+                    {
+                        TestOutcome.Passed => "🟩",
+                        TestOutcome.Failed => "🟥",
+                        _ => "🟨"
+                    })
+                    // Test name
+                    .Append(" ")
+                    .Append(
+                        // Use display name if it's different from the fully qualified name,
+                        // otherwise use the minimally qualified name.
+                        !string.Equals(
+                            testResult.TestCase.DisplayName,
+                            testResult.TestCase.FullyQualifiedName,
+                            StringComparison.Ordinal
+                        )
+                            ? testResult.TestCase.DisplayName
+                            : testResult.TestCase.GetMinimallyQualifiedName()
+                    )
+                    .AppendLine()
+                    .AppendLine();
+
+                // Error message & stack trace
+                if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
+                {
+                    // YAML syntax highlighting works really well for exception messages
+                    buffer
+                        .Append("    ").Append("```yml").AppendLine()
+                        // Every line here should be indented, otherwise the formatting will break
+                        .Append(testResult.ErrorMessage.Indent(4)).AppendLine()
+                        .Append(testResult.ErrorStackTrace?.Indent(4)).AppendLine()
+                        .Append("    ").Append("```").AppendLine();
+                }
+
+                // Test source permalink
+                var filePath = testResult.TryGetSourceFilePath();
+                var fileLine = testResult.TryGetSourceLine();
+                var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    buffer
+                        .Append("    ")
+                        .Append("<sup>")
+                        .Append("[")
+                        .Append("🔗 Navigate to source")
+                        .Append("]")
+                        .Append("(")
+                        .Append(url)
+                        .Append(")")
+                        .Append("</sup>")
+                        .AppendLine();
+                }
             }
 
             buffer
-                .Append("**")
-                .Append(testResult.TestCase.DisplayName)
-                .Append("**");
-
-            if (!string.IsNullOrWhiteSpace(url))
-            {
-                buffer
-                    .Append("]")
-                    .Append("(")
-                    .Append(url)
-                    .Append(")");
-            }
-
-            buffer.AppendLine();
-
-            if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
-            {
-                // YAML syntax highlighting works really well for exception messages and stack traces
-                buffer
-                    .Append("   ").AppendLine("```yml")
-                    .Append("   ").AppendLine(testResult.ErrorMessage)
-                    .Append("   ").AppendLine(testResult.ErrorStackTrace)
-                    .Append("   ").AppendLine("```");
-            }
+                // Close spoiler
+                .Append("</details>")
+                .AppendLine()
+                .AppendLine();
         }
 
-        // Spoiler closing tag
+        // Footer
         buffer
-            .Append("</details>")
+            .Append("___")
             .AppendLine()
             .AppendLine();
 

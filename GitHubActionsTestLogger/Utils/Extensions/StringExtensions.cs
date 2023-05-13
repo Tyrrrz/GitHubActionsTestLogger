@@ -17,6 +17,28 @@ internal static class StringExtensions
             : str[..index];
     }
 
+    public static string SubstringUntilLast(
+        this string str,
+        string sub,
+        StringComparison comparison = StringComparison.Ordinal)
+    {
+        var index = str.LastIndexOf(sub, comparison);
+        return index < 0
+            ? str
+            : str[..index];
+    }
+
+    public static string SubstringAfter(
+        this string str,
+        string sub,
+        StringComparison comparison = StringComparison.Ordinal)
+    {
+        var index = str.IndexOf(sub, comparison);
+        return index >= 0
+            ? str.Substring(index + sub.Length, str.Length - index - sub.Length)
+            : "";
+    }
+
     public static string SubstringAfterLast(
         this string str,
         string sub,
@@ -26,6 +48,12 @@ internal static class StringExtensions
         return index >= 0
             ? str.Substring(index + sub.Length, str.Length - index - sub.Length)
             : "";
+    }
+
+    public static string Indent(this string str, int spaces)
+    {
+        var indentUnit = new string(' ', spaces);
+        return indentUnit + str.Replace("\n", "\n" + new string(' ', spaces));
     }
 
     public static int? TryParseInt(this string? str) =>

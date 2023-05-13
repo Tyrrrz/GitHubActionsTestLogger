@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -64,4 +64,13 @@ internal static class TestResultExtensions
         // Try to extract it from the stack trace (works only if there was an exception)
         return testResult.TryGetTestStackFrame()?.Line;
     }
+
+    public static TestOutcome GetOverallOutcome(this IReadOnlyList<TestResult> testResults) =>
+        testResults.Any(r => r.Outcome == TestOutcome.Failed)
+            ? TestOutcome.Failed
+            : testResults.Any(r => r.Outcome == TestOutcome.Passed)
+                ? TestOutcome.Passed
+                : testResults.Any(r => r.Outcome == TestOutcome.Skipped)
+                    ? TestOutcome.Skipped
+                    : TestOutcome.None;
 }
