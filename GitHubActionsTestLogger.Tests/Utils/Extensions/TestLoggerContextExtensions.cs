@@ -16,19 +16,19 @@ internal static class TestLoggerContextExtensions
         string targetFrameworkName,
         params TestResult[] testResults)
     {
-        // lang=xml
-        var testSettings =
+        context.HandleTestRunStart(new TestRunStartEventArgs(new TestRunCriteria(
+            new[] { testSuiteFilePath },
+            1,
+            true,
+            // lang=xml
             $"""
             <RunSettings>
                 <RunConfiguration>
                     <TargetFrameworkVersion>{targetFrameworkName}</TargetFrameworkVersion>
                 </RunConfiguration>
             </RunSettings>
-            """;
-
-        context.HandleTestRunStart(new TestRunStartEventArgs(
-            new TestRunCriteria(new[] { testSuiteFilePath }, 1, true, testSettings)
-        ));
+            """
+        )));
 
         foreach (var testResult in testResults)
             context.HandleTestResult(new TestResultEventArgs(testResult));

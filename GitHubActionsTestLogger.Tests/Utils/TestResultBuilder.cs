@@ -1,16 +1,17 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+﻿using System;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger.Tests.Utils;
 
 internal class TestResultBuilder
 {
-    private TestResult _testResult = new(new TestCase());
-
-    public TestResultBuilder SetSource(string source)
+    private TestResult _testResult = new(new TestCase
     {
-        _testResult.TestCase.Source = source;
-        return this;
-    }
+        Id = Guid.NewGuid(),
+        Source = "FakeTests.dll",
+        FullyQualifiedName = "FakeTests.FakeTest",
+        DisplayName = "FakeTest"
+    });
 
     public TestResultBuilder SetDisplayName(string displayName)
     {

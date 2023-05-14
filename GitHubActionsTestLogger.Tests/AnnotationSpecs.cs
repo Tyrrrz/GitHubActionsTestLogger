@@ -1,5 +1,4 @@
 using System.IO;
-using System.Reflection;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Utils;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
