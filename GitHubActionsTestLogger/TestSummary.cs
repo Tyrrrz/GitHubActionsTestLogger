@@ -164,11 +164,17 @@ internal static class TestSummary
 
                 buffer
                 .Append("</summary>")
+                .Append("<p>")
                 .AppendLine()
                 .AppendLine();
 
             foreach (var testResult in testResultGroup.TestResults)
             {
+                // Test source permalink
+                var filePath = testResult.TryGetSourceFilePath();
+                var fileLine = testResult.TryGetSourceLine();
+                var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
+
                 buffer
                     .Append("  - ")
                     // Outcome
@@ -179,20 +185,35 @@ internal static class TestSummary
                         _ => "🟨"
                     })
                     // Test name
-                    .Append(" ")
-                    .Append(
-                        // Use display name if it's different from the fully qualified name,
-                        // otherwise use the minimally qualified name.
-                        !string.Equals(
-                            testResult.TestCase.DisplayName,
-                            testResult.TestCase.FullyQualifiedName,
-                            StringComparison.Ordinal
-                        )
-                            ? testResult.TestCase.DisplayName
-                            : testResult.TestCase.GetMinimallyQualifiedName()
+                    .Append(" ");
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    buffer.Append("[");
+                }
+
+                buffer.Append(
+                    // Use display name if it's different from the fully qualified name,
+                    // otherwise use the minimally qualified name.
+                    !string.Equals(
+                        testResult.TestCase.DisplayName,
+                        testResult.TestCase.FullyQualifiedName,
+                        StringComparison.Ordinal
                     )
-                    .AppendLine()
-                    .AppendLine();
+                        ? testResult.TestCase.DisplayName
+                        : testResult.TestCase.GetMinimallyQualifiedName()
+                );
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    buffer
+                        .Append("]")
+                        .Append("(")
+                        .Append(url)
+                        .Append(")");
+                }
+
+                buffer.AppendLine();
 
                 // Error message & stack trace
                 if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
@@ -205,30 +226,11 @@ internal static class TestSummary
                         .Append(testResult.ErrorStackTrace?.Indent(4)).AppendLine()
                         .Append("    ").Append("```").AppendLine();
                 }
-
-                // Test source permalink
-                var filePath = testResult.TryGetSourceFilePath();
-                var fileLine = testResult.TryGetSourceLine();
-                var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
-
-                if (!string.IsNullOrWhiteSpace(url))
-                {
-                    buffer
-                        .Append("    ")
-                        .Append("<sup>")
-                        .Append("[")
-                        .Append("🔗 Navigate to source")
-                        .Append("]")
-                        .Append("(")
-                        .Append(url)
-                        .Append(")")
-                        .Append("</sup>")
-                        .AppendLine();
-                }
             }
 
             buffer
                 // Close spoiler
+                .Append("</p>")
                 .Append("</details>")
                 .AppendLine()
                 .AppendLine();
