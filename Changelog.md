@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.2.1 (18-May-2023)
+
+- Fixed an issue where the test summary was not properly rendered when it was preceded by a different summary that ended in an HTML tag.
+- Fixed minor layout-related issues in the test summary.
+
 ## v2.2 (18-May-2023)
 
 - Reworked the test summary layout:
