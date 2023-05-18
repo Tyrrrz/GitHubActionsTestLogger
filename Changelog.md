@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.2 (18-May-2023)
+
+- Reworked the test summary layout:
+  - Overall test stats are no longer hidden by an expander.
+  - Tests are now grouped by their defining type.
+  - Other minor visual improvements.
+- Fixed an issue where exception messages rendered under failed tests in the test summary broke formatting if they contained indented lines.
+
 ## v2.1 (09-May-2023)
 
 - Added `summary.includePassedTests` and `summary.includeSkippedTests` options to extend the test summary with the list of passed and skipped tests, respectively. These options are set to `false` by default to match the previous behavior.
