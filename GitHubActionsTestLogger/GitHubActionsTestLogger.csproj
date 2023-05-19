@@ -26,6 +26,7 @@
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.5.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.2.0" PrivateAssets="all" />
+    <PackageReference Include="RazorBlade" Version="0.4.3" ExcludeAssets="compile;runtime" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

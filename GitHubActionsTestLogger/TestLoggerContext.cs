@@ -126,12 +126,13 @@ public class TestLoggerContext
                 .ToArray();
 
             _github.CreateSummary(
-                TestSummary.Generate(
-                    testSuiteName,
-                    targetFrameworkName,
-                    testRunStatistics,
-                    testResults
-                )
+                new TestSummaryTemplate
+                {
+                    TestSuite = testSuiteName,
+                    TargetFramework = targetFrameworkName,
+                    TestRunStatistics = testRunStatistics,
+                    TestResults = testResults
+                }.Render()
             );
         }
     }
