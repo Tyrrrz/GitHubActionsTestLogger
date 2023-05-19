@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using GitHubActionsTestLogger.Templates;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -89,49 +90,22 @@ public class TestLoggerContext
     {
         lock (_lock)
         {
-            var testSuite =
-                _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
-                "Unknown Test Suite";
-
-            var targetFramework =
-                _testRunCriteria?.TryGetTargetFramework() ??
-                "Unknown Target Framework";
-
-            var testRunStatistics = new TestRunStatistics
+            var context = new TestSummaryContext
             {
-                PassedTestCount =
-                    args.TestRunStatistics?[TestOutcome.Passed] ??
-                    _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+                Options = Options,
 
-                FailedTestCount =
-                    args.TestRunStatistics?[TestOutcome.Failed] ??
-                    _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+                TestSuite =
+                    _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
+                    "Unknown Test Suite",
 
-                SkippedTestCount =
-                    args.TestRunStatistics?[TestOutcome.Skipped] ??
-                    _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+                TargetFramework =
+                    _testRunCriteria?.TryGetTargetFramework() ??
+                    "Unknown Target Framework",
 
-                TotalTestCount = args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
-                ElapsedDuration = args.ElapsedTimeInRunningTests
+                TestRunResult = new TestRunResult(_testResults, args.ElapsedTimeInRunningTests)
             };
 
-            var testResults = _testResults
-                .Where(r =>
-                    r.Outcome == TestOutcome.Failed ||
-                    r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
-                    r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
-                )
-                .ToArray();
-
-            _github.CreateSummary(
-                new TestSummaryTemplate
-                {
-                    TestSuite = testSuite,
-                    TargetFramework = targetFramework,
-                    TestRunStatistics = testRunStatistics,
-                    TestResults = testResults
-                }.Render()
-            );
+            _github.CreateSummary(new TestSummaryTemplate(context).Render());
         }
     }
 }

@@ -79,7 +79,7 @@ public partial class GitHubWorkflow
     {
         // Other steps may have reported summaries that contain HTML tags,
         // which can screw up markdown parsing, so we need to make sure
-        // there's at least two newlines before our summary, to be safe.
+        // there's at least two newlines before our summary to be safe.
         // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
         _summaryWriter.WriteLine();
         _summaryWriter.WriteLine();

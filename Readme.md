@@ -112,22 +112,21 @@ Supports the same replacement tokens as [`annotations.titleFormat`](#custom-anno
 - `$error` → `AssertionException: Expected 'true' but found 'false'`
 - `$error\n$trace` → `AssertionException: Expected 'true' but found 'false'`, followed by stacktrace on the next line
 
+#### Compact summary layout
+
+Use the `summary.compactLayout` option to enable a more compact layout for the test summary.
+This layout is better suited for solutions that contain a large number of test projects.
+
+**Default**: `false`.
+
 #### Include passed tests in summary
 
 Use the `summary.includePassedTests` option to specify whether passed tests should be included in the summary.
 
 **Default**: `false`.
 
-> **Warning**:
-> GitHub job summaries are limited to `1MB` worth of content for each workflow step.
-> If your project has a large number of tests, you may want to keep this option disabled to avoid hitting the limit.
-
 #### Include skipped tests in summary
 
 Use the `summary.includeSkippedTests` option to specify whether skipped tests should be included in the summary.
 
 **Default**: `false`.
-
-> **Warning**:
-> GitHub job summaries are limited to `1MB` worth of content for each workflow step.
-> If your project has a large number of tests, you may want to keep this option disabled to avoid hitting the limit.

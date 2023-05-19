@@ -9,6 +9,8 @@ public partial class TestLoggerOptions
 
     public string AnnotationMessageFormat { get; init; } = "$error";
 
+    public bool SummaryCompactLayout { get; init; }
+
     public bool SummaryIncludePassedTests { get; init; }
 
     public bool SummaryIncludeSkippedTests { get; init; }
@@ -27,6 +29,10 @@ public partial class TestLoggerOptions
         AnnotationMessageFormat =
             parameters.GetValueOrDefault("annotations.messageFormat") ??
             Default.AnnotationMessageFormat,
+
+        SummaryCompactLayout =
+            parameters.GetValueOrDefault("summary.compactLayout")?.Pipe(bool.Parse) ??
+            Default.SummaryCompactLayout,
 
         SummaryIncludePassedTests =
             parameters.GetValueOrDefault("summary.includePassedTests")?.Pipe(bool.Parse) ??

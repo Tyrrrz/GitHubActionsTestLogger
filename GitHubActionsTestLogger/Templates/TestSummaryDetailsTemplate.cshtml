@@ -1,68 +1,18 @@
 ﻿@using System
-@using System.Collections.Generic
 @using System.Linq
 @using GitHubActionsTestLogger.Utils.Extensions
 @using Microsoft.VisualStudio.TestPlatform.ObjectModel
 
-@inherits RazorBlade.PlainTextTemplate
-
-@functions
-{
-    public required string TestSuite { get; init; }
-    public required string TargetFramework { get; init; }
-    public required TestRunStatistics TestRunStatistics { get; init; }
-    public required IReadOnlyList<TestResult> TestResults { get; init; }
-}
-
-@functions
-{
-    // In order to generate HTML that's also valid Markdown, we need to
-    // remove some whitespace inside literals.
-    public new void WriteLiteral(string? literal)
-    {
-        if (!string.IsNullOrEmpty(literal))
-        {
-            base.WriteLiteral(
-                literal
-                    // Remove indentation
-                    .Replace("    ", "")
-                    // Remove linebreaks
-                    .Replace("\r", "").Replace("\n", "")
-            );
-        }
-        else
-        {
-            base.WriteLiteral(literal);
-        }
-    }
-
-    // Using params here to write multiple lines as a workaround
-    // for the fact that Razor does not support raw string literals.
-    private void WriteMarkdown(params string?[] lines)
-    {
-        // Two line breaks are required to separate markdown from HTML
-        base.WriteLiteral("\n\n");
-
-        foreach (var line in lines)
-        {
-            base.WriteLiteral(line);
-            base.WriteLiteral("\n");
-        }
-    }
-}
+@inherits MarkdownRazorTemplate<TestSummaryContext>
 
 @{
-    static string FormatTestOutcome(TestOutcome outcome, bool isCircle) => outcome switch
+    string FormatTestOutcome(TestOutcome outcome) => outcome switch
     {
-        TestOutcome.Passed => isCircle ? "🟢" : "🟩",
-        TestOutcome.Failed => isCircle ? "🔴" : "🟥",
-        _ => isCircle ? "🟡" : "🟨"
+        TestOutcome.Passed => "🟩",
+        TestOutcome.Failed => "🟥",
+        _ => "🟨"
     };
 }
-
-<h2>
-    @FormatTestOutcome(TestRunStatistics.OverallOutcome, true) @TestSuite <sub><sup>(@TargetFramework)</sup></sub>
-</h2>
 
 <table>
     <th width="99999">✓&nbsp;&nbsp;Passed</th>
@@ -72,31 +22,40 @@
     <th width="99999">⧗&nbsp;&nbsp;Elapsed</th>
     <tr>
         <td align="center">
-            @(TestRunStatistics.PassedTestCount > 0
-                ? TestRunStatistics.PassedTestCount.ToString()
+            @(Model.TestRunResult.PassedTestCount > 0
+                ? Model.TestRunResult.PassedTestCount.ToString()
                 : "—")
         </td>
         <td align="center">
-            @(TestRunStatistics.FailedTestCount > 0
-                ? TestRunStatistics.FailedTestCount.ToString()
+            @(Model.TestRunResult.FailedTestCount > 0
+                ? Model.TestRunResult.FailedTestCount.ToString()
                 : "—")
         </td>
         <td align="center">
-            @(TestRunStatistics.SkippedTestCount > 0
-                ? TestRunStatistics.SkippedTestCount.ToString()
+            @(Model.TestRunResult.SkippedTestCount > 0
+                ? Model.TestRunResult.SkippedTestCount.ToString()
                 : "—")
         </td>
         <td align="center">
-            @TestRunStatistics.TotalTestCount
+            @Model.TestRunResult.TotalTestCount
         </td>
         <td align="center">
-            @TestRunStatistics.ElapsedDuration.ToHumanString()
+            @Model.TestRunResult.OverallDuration.ToHumanString()
         </td>
     </tr>
 </table>
 
 @{
-    var testResultGroups = TestResults
+    var testResults = Model
+        .TestRunResult
+        .TestResults
+        .Where(r =>
+            r.Outcome == TestOutcome.Failed ||
+            r.Outcome == TestOutcome.Passed && Model.Options.SummaryIncludePassedTests ||
+            r.Outcome == TestOutcome.Skipped && Model.Options.SummaryIncludeSkippedTests
+        );
+
+    var testResultGroups = testResults
         .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
         .Select(g => new
         {
@@ -117,7 +76,7 @@
 {
     var failedTestCount = testResultGroup.TestResults.Count(r => r.Outcome == TestOutcome.Failed);
 
-    <details>
+    <details @(Model.Options.SummaryCompactLayout ? "open" : null)>
         <summary>
             <b>@testResultGroup.TypeName</b>
 
@@ -127,7 +86,7 @@
             }
         </summary>
 
-        @* This adds some margin which is smaller than <br> *@
+        @* This adds a margin that is smaller than <br> *@
         <p></p>
 
         <ul>
@@ -148,7 +107,7 @@
                 var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
 
                 <li>
-                    @FormatTestOutcome(testResult.Outcome, false)
+                    @FormatTestOutcome(testResult.Outcome)
 
                     @if (!string.IsNullOrWhiteSpace(url))
                     {
@@ -173,5 +132,3 @@
         </ul>
     </details>
 }
-
-<hr />
