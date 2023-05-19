@@ -91,8 +91,6 @@ public class TestLoggerContext
         {
             var template = new TestSummaryTemplate
             {
-                Options = Options,
-
                 TestSuite =
                     _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
                     "Unknown Test Suite",
@@ -116,7 +114,11 @@ public class TestLoggerContext
                     args.ElapsedTimeInRunningTests
                 ),
 
-                TestResults = _testResults
+                TestResults = _testResults.Where(r =>
+                    r.Outcome == TestOutcome.Failed ||
+                    r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
+                    r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
+                ).ToArray()
             };
 
             _github.CreateSummary(template.Render());

@@ -8,8 +8,6 @@
 
 @functions
 {
-    public required TestLoggerOptions Options { get; init; }
-
     public required string TestSuite { get; init; }
 
     public required string TargetFramework { get; init; }
@@ -69,11 +67,6 @@
 
     @{
         var testResultGroups = TestResults
-            .Where(r =>
-                r.Outcome == TestOutcome.Failed ||
-                r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
-                r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
-            )
             .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
             .Select(g => new
             {
