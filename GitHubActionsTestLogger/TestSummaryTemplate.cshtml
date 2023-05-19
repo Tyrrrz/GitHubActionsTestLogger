@@ -1,0 +1,196 @@
+﻿@using System
+@using System.Collections.Generic
+@using System.Linq
+@using GitHubActionsTestLogger.Utils.Extensions
+@using Microsoft.VisualStudio.TestPlatform.ObjectModel
+
+@inherits RazorBlade.PlainTextTemplate
+
+@functions
+{
+    public required TestLoggerOptions Options { get; init; }
+
+    public required string TestSuite { get; init; }
+
+    public required string TargetFramework { get; init; }
+
+    public required TestRunResult TestRunResult { get; init; }
+}
+
+<details>
+    @{
+        var overallOutcomeEmoji = TestRunResult.OverallOutcome switch
+        {
+            TestOutcome.Passed => "🟢",
+            TestOutcome.Failed => "🔴",
+            _ => "🟡"
+        };
+    }
+
+    <summary>
+        <h3>@overallOutcomeEmoji @TestSuite <sub><sup>(@TargetFramework)</sup></sub></h3>
+    </summary>
+
+    @* This adds a margin that is smaller than <br> *@
+    <p></p>
+
+    <table>
+        <th width="99999">✓&nbsp;&nbsp;Passed</th>
+        <th width="99999">✘&nbsp;&nbsp;Failed</th>
+        <th width="99999">↷&nbsp;&nbsp;Skipped</th>
+        <th width="99999">∑&nbsp;&nbsp;Total</th>
+        <th width="99999">⧗&nbsp;&nbsp;Elapsed</th>
+        <tr>
+            <td align="center">
+                @(TestRunResult.PassedTestCount > 0
+                    ? TestRunResult.PassedTestCount.ToString()
+                    : "—")
+            </td>
+            <td align="center">
+                @(TestRunResult.FailedTestCount > 0
+                    ? TestRunResult.FailedTestCount.ToString()
+                    : "—")
+            </td>
+            <td align="center">
+                @(TestRunResult.SkippedTestCount > 0
+                    ? TestRunResult.SkippedTestCount.ToString()
+                    : "—")
+            </td>
+            <td align="center">
+                @TestRunResult.TotalTestCount
+            </td>
+            <td align="center">
+                @TestRunResult.OverallDuration.ToHumanString()
+            </td>
+        </tr>
+    </table>
+
+    @{
+        var testResultGroups = TestRunResult
+            .TestResults
+            .Where(r =>
+                r.Outcome == TestOutcome.Failed ||
+                r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
+                r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
+            )
+            .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
+            .Select(g => new
+            {
+                TypeFullyQualifiedName = g.Key,
+                TypeName = g.First().TestCase.GetTypeMinimallyQualifiedName(),
+                TestResults = g
+                    .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
+                    .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
+                    .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal)
+                    .ToArray()
+            })
+            .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
+            .ThenByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Passed))
+            .ThenBy(g => g.TypeName, StringComparer.Ordinal);
+    }
+
+    @foreach (var testResultGroup in testResultGroups)
+    {
+        var failedTestCount = testResultGroup.TestResults.Count(r => r.Outcome == TestOutcome.Failed);
+
+        <details open>
+            <summary>
+                <b>@testResultGroup.TypeName</b>
+
+                @if (failedTestCount > 0)
+                {
+                    @(" ")<i>(@failedTestCount failed)</i>
+                }
+            </summary>
+
+            @* This adds a margin that is smaller than <br> *@
+            <p></p>
+
+            <ul>
+                @foreach (var testResult in testResultGroup.TestResults)
+                {
+                    var outcomeEmoji = testResult.Outcome switch
+                    {
+                        TestOutcome.Passed => "🟩",
+                        TestOutcome.Failed => "🟥",
+                        _ => "🟨"
+                        };
+
+                    // Use display name if it's different from the fully qualified name,
+                    // otherwise use the minimally qualified name.
+                    var testName = !string.Equals(
+                        testResult.TestCase.DisplayName,
+                        testResult.TestCase.FullyQualifiedName,
+                        StringComparison.Ordinal)
+                        ? testResult.TestCase.DisplayName
+                        : testResult.TestCase.GetMinimallyQualifiedName();
+
+                    // Test source permalink
+                    var filePath = testResult.TryGetSourceFilePath();
+                    var fileLine = testResult.TryGetSourceLine();
+                    var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
+
+                    <li>
+                        @outcomeEmoji
+
+                        @if (!string.IsNullOrWhiteSpace(url))
+                        {
+                            <a href="@url">@testName</a>
+                        }
+                        else
+                        {
+                            @testName
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
+                        {
+                            WriteMarkdown(
+                                "```yml",
+                                testResult.ErrorMessage,
+                                testResult.ErrorStackTrace,
+                                "```"
+                                );
+                        }
+                    </li>
+                }
+            </ul>
+        </details>
+    }
+</details>
+
+@functions
+{
+    // In order to produce HTML that's also valid Markdown, we need to
+    // remove some whitespace inside literals.
+    public new void WriteLiteral(string? literal)
+    {
+        if (!string.IsNullOrEmpty(literal))
+        {
+            base.WriteLiteral(
+                literal
+                    // Remove indentation
+                    .Replace("    ", "")
+                    // Remove linebreaks
+                    .Replace("\r", "").Replace("\n", "")
+            );
+        }
+        else
+        {
+            base.WriteLiteral(literal);
+        }
+    }
+
+    // Using params here to write multiple lines as a workaround
+    // for the fact that Razor does not support raw string literals.
+    private void WriteMarkdown(params string?[] lines)
+    {
+        // Two line breaks are required to separate markdown from HTML
+        base.WriteLiteral("\n\n");
+
+        foreach (var line in lines)
+        {
+            base.WriteLiteral(line);
+            base.WriteLiteral("\n");
+        }
+    }
+}

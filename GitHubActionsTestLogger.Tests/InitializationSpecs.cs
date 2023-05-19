@@ -34,7 +34,6 @@ public class InitializationSpecs
         {
             ["annotations.titleFormat"] = "TitleFormat",
             ["annotations.messageFormat"] = "MessageFormat",
-            ["summary.compactLayout"] = "true",
             ["summary.includePassedTests"] = "true",
             ["summary.includeSkippedTests"] = "true"
         };
@@ -46,7 +45,6 @@ public class InitializationSpecs
         logger.Context.Should().NotBeNull();
         logger.Context?.Options.AnnotationTitleFormat.Should().Be("TitleFormat");
         logger.Context?.Options.AnnotationMessageFormat.Should().Be("MessageFormat");
-        logger.Context?.Options.SummaryCompactLayout.Should().BeTrue();
         logger.Context?.Options.SummaryIncludePassedTests.Should().BeTrue();
         logger.Context?.Options.SummaryIncludeSkippedTests.Should().BeTrue();
     }

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using GitHubActionsTestLogger.Templates;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -90,7 +89,7 @@ public class TestLoggerContext
     {
         lock (_lock)
         {
-            var context = new TestSummaryContext
+            var template = new TestSummaryTemplate
             {
                 Options = Options,
 
@@ -105,7 +104,7 @@ public class TestLoggerContext
                 TestRunResult = new TestRunResult(_testResults, args.ElapsedTimeInRunningTests)
             };
 
-            _github.CreateSummary(new TestSummaryTemplate(context).Render());
+            _github.CreateSummary(template.Render());
         }
     }
 }
