@@ -89,33 +89,31 @@ public class TestLoggerContext
     {
         lock (_lock)
         {
-            // TestRunStart event sometimes doesn't fire, which means _testRunCriteria may be null
-            // https://github.com/microsoft/vstest/issues/3121
-            // Note: it might be an issue only on this repo, when using coverlet with the logger
-            // https://twitter.com/Tyrrrz/status/1530141770788610048
-
-            var testSuiteName =
+            var testSuite =
                 _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
                 "Unknown Test Suite";
 
-            var targetFrameworkName =
+            var targetFramework =
                 _testRunCriteria?.TryGetTargetFramework() ??
                 "Unknown Target Framework";
 
-            var testRunStatistics = new TestRunStatistics(
-                args.TestRunStatistics?[TestOutcome.Passed] ??
-                _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+            var testRunStatistics = new TestRunStatistics
+            {
+                PassedTestCount =
+                    args.TestRunStatistics?[TestOutcome.Passed] ??
+                    _testResults.Count(r => r.Outcome == TestOutcome.Passed),
 
-                args.TestRunStatistics?[TestOutcome.Failed] ??
-                _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+                FailedTestCount =
+                    args.TestRunStatistics?[TestOutcome.Failed] ??
+                    _testResults.Count(r => r.Outcome == TestOutcome.Failed),
 
-                args.TestRunStatistics?[TestOutcome.Skipped] ??
-                _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+                SkippedTestCount =
+                    args.TestRunStatistics?[TestOutcome.Skipped] ??
+                    _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
 
-                args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
-
-                args.ElapsedTimeInRunningTests
-            );
+                TotalTestCount = args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
+                ElapsedDuration = args.ElapsedTimeInRunningTests
+            };
 
             var testResults = _testResults
                 .Where(r =>
@@ -128,8 +126,8 @@ public class TestLoggerContext
             _github.CreateSummary(
                 new TestSummaryTemplate
                 {
-                    TestSuite = testSuiteName,
-                    TargetFramework = targetFrameworkName,
+                    TestSuite = testSuite,
+                    TargetFramework = targetFramework,
                     TestRunStatistics = testRunStatistics,
                     TestResults = testResults
                 }.Render()

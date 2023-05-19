@@ -3,13 +3,14 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger;
 
-internal record TestRunStatistics(
-    long PassedTestCount,
-    long FailedTestCount,
-    long SkippedTestCount,
-    long TotalTestCount,
-    TimeSpan ElapsedDuration)
+internal class TestRunStatistics
 {
+    public required long PassedTestCount { get; init; }
+    public required long FailedTestCount { get; init; }
+    public required long SkippedTestCount { get; init; }
+    public required long TotalTestCount { get; init; }
+    public required TimeSpan ElapsedDuration { get; init; }
+
     public TestOutcome OverallOutcome
     {
         get
