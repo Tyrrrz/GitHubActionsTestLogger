@@ -101,7 +101,22 @@ public class TestLoggerContext
                     _testRunCriteria?.TryGetTargetFramework() ??
                     "Unknown Target Framework",
 
-                TestRunResult = new TestRunResult(_testResults, args.ElapsedTimeInRunningTests)
+                TestRunStatistics = new TestRunStatistics(
+                    (int?)args.TestRunStatistics?[TestOutcome.Passed] ??
+                    _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+
+                    (int?)args.TestRunStatistics?[TestOutcome.Failed] ??
+                    _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+
+                    (int?)args.TestRunStatistics?[TestOutcome.Skipped] ??
+                    _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+
+                    (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
+
+                    args.ElapsedTimeInRunningTests
+                ),
+
+                TestResults = _testResults
             };
 
             _github.CreateSummary(template.Render());

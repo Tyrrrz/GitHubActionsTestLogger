@@ -14,12 +14,14 @@
 
     public required string TargetFramework { get; init; }
 
-    public required TestRunResult TestRunResult { get; init; }
+    public required TestRunStatistics TestRunStatistics { get; init; }
+
+    public required IReadOnlyList<TestResult> TestResults { get; init; }
 }
 
 <details>
     @{
-        var overallOutcomeEmoji = TestRunResult.OverallOutcome switch
+        var overallOutcomeEmoji = TestRunStatistics.OverallOutcome switch
         {
             TestOutcome.Passed => "🟢",
             TestOutcome.Failed => "🔴",
@@ -42,32 +44,31 @@
         <th width="99999">⧗&nbsp;&nbsp;Elapsed</th>
         <tr>
             <td align="center">
-                @(TestRunResult.PassedTestCount > 0
-                    ? TestRunResult.PassedTestCount.ToString()
+                @(TestRunStatistics.PassedTestCount > 0
+                    ? TestRunStatistics.PassedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @(TestRunResult.FailedTestCount > 0
-                    ? TestRunResult.FailedTestCount.ToString()
+                @(TestRunStatistics.FailedTestCount > 0
+                    ? TestRunStatistics.FailedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @(TestRunResult.SkippedTestCount > 0
-                    ? TestRunResult.SkippedTestCount.ToString()
+                @(TestRunStatistics.SkippedTestCount > 0
+                    ? TestRunStatistics.SkippedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @TestRunResult.TotalTestCount
+                @TestRunStatistics.TotalTestCount
             </td>
             <td align="center">
-                @TestRunResult.OverallDuration.ToHumanString()
+                @TestRunStatistics.OverallDuration.ToHumanString()
             </td>
         </tr>
     </table>
 
     @{
-        var testResultGroups = TestRunResult
-            .TestResults
+        var testResultGroups = TestResults
             .Where(r =>
                 r.Outcome == TestOutcome.Failed ||
                 r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
