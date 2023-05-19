@@ -83,73 +83,73 @@
             .ThenBy(g => g.TypeName, StringComparer.Ordinal);
     }
 
-    @foreach (var testResultGroup in testResultGroups)
-    {
-        var failedTestCount = testResultGroup.TestResults.Count(r => r.Outcome == TestOutcome.Failed);
+    <ul>
+        @foreach (var testResultGroup in testResultGroups)
+        {
+            var failedTestCount = testResultGroup.TestResults.Count(r => r.Outcome == TestOutcome.Failed);
 
-        <details open>
-            <summary>
+            <li>
                 <b>@testResultGroup.TypeName</b>
 
                 @if (failedTestCount > 0)
                 {
                     @(" ")<i>(@failedTestCount failed)</i>
                 }
-            </summary>
 
-            @* This adds a margin that is smaller than <br> *@
-            <p></p>
+                @* This adds a margin that is smaller than <br> *@
+                <p></p>
 
-            <ul>
-                @foreach (var testResult in testResultGroup.TestResults)
-                {
-                    var outcomeEmoji = testResult.Outcome switch
+                <ul>
+                    @foreach (var testResult in testResultGroup.TestResults)
                     {
-                        TestOutcome.Passed => "🟩",
-                        TestOutcome.Failed => "🟥",
-                        _ => "🟨"
-                    };
-
-                    // Use display name if it's different from the fully qualified name,
-                    // otherwise use the minimally qualified name.
-                    var testName = !string.Equals(
-                        testResult.TestCase.DisplayName,
-                        testResult.TestCase.FullyQualifiedName,
-                        StringComparison.Ordinal)
-                        ? testResult.TestCase.DisplayName
-                        : testResult.TestCase.GetMinimallyQualifiedName();
-
-                    // Test source permalink
-                    var filePath = testResult.TryGetSourceFilePath();
-                    var fileLine = testResult.TryGetSourceLine();
-                    var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
-
-                    <li>
-                        @outcomeEmoji
-
-                        @if (!string.IsNullOrWhiteSpace(url))
+                        var outcomeEmoji = testResult.Outcome switch
                         {
-                            <a href="@url">@testName</a>
-                        }
-                        else
-                        {
-                            @testName
-                        }
+                            TestOutcome.Passed => "🟩",
+                            TestOutcome.Failed => "🟥",
+                            _ => "🟨"
+                        };
 
-                        @if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
-                        {
-                            WriteMarkdown(
-                                "```yml",
-                                testResult.ErrorMessage,
-                                testResult.ErrorStackTrace,
-                                "```"
-                            );
-                        }
-                    </li>
-                }
-            </ul>
-        </details>
-    }
+                        // Use display name if it's different from the fully qualified name,
+                        // otherwise use the minimally qualified name.
+                        var testName = !string.Equals(
+                            testResult.TestCase.DisplayName,
+                            testResult.TestCase.FullyQualifiedName,
+                            StringComparison.Ordinal)
+                            ? testResult.TestCase.DisplayName
+                            : testResult.TestCase.GetMinimallyQualifiedName();
+
+                        // Test source permalink
+                        var filePath = testResult.TryGetSourceFilePath();
+                        var fileLine = testResult.TryGetSourceLine();
+                        var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
+
+                        <li>
+                            @outcomeEmoji
+
+                            @if (!string.IsNullOrWhiteSpace(url))
+                            {
+                                <a href="@url">@testName</a>
+                            }
+                            else
+                            {
+                                @testName
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
+                            {
+                                WriteMarkdown(
+                                    "```yml",
+                                    testResult.ErrorMessage,
+                                    testResult.ErrorStackTrace,
+                                    "```"
+                                );
+                            }
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
 </details>
 
 @functions
