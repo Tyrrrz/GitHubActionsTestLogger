@@ -128,11 +128,11 @@
 
                             @if (!string.IsNullOrWhiteSpace(url))
                             {
-                                <a href="@url">@testName</a>
+                                @(" ")<a href="@url">@testName</a>
                             }
                             else
                             {
-                                @testName
+                                @(" ")@testName
                             }
 
                             @if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
