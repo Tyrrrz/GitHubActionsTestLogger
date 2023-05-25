@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3 (25-May-2023)
+
+- Reverted some of the test summary layout changes introduced in v2.2 to restore a more compact view of the test results. This should make the summary more accessible for repositories that have a large number of test suites.
+
 ## v2.2.1 (18-May-2023)
 
 - Fixed an issue where the test summary was not properly rendered when it was preceded by a different summary that ended in an HTML tag.
