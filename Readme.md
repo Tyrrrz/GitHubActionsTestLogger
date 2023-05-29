@@ -76,12 +76,53 @@ jobs:
 > If you are using **.NET SDK v2.2 or lower**, you need to set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project.
 > [Learn more](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
+### Collecting source information
+
+**GitHub Actions Test Logger** can leverage source information to link reported test results to the locations in the source code where the corresponding tests are defined.
+By default, `dotnet test` does not collect source information, so the logger relies on stack traces to extract it manually.
+This approach only works for failed tests, and even then may not always be fully accurate.
+
+To instruct the runner to collect source information, add the `RunConfiguration.CollectSourceInformation=true` to the command as shown below:
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ...
+
+      - name: Build & test
+        # Note that the space after the last double dash (--) is intentional
+        run: >
+          dotnet test
+          --configuration Release
+          --logger GitHubActions
+          --
+          RunConfiguration.CollectSourceInformation=true
+```
+
+> **Note**:
+> This option can also be enabled by setting the corresponding property in a `.runsettings` file instead.
+> [Learn more](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file).
+
 ### Customizing behavior
 
 When running `dotnet test`, you can customize the logger's behavior by passing additional options:
 
-```sh
-$ dotnet test --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ...
+
+      - name: Build & test
+        run: >
+          dotnet test
+          --configuration Release
+          --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
 ```
 
 #### Custom annotation title
@@ -119,11 +160,13 @@ Supports the same replacement tokens as [`annotations.titleFormat`](#custom-anno
 #### Include passed tests in summary
 
 Use the `summary.includePassedTests` option to specify whether passed tests should be included in the summary.
+If you want to link passed tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `false`.
 
 #### Include skipped tests in summary
 
 Use the `summary.includeSkippedTests` option to specify whether skipped tests should be included in the summary.
+If you want to link skipped tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `false`.
