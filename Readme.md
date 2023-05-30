@@ -82,7 +82,7 @@ jobs:
 By default, `dotnet test` does not collect source information, so the logger relies on stack traces to extract it manually.
 This approach only works for failed tests, and even then may not always be fully accurate.
 
-To instruct the runner to collect source information, add the `RunConfiguration.CollectSourceInformation=true` to the command as shown below:
+To instruct the runner to collect source information, add the `RunConfiguration.CollectSourceInformation=true` argument to the command as shown below:
 
 ```yml
 jobs:
