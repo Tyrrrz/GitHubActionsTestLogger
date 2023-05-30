@@ -43,7 +43,7 @@ internal static class TestResultExtensions
 
     public static string? TryGetSourceFilePath(this TestResult testResult)
     {
-        // See if the test runner provided it (never actually happens)
+        // See if it was provided directly (requires source information collection to be enabled)
         if (!string.IsNullOrWhiteSpace(testResult.TestCase.CodeFilePath))
             return testResult.TestCase.CodeFilePath;
 
@@ -57,20 +57,11 @@ internal static class TestResultExtensions
 
     public static int? TryGetSourceLine(this TestResult testResult)
     {
-        // See if the test runner provided it (never actually happens)
+        // See if it was provided directly (requires source information collection to be enabled)
         if (testResult.TestCase.LineNumber > 0)
             return testResult.TestCase.LineNumber;
 
         // Try to extract it from the stack trace (works only if there was an exception)
         return testResult.TryGetTestStackFrame()?.Line;
     }
-
-    public static TestOutcome GetOverallOutcome(this IReadOnlyList<TestResult> testResults) =>
-        testResults.Any(r => r.Outcome == TestOutcome.Failed)
-            ? TestOutcome.Failed
-            : testResults.Any(r => r.Outcome == TestOutcome.Passed)
-                ? TestOutcome.Passed
-                : testResults.Any(r => r.Outcome == TestOutcome.Skipped)
-                    ? TestOutcome.Skipped
-                    : TestOutcome.None;
 }
