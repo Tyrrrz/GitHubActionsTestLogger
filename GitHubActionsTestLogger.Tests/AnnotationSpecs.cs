@@ -182,8 +182,8 @@ public class AnnotationSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "<$test>",
-                AnnotationMessageFormat = "[$test]"
+                AnnotationTitleFormat = "<@test>",
+                AnnotationMessageFormat = "[@test]"
             }
         );
 
@@ -217,8 +217,8 @@ public class AnnotationSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "<$traits.Category -> $test>",
-                AnnotationMessageFormat = "[$traits.Category -> $test]"
+                AnnotationTitleFormat = "<@traits.Category -> @test>",
+                AnnotationMessageFormat = "[@traits.Category -> @test]"
             }
         );
 
@@ -254,8 +254,8 @@ public class AnnotationSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "<$test: $error>",
-                AnnotationMessageFormat = "[$test: $error]"
+                AnnotationTitleFormat = "<@test: @error>",
+                AnnotationMessageFormat = "[@test: @error]"
             }
         );
 
@@ -290,8 +290,8 @@ public class AnnotationSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "<$test: $trace>",
-                AnnotationMessageFormat = "[$test: $trace]"
+                AnnotationTitleFormat = "<@test: @trace>",
+                AnnotationMessageFormat = "[@test: @trace]"
             }
         );
 
@@ -326,8 +326,8 @@ public class AnnotationSpecs
             ),
             new TestLoggerOptions
             {
-                AnnotationTitleFormat = "<$test ($framework)>",
-                AnnotationMessageFormat = "[$test ($framework)]"
+                AnnotationTitleFormat = "<@test (@framework)>",
+                AnnotationMessageFormat = "[@test (@framework)]"
             }
         );
 

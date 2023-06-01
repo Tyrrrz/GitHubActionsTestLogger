@@ -29,24 +29,41 @@ public class TestLoggerContext
     {
         var buffer = new StringBuilder(format);
 
-        // New line token (don't include caret return for consistency across platforms)
+        // Escaped new line token (backwards compat)
         buffer.Replace("\\n", "\n");
 
         // Name token
-        buffer.Replace("$test", testResult.TestCase.DisplayName ?? "");
+        buffer
+            .Replace("@test", testResult.TestCase.DisplayName)
+            // Backwards compat
+            .Replace("$test", testResult.TestCase.DisplayName);
 
         // Trait tokens
         foreach (var trait in testResult.Traits.Union(testResult.TestCase.Traits))
-            buffer.Replace($"$traits.{trait.Name}", trait.Value);
+        {
+            buffer
+                .Replace($"@traits.{trait.Name}", trait.Value)
+                // Backwards compat
+                .Replace($"$traits.{trait.Name}", trait.Value);
+        }
 
         // Error message
-        buffer.Replace("$error", testResult.ErrorMessage ?? "");
+        buffer
+            .Replace("@error", testResult.ErrorMessage ?? "")
+            // Backwards compat
+            .Replace("$error", testResult.ErrorMessage ?? "");
 
         // Error trace
-        buffer.Replace("$trace", testResult.ErrorStackTrace ?? "");
+        buffer
+            .Replace("@trace", testResult.ErrorStackTrace ?? "")
+            // Backwards compat
+            .Replace("$trace", testResult.ErrorStackTrace ?? "");
 
         // Target framework
-        buffer.Replace("$framework", _testRunCriteria?.TryGetTargetFramework() ?? "");
+        buffer
+            .Replace("@framework", _testRunCriteria?.TryGetTargetFramework() ?? "")
+            // Backwards compat
+            .Replace("$framework", _testRunCriteria?.TryGetTargetFramework() ?? "");
 
         return buffer.Trim().ToString();
     }
