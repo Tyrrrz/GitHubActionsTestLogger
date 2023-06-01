@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -8,7 +7,7 @@ namespace GitHubActionsTestLogger.Utils.Extensions;
 internal static class TestResultExtensions
 {
     // This method attempts to get the stack frame that represents the call to the test method.
-    // Obviously, this only works if the test threw an exception.
+    // Obviously, this only works if the test throws an exception.
     private static StackFrame? TryGetTestStackFrame(this TestResult testResult)
     {
         if (string.IsNullOrWhiteSpace(testResult.ErrorStackTrace))
@@ -27,9 +26,9 @@ internal static class TestResultExtensions
             StringComparison.OrdinalIgnoreCase
         );
 
-        var matchingStackFrames = StackFrame
+        return StackFrame
             .ParseMany(testResult.ErrorStackTrace)
-            .Where(f =>
+            .LastOrDefault(f =>
                 // Sync method call
                 // e.g. MyTests.EnsureOnePlusOneEqualsTwo()
                 f.MethodCall.StartsWith(testMethodFullyQualifiedName, StringComparison.OrdinalIgnoreCase) ||
@@ -37,8 +36,6 @@ internal static class TestResultExtensions
                 // e.g. MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
                 f.MethodCall.Contains('<' + testMethodName + '>', StringComparison.OrdinalIgnoreCase)
             );
-
-        return matchingStackFrames.LastOrDefault();
     }
 
     public static string? TryGetSourceFilePath(this TestResult testResult)

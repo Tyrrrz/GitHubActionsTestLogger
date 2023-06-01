@@ -91,14 +91,19 @@ public partial class GitHubWorkflow
 
 public partial class GitHubWorkflow
 {
-    public static bool IsRunningOnAgent { get; } = string.Equals(
-        Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
-        "true",
-        StringComparison.OrdinalIgnoreCase
+    public static GitHubWorkflow Default { get; } = new(
+        // Commands are written to the standard output
+        Console.Out,
+        // Summary is written to the file specified by an environment variable.
+        // We may need to write to the summary file from multiple test suites in parallel,
+        // so we should use a stream that delays acquiring the file lock until the very last moment,
+        // and employs retry logic to handle potential race conditions.
+        Environment
+            .GetEnvironmentVariable("GITHUB_STEP_SUMMARY")?
+            .Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
+            .Pipe(s => new StreamWriter(s)) ??
+        TextWriter.Null
     );
-
-    public static string? SummaryFilePath { get; } =
-        Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
 
     public static string? TryGenerateFilePermalink(string filePath, int? line = null)
     {
@@ -111,12 +116,14 @@ public partial class GitHubWorkflow
             string.IsNullOrWhiteSpace(repositorySlug) ||
             string.IsNullOrWhiteSpace(workspacePath) ||
             string.IsNullOrWhiteSpace(commitHash))
+        {
             return null;
+        }
 
         var filePathRelative =
             // If the file path starts with /_/ but the workspace path doesn't,
             // then it's safe to assume that the file path has already been normalized
-            // by the deterministic build feature.
+            // by the Deterministic Build feature of MSBuild.
             // In this case, we only need to remove the leading /_/ from the file path
             // to get the correct relative path.
             filePath.StartsWith("/_/", StringComparison.Ordinal) &&
