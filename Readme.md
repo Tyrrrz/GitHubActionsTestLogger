@@ -122,7 +122,7 @@ jobs:
         run: >
           dotnet test
           --configuration Release
-          --logger "GitHubActions;annotations.titleFormat=$test;annotations.messageFormat=$error"
+          --logger "GitHubActions;annotations.titleFormat=@test;annotations.messageFormat=@error"
 ```
 
 #### Custom annotation title
@@ -131,31 +131,31 @@ Use the `annotations.titleFormat` option to specify the annotation title format 
 
 The following replacement tokens are available:
 
-- `$test` — replaced with the display name of the test
-- `$traits.TRAIT_NAME` — replaced with the value of the trait named `TRAIT_NAME`
-- `$error` — replaced with the error message
-- `$trace` — replaced with the stack trace
-- `$framework` — replaced with the target framework
+- `@test` — replaced with the display name of the test
+- `@traits.TRAIT_NAME` — replaced with the value of the trait named `TRAIT_NAME`
+- `@error` — replaced with the error message
+- `@trace` — replaced with the stack trace
+- `@framework` — replaced with the target framework
 
-**Default**: `$test`.
+**Default**: `@test`.
 
 **Examples**:
 
-- `$test` → `MyTests.Test1`
-- `[$traits.Category] $test` → `[UI Tests] MyTests.Test1`
-- `$test ($framework)` → `MyTests.Test1 (.NETCoreApp,Version=v6.0)`
+- `@test` → `MyTests.Test1`
+- `[@traits.Category] @test` → `[UI Tests] MyTests.Test1`
+- `@test (@framework)` → `MyTests.Test1 (.NETCoreApp,Version=v6.0)`
 
 #### Custom annotation message
 
 Use the `annotations.messageFormat` option to specify the annotation message format used for reporting test failures.
 Supports the same replacement tokens as [`annotations.titleFormat`](#custom-annotation-title).
 
-**Default**: `$error`.
+**Default**: `@error`.
 
 **Examples**:
 
-- `$error` → `AssertionException: Expected 'true' but found 'false'`
-- `$error\n$trace` → `AssertionException: Expected 'true' but found 'false'`, followed by stacktrace on the next line
+- `@error` → `AssertionException: Expected 'true' but found 'false'`
+- `@error\n@trace` → `AssertionException: Expected 'true' but found 'false'`, followed by stacktrace on the next line
 
 #### Include passed tests in summary
 

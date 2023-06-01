@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3.2 (01-Jun-2023)
+
+- Changed the special character used to identify replacement tokens inside `annotations.titleFormat` and `annotations.messageFormat` from `$` to `@`. The previous character (`$`) had special meaning inside POSIX shells and required escaping, which resulted in non-uniform syntax across different platforms. The new character (`@`) does not require escaping. For backwards compatibility, the logger will still recognize the `$` character as a replacement token identifier, but it is recommended to switch to the new character (`@`) when possible.
+
 ## v2.3.1 (31-May-2023)
 
 - Fixed minor spacing issues in the test summary.
