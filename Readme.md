@@ -41,11 +41,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ## Usage
 
-To use **GitHub Actions Test Logger**, follow these steps:
-
-1. Install the **GitHubActionsTestLogger** package in your test project
-2. Update the **Microsoft.NET.Test.Sdk** package in your test project to the latest version
-3. Modify your GitHub Actions workflow file by adding `--logger GitHubActions` to `dotnet test`:
+To use **GitHub Actions Test Logger**, install it in your test project and modify your GitHub Actions workflow by adding `--logger GitHubActions` to `dotnet test`:
 
 ```yaml
 name: main
@@ -69,8 +65,8 @@ jobs:
 ```
 
 > **Warning**:
-> Ensure that your test project references **Microsoft.NET.Test.Sdk** version **17.2.0** or higher.
-> Older versions of this package may not work properly with custom test loggers.
+> Ensure that your test project references the latest version of **Microsoft.NET.Test.Sdk**.
+> Older versions of this package may not be compatible with the logger.
 
 > **Warning**:
 > If you are using **.NET SDK v2.2 or lower**, you need to set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project.
