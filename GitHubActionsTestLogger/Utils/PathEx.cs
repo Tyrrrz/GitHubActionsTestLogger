@@ -19,15 +19,18 @@ internal static class PathEx
         var basePathSegments = basePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var pathSegments = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-        var commonSegments = 0;
+        var commonSegmentsCount = 0;
         for (var i = 0; i < basePathSegments.Length && i < pathSegments.Length; i++)
         {
             if (!string.Equals(basePathSegments[i], pathSegments[i], PathStringComparison))
                 break;
 
-            commonSegments++;
+            commonSegmentsCount++;
         }
 
-        return string.Join("/", pathSegments.Skip(commonSegments));
+        return string.Join(
+            Path.DirectorySeparatorChar.ToString(),
+            pathSegments.Skip(commonSegmentsCount)
+        );
     }
 }
