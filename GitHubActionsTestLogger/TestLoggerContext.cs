@@ -109,33 +109,30 @@ public class TestLoggerContext
             var template = new TestSummaryTemplate
             {
                 TestSuite =
-                    _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension) ??
-                    "Unknown Test Suite",
-
+                    _testRunCriteria
+                        ?.Sources?.FirstOrDefault()
+                        ?.Pipe(Path.GetFileNameWithoutExtension) ?? "Unknown Test Suite",
                 TargetFramework =
-                    _testRunCriteria?.TryGetTargetFramework() ??
-                    "Unknown Target Framework",
-
+                    _testRunCriteria?.TryGetTargetFramework() ?? "Unknown Target Framework",
                 TestRunStatistics = new TestRunStatistics(
-                    (int?)args.TestRunStatistics?[TestOutcome.Passed] ??
-                    _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-
-                    (int?)args.TestRunStatistics?[TestOutcome.Failed] ??
-                    _testResults.Count(r => r.Outcome == TestOutcome.Failed),
-
-                    (int?)args.TestRunStatistics?[TestOutcome.Skipped] ??
-                    _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
-
+                    (int?)args.TestRunStatistics?[TestOutcome.Passed]
+                        ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+                    (int?)args.TestRunStatistics?[TestOutcome.Failed]
+                        ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+                    (int?)args.TestRunStatistics?[TestOutcome.Skipped]
+                        ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
                     (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
-
                     args.ElapsedTimeInRunningTests
                 ),
-
-                TestResults = _testResults.Where(r =>
-                    r.Outcome == TestOutcome.Failed ||
-                    r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests ||
-                    r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
-                ).ToArray()
+                TestResults = _testResults
+                    .Where(
+                        r =>
+                            r.Outcome == TestOutcome.Failed
+                            || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
+                            || r.Outcome == TestOutcome.Skipped
+                                && Options.SummaryIncludeSkippedTests
+                    )
+                    .ToArray()
             };
 
             _github.CreateSummary(template.Render());

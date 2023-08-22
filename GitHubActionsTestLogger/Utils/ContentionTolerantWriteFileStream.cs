@@ -38,7 +38,7 @@ internal class ContentionTolerantWriteFileStream : Stream
     // Backoff and retry if the file is locked
     private FileStream CreateInnerStream()
     {
-        for (var retriesRemaining = 10;; retriesRemaining--)
+        for (var retriesRemaining = 10; ; retriesRemaining--)
         {
             try
             {
@@ -73,10 +73,8 @@ internal class ContentionTolerantWriteFileStream : Stream
         throw new NotSupportedException();
 
     [ExcludeFromCodeCoverage]
-    public override long Seek(long offset, SeekOrigin origin) =>
-        throw new NotSupportedException();
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
     [ExcludeFromCodeCoverage]
-    public override void SetLength(long value) =>
-        throw new NotSupportedException();
+    public override void SetLength(long value) => throw new NotSupportedException();
 }

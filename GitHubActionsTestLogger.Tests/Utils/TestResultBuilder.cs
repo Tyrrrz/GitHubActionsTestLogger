@@ -5,13 +5,16 @@ namespace GitHubActionsTestLogger.Tests.Utils;
 
 internal class TestResultBuilder
 {
-    private TestResult _testResult = new(new TestCase
-    {
-        Id = Guid.NewGuid(),
-        Source = "FakeTests.dll",
-        FullyQualifiedName = "FakeTests.FakeTest",
-        DisplayName = "FakeTest"
-    });
+    private TestResult _testResult =
+        new(
+            new TestCase
+            {
+                Id = Guid.NewGuid(),
+                Source = "FakeTests.dll",
+                FullyQualifiedName = "FakeTests.FakeTest",
+                DisplayName = "FakeTest"
+            }
+        );
 
     public TestResultBuilder SetDisplayName(string displayName)
     {

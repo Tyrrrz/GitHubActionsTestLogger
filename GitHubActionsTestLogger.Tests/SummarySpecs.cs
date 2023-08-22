@@ -12,8 +12,7 @@ public class SummarySpecs
 {
     private readonly ITestOutputHelper _testOutput;
 
-    public SummarySpecs(ITestOutputHelper testOutput) =>
-        _testOutput = testOutput;
+    public SummarySpecs(ITestOutputHelper testOutput) => _testOutput = testOutput;
 
     [Fact]
     public void I_can_use_the_logger_to_produce_a_summary_that_includes_the_test_suite_name()
@@ -22,10 +21,7 @@ public class SummarySpecs
         using var summaryWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                TextWriter.Null,
-                summaryWriter
-            ),
+            new GitHubWorkflow(TextWriter.Null, summaryWriter),
             TestLoggerOptions.Default
         );
 
@@ -47,14 +43,8 @@ public class SummarySpecs
         using var summaryWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                TextWriter.Null,
-                summaryWriter
-            ),
-            new TestLoggerOptions
-            {
-                SummaryIncludePassedTests = true
-            }
+            new GitHubWorkflow(TextWriter.Null, summaryWriter),
+            new TestLoggerOptions { SummaryIncludePassedTests = true }
         );
 
         // Act
@@ -100,14 +90,8 @@ public class SummarySpecs
         using var summaryWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                TextWriter.Null,
-                summaryWriter
-            ),
-            new TestLoggerOptions
-            {
-                SummaryIncludeSkippedTests = true
-            }
+            new GitHubWorkflow(TextWriter.Null, summaryWriter),
+            new TestLoggerOptions { SummaryIncludeSkippedTests = true }
         );
 
         // Act
@@ -153,10 +137,7 @@ public class SummarySpecs
         using var summaryWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                TextWriter.Null,
-                summaryWriter
-            ),
+            new GitHubWorkflow(TextWriter.Null, summaryWriter),
             TestLoggerOptions.Default
         );
 

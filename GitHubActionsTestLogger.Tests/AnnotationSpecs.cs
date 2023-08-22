@@ -12,8 +12,7 @@ public class AnnotationSpecs
 {
     private readonly ITestOutputHelper _testOutput;
 
-    public AnnotationSpecs(ITestOutputHelper testOutput) =>
-        _testOutput = testOutput;
+    public AnnotationSpecs(ITestOutputHelper testOutput) => _testOutput = testOutput;
 
     [Fact]
     public void I_can_use_the_logger_to_produce_annotations_for_failed_tests()
@@ -22,10 +21,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             TestLoggerOptions.Default
         );
 
@@ -36,14 +32,8 @@ public class AnnotationSpecs
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build(),
-            new TestResultBuilder()
-                .SetDisplayName("Test2")
-                .SetOutcome(TestOutcome.Passed)
-                .Build(),
-            new TestResultBuilder()
-                .SetDisplayName("Test3")
-                .SetOutcome(TestOutcome.Skipped)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test2").SetOutcome(TestOutcome.Passed).Build(),
+            new TestResultBuilder().SetDisplayName("Test3").SetOutcome(TestOutcome.Skipped).Build()
         );
 
         // Assert
@@ -69,10 +59,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             TestLoggerOptions.Default
         );
 
@@ -122,10 +109,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             TestLoggerOptions.Default
         );
 
@@ -176,10 +160,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test>",
@@ -189,10 +170,7 @@ public class AnnotationSpecs
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert
@@ -211,10 +189,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@traits.Category -> @test>",
@@ -248,10 +223,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test: @error>",
@@ -284,10 +256,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test: @trace>",
@@ -320,10 +289,7 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test (@framework)>",
@@ -358,22 +324,13 @@ public class AnnotationSpecs
         using var commandWriter = new StringWriter();
 
         var context = new TestLoggerContext(
-            new GitHubWorkflow(
-                commandWriter,
-                TextWriter.Null
-            ),
-            new TestLoggerOptions
-            {
-                AnnotationMessageFormat = "foo\\nbar"
-            }
+            new GitHubWorkflow(commandWriter, TextWriter.Null),
+            new TestLoggerOptions { AnnotationMessageFormat = "foo\\nbar" }
         );
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert

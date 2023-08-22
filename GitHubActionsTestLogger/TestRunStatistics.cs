@@ -8,7 +8,8 @@ internal record TestRunStatistics(
     int FailedTestCount,
     int SkippedTestCount,
     int TotalTestCount,
-    TimeSpan OverallDuration)
+    TimeSpan OverallDuration
+)
 {
     public TestOutcome OverallOutcome
     {

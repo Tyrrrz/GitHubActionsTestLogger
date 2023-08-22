@@ -22,17 +22,16 @@ public partial class GitHubWorkflow
     private void InvokeCommand(
         string command,
         string message,
-        IReadOnlyDictionary<string, string>? options = null)
+        IReadOnlyDictionary<string, string>? options = null
+    )
     {
         // URL-encode certain characters to ensure they don't get parsed as command tokens
         // https://pakstech.com/blog/github-actions-workflow-commands
-        static string Escape(string value) => value
-            .Replace("%", "%25")
-            .Replace("\n", "%0A")
-            .Replace("\r", "%0D");
+        static string Escape(string value) =>
+            value.Replace("%", "%25").Replace("\n", "%0A").Replace("\r", "%0D");
 
-        var formattedOptions = options?
-            .Select(kvp => Escape(kvp.Key) + '=' + Escape(kvp.Value))
+        var formattedOptions = options
+            ?.Select(kvp => Escape(kvp.Key) + '=' + Escape(kvp.Value))
             .Pipe(s => string.Join(",", s));
 
         // Command should start at the beginning of the line, so add a newline
@@ -41,9 +40,7 @@ public partial class GitHubWorkflow
         // ANSI color codes enabled.
         _commandWriter.WriteLine();
 
-        _commandWriter.WriteLine(
-            $"::{command} {formattedOptions}::{Escape(message)}"
-        );
+        _commandWriter.WriteLine($"::{command} {formattedOptions}::{Escape(message)}");
 
         // This newline is just for symmetry
         _commandWriter.WriteLine();
@@ -56,12 +53,10 @@ public partial class GitHubWorkflow
         string message,
         string? filePath = null,
         int? line = null,
-        int? column = null)
+        int? column = null
+    )
     {
-        var options = new Dictionary<string, string>
-        {
-            ["title"] = title
-        };
+        var options = new Dictionary<string, string> { ["title"] = title };
 
         if (!string.IsNullOrWhiteSpace(filePath))
             options["file"] = filePath;
@@ -91,19 +86,19 @@ public partial class GitHubWorkflow
 
 public partial class GitHubWorkflow
 {
-    public static GitHubWorkflow Default { get; } = new(
-        // Commands are written to the standard output
-        Console.Out,
-        // Summary is written to the file specified by an environment variable.
-        // We may need to write to the summary file from multiple test suites in parallel,
-        // so we should use a stream that delays acquiring the file lock until the very last moment,
-        // and employs retry logic to handle potential race conditions.
-        Environment
-            .GetEnvironmentVariable("GITHUB_STEP_SUMMARY")?
-            .Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
-            .Pipe(s => new StreamWriter(s)) ??
-        TextWriter.Null
-    );
+    public static GitHubWorkflow Default { get; } =
+        new(
+            // Commands are written to the standard output
+            Console.Out,
+            // Summary is written to the file specified by an environment variable.
+            // We may need to write to the summary file from multiple test suites in parallel,
+            // so we should use a stream that delays acquiring the file lock until the very last moment,
+            // and employs retry logic to handle potential race conditions.
+            Environment
+                .GetEnvironmentVariable("GITHUB_STEP_SUMMARY")
+                ?.Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
+                .Pipe(s => new StreamWriter(s)) ?? TextWriter.Null
+        );
 
     public static string? TryGenerateFilePermalink(string filePath, int? line = null)
     {
@@ -112,10 +107,12 @@ public partial class GitHubWorkflow
         var workspacePath = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
         var commitHash = Environment.GetEnvironmentVariable("GITHUB_SHA");
 
-        if (string.IsNullOrWhiteSpace(serverUrl) ||
-            string.IsNullOrWhiteSpace(repositorySlug) ||
-            string.IsNullOrWhiteSpace(workspacePath) ||
-            string.IsNullOrWhiteSpace(commitHash))
+        if (
+            string.IsNullOrWhiteSpace(serverUrl)
+            || string.IsNullOrWhiteSpace(repositorySlug)
+            || string.IsNullOrWhiteSpace(workspacePath)
+            || string.IsNullOrWhiteSpace(commitHash)
+        )
         {
             return null;
         }
@@ -126,8 +123,8 @@ public partial class GitHubWorkflow
             // by the Deterministic Build feature of MSBuild.
             // In this case, we only need to remove the leading /_/ from the file path
             // to get the correct relative path.
-            filePath.StartsWith("/_/", StringComparison.Ordinal) &&
-            !workspacePath.StartsWith("/_/", StringComparison.Ordinal)
+            filePath.StartsWith("/_/", StringComparison.Ordinal)
+            && !workspacePath.StartsWith("/_/", StringComparison.Ordinal)
                 ? filePath[3..]
                 : PathEx.GetRelativePath(workspacePath, filePath);
 

@@ -10,9 +10,10 @@ internal static class TestRunCriteriaExtensions
         if (string.IsNullOrWhiteSpace(testRunCriteria.TestRunSettings))
             return null;
 
-        return (string?)XElement
-            .Parse(testRunCriteria.TestRunSettings)
-            .Element("RunConfiguration")?
-            .Element("TargetFrameworkVersion");
+        return (string?)
+            XElement
+                .Parse(testRunCriteria.TestRunSettings)
+                .Element("RunConfiguration")
+                ?.Element("TargetFrameworkVersion");
     }
 }

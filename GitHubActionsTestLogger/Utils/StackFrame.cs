@@ -28,8 +28,9 @@ internal partial class StackFrame
     private const string Space = @"[\x20\t]";
     private const string NotSpace = @"[^\x20\t]";
 
-    private static readonly Regex Pattern = new(
-        $$"""
+    private static readonly Regex Pattern =
+        new(
+            $$"""
         ^
         {{Space}}*
         \w+ {{Space}}+
@@ -57,22 +58,22 @@ internal partial class StackFrame
         \s*
         $
         """,
-        RegexOptions.IgnoreCase |
-        RegexOptions.Multiline |
-        RegexOptions.ExplicitCapture |
-        RegexOptions.CultureInvariant |
-        RegexOptions.IgnorePatternWhitespace |
-        RegexOptions.Compiled,
-        // Cap the evaluation time to make it obvious should the expression
-        // fall into the "catastrophic backtracking" trap due to over
-        // generalization.
-        // https://github.com/atifaziz/StackTraceParser/issues/4
-        TimeSpan.FromSeconds(5));
+            RegexOptions.IgnoreCase
+                | RegexOptions.Multiline
+                | RegexOptions.ExplicitCapture
+                | RegexOptions.CultureInvariant
+                | RegexOptions.IgnorePatternWhitespace
+                | RegexOptions.Compiled,
+            // Cap the evaluation time to make it obvious should the expression
+            // fall into the "catastrophic backtracking" trap due to over
+            // generalization.
+            // https://github.com/atifaziz/StackTraceParser/issues/4
+            TimeSpan.FromSeconds(5)
+        );
 
     public static IEnumerable<StackFrame> ParseMany(string text) =>
         from Match m in Pattern.Matches(text)
-        select m.Groups
-        into groups
+        select m.Groups into groups
         select new StackFrame(
             groups["type"].Value + '.' + groups["method"].Value,
             groups["file"].Value,
