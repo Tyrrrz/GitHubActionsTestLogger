@@ -106,6 +106,9 @@ jobs:
 > This option can also be enabled by setting the corresponding property in a `.runsettings` file instead.
 > [Learn more](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file).
 
+> **Warning**:
+> Source information collection is not supported on legacy .NET Framework.
+
 ### Customizing behavior
 
 When running `dotnet test`, you can customize the logger's behavior by passing additional options:
