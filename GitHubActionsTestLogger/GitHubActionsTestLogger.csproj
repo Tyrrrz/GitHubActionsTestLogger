@@ -13,7 +13,6 @@
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
