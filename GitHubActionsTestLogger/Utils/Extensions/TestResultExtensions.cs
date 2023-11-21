@@ -16,10 +16,10 @@ internal static class TestResultExtensions
         if (string.IsNullOrWhiteSpace(testResult.TestCase.FullyQualifiedName))
             return null;
 
-        var testMethodFullyQualifiedName = testResult.TestCase.FullyQualifiedName.SubstringUntil(
-            "(",
-            StringComparison.OrdinalIgnoreCase
-        );
+        var testMethodFullyQualifiedName = testResult
+            .TestCase
+            .FullyQualifiedName
+            .SubstringUntil("(", StringComparison.OrdinalIgnoreCase);
 
         var testMethodName = testMethodFullyQualifiedName.SubstringAfterLast(
             ".",

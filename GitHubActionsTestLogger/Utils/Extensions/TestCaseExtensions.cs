@@ -7,7 +7,8 @@ namespace GitHubActionsTestLogger.Utils.Extensions;
 internal static class TestCaseExtensions
 {
     public static string GetTypeFullyQualifiedName(this TestCase testCase) =>
-        testCase.FullyQualifiedName
+        testCase
+            .FullyQualifiedName
             // Strip the test cases (if this is a parameterized test method)
             .SubstringUntil("(", StringComparison.OrdinalIgnoreCase)
             // Strip everything after the last dot, to leave the full type name

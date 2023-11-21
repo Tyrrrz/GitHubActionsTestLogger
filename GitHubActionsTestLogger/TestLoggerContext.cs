@@ -110,10 +110,13 @@ public class TestLoggerContext
             {
                 TestSuite =
                     _testRunCriteria
-                        ?.Sources?.FirstOrDefault()
+                        ?.Sources
+                        ?.FirstOrDefault()
                         ?.Pipe(Path.GetFileNameWithoutExtension) ?? "Unknown Test Suite",
+
                 TargetFramework =
                     _testRunCriteria?.TryGetTargetFramework() ?? "Unknown Target Framework",
+
                 TestRunStatistics = new TestRunStatistics(
                     (int?)args.TestRunStatistics?[TestOutcome.Passed]
                         ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
@@ -124,6 +127,7 @@ public class TestLoggerContext
                     (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
                     args.ElapsedTimeInRunningTests
                 ),
+
                 TestResults = _testResults
                     .Where(
                         r =>
