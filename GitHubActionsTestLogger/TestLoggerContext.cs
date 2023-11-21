@@ -106,37 +106,39 @@ public class TestLoggerContext
     {
         lock (_lock)
         {
+            var testSuite =
+                _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension)
+                ?? "Unknown Test Suite";
+
+            var targetFramework =
+                _testRunCriteria?.TryGetTargetFramework() ?? "Unknown Target Framework";
+
+            var testRunStatistics = new TestRunStatistics(
+                (int?)args.TestRunStatistics?[TestOutcome.Passed]
+                    ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+                (int?)args.TestRunStatistics?[TestOutcome.Failed]
+                    ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+                (int?)args.TestRunStatistics?[TestOutcome.Skipped]
+                    ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+                (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
+                args.ElapsedTimeInRunningTests
+            );
+
+            var testResults = _testResults
+                .Where(
+                    r =>
+                        r.Outcome == TestOutcome.Failed
+                        || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
+                        || r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
+                )
+                .ToArray();
+
             var template = new TestSummaryTemplate
             {
-                TestSuite =
-                    _testRunCriteria
-                        ?.Sources
-                        ?.FirstOrDefault()
-                        ?.Pipe(Path.GetFileNameWithoutExtension) ?? "Unknown Test Suite",
-
-                TargetFramework =
-                    _testRunCriteria?.TryGetTargetFramework() ?? "Unknown Target Framework",
-
-                TestRunStatistics = new TestRunStatistics(
-                    (int?)args.TestRunStatistics?[TestOutcome.Passed]
-                        ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-                    (int?)args.TestRunStatistics?[TestOutcome.Failed]
-                        ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
-                    (int?)args.TestRunStatistics?[TestOutcome.Skipped]
-                        ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
-                    (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
-                    args.ElapsedTimeInRunningTests
-                ),
-
-                TestResults = _testResults
-                    .Where(
-                        r =>
-                            r.Outcome == TestOutcome.Failed
-                            || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
-                            || r.Outcome == TestOutcome.Skipped
-                                && Options.SummaryIncludeSkippedTests
-                    )
-                    .ToArray()
+                TestSuite = testSuite,
+                TargetFramework = targetFramework,
+                TestRunStatistics = testRunStatistics,
+                TestResults = testResults
             };
 
             _github.CreateSummary(template.Render());
