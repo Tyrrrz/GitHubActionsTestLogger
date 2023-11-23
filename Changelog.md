@@ -1,5 +1,9 @@
 # Changelog
 
+> **Important**:
+> This changelog is no longer maintained and will be removed in the future.
+> Going forward, new versions of this package will have the corresponding release notes published on [GitHub Releases](https://githu.com/Tyrrrz/GitHubActionsTestLogger/releases).
+
 ## v2.3.3 (24-Aug-2023)
 
 - Fixed an issue where parameterized tests that contained a `.` character in their fully qualified name were not properly grouped in the test summary.
