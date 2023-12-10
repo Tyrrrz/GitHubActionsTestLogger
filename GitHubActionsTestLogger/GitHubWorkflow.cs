@@ -8,17 +8,8 @@ using GitHubActionsTestLogger.Utils.Extensions;
 namespace GitHubActionsTestLogger;
 
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
-public partial class GitHubWorkflow
+public partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
 {
-    private readonly TextWriter _commandWriter;
-    private readonly TextWriter _summaryWriter;
-
-    public GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
-    {
-        _commandWriter = commandWriter;
-        _summaryWriter = summaryWriter;
-    }
-
     private void InvokeCommand(
         string command,
         string message,
@@ -38,14 +29,14 @@ public partial class GitHubWorkflow
         // to make sure there is no preceding text.
         // Preceding text may sometimes appear if the .NET CLI is running with
         // ANSI color codes enabled.
-        _commandWriter.WriteLine();
+        commandWriter.WriteLine();
 
-        _commandWriter.WriteLine($"::{command} {formattedOptions}::{Escape(message)}");
+        commandWriter.WriteLine($"::{command} {formattedOptions}::{Escape(message)}");
 
         // This newline is just for symmetry
-        _commandWriter.WriteLine();
+        commandWriter.WriteLine();
 
-        _commandWriter.Flush();
+        commandWriter.Flush();
     }
 
     public void CreateErrorAnnotation(
@@ -76,11 +67,11 @@ public partial class GitHubWorkflow
         // which can screw up markdown parsing, so we need to make sure
         // there's at least two newlines before our summary to be safe.
         // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
-        _summaryWriter.WriteLine();
-        _summaryWriter.WriteLine();
+        summaryWriter.WriteLine();
+        summaryWriter.WriteLine();
 
-        _summaryWriter.WriteLine(content);
-        _summaryWriter.Flush();
+        summaryWriter.WriteLine(content);
+        summaryWriter.Flush();
     }
 }
 

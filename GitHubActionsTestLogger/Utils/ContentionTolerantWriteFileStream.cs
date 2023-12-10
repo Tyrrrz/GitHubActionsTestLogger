@@ -7,11 +7,8 @@ using System.Threading;
 
 namespace GitHubActionsTestLogger.Utils;
 
-internal class ContentionTolerantWriteFileStream : Stream
+internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileMode) : Stream
 {
-    private readonly string _filePath;
-    private readonly FileMode _fileMode;
-
     private readonly List<byte> _buffer = new(1024);
 
     [ExcludeFromCodeCoverage]
@@ -29,12 +26,6 @@ internal class ContentionTolerantWriteFileStream : Stream
     [ExcludeFromCodeCoverage]
     public override long Position { get; set; }
 
-    public ContentionTolerantWriteFileStream(string filePath, FileMode fileMode)
-    {
-        _filePath = filePath;
-        _fileMode = fileMode;
-    }
-
     // Backoff and retry if the file is locked
     private FileStream CreateInnerStream()
     {
@@ -42,7 +33,7 @@ internal class ContentionTolerantWriteFileStream : Stream
         {
             try
             {
-                return new FileStream(_filePath, _fileMode);
+                return new FileStream(filePath, fileMode);
             }
             catch (IOException) when (retriesRemaining > 0)
             {

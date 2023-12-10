@@ -8,12 +8,8 @@ using Xunit.Abstractions;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class AnnotationSpecs
+public class AnnotationSpecs(ITestOutputHelper testOutput)
 {
-    private readonly ITestOutputHelper _testOutput;
-
-    public AnnotationSpecs(ITestOutputHelper testOutput) => _testOutput = testOutput;
-
     [Fact]
     public void I_can_use_the_logger_to_produce_annotations_for_failed_tests()
     {
@@ -46,7 +42,7 @@ public class AnnotationSpecs
         output.Should().NotContain("Test2");
         output.Should().NotContain("Test3");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -96,7 +92,7 @@ public class AnnotationSpecs
         output.Should().Contain("I can execute a command with buffering and cancel it immediately");
         output.Should().Contain("ErrorMessage");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -150,7 +146,7 @@ public class AnnotationSpecs
         output.Should().Contain("SendEnvelopeAsync_ItemRateLimit_DropsItem");
         output.Should().Contain("ErrorMessage");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -179,7 +175,7 @@ public class AnnotationSpecs
         output.Should().Contain("<Test1>");
         output.Should().Contain("[Test1]");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -213,7 +209,7 @@ public class AnnotationSpecs
         output.Should().Contain("<UI Test -> Test1>");
         output.Should().Contain("[UI Test -> Test1]");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -246,7 +242,7 @@ public class AnnotationSpecs
         output.Should().Contain("<Test1: ErrorMessage>");
         output.Should().Contain("[Test1: ErrorMessage]");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -279,7 +275,7 @@ public class AnnotationSpecs
         output.Should().Contain("<Test1: ErrorStackTrace>");
         output.Should().Contain("[Test1: ErrorStackTrace]");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -314,7 +310,7 @@ public class AnnotationSpecs
         output.Should().Contain("<Test1 (FakeTargetFramework)>");
         output.Should().Contain("[Test1 (FakeTargetFramework)]");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -338,6 +334,6 @@ public class AnnotationSpecs
 
         output.Should().Contain("foo%0Abar");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 }

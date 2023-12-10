@@ -8,12 +8,8 @@ using Xunit.Abstractions;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class SummarySpecs
+public class SummarySpecs(ITestOutputHelper testOutput)
 {
-    private readonly ITestOutputHelper _testOutput;
-
-    public SummarySpecs(ITestOutputHelper testOutput) => _testOutput = testOutput;
-
     [Fact]
     public void I_can_use_the_logger_to_produce_a_summary_that_includes_the_test_suite_name()
     {
@@ -33,7 +29,7 @@ public class SummarySpecs
 
         output.Should().Contain("TestProject");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -80,7 +76,7 @@ public class SummarySpecs
         output.Should().Contain("Test3");
         output.Should().Contain("Test4");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -127,7 +123,7 @@ public class SummarySpecs
         output.Should().Contain("Test3");
         output.Should().Contain("Test4");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 
     [Fact]
@@ -186,6 +182,6 @@ public class SummarySpecs
         output.Should().NotContain("Test4");
         output.Should().NotContain("Test5");
 
-        _testOutput.WriteLine(output);
+        testOutput.WriteLine(output);
     }
 }

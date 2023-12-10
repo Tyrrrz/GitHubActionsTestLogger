@@ -9,21 +9,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger;
 
-public class TestLoggerContext
+public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 {
-    private readonly GitHubWorkflow _github;
-
     private readonly object _lock = new();
     private TestRunCriteria? _testRunCriteria;
     private readonly List<TestResult> _testResults = new();
 
-    public TestLoggerOptions Options { get; }
-
-    public TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
-    {
-        _github = github;
-        Options = options;
-    }
+    public TestLoggerOptions Options { get; } = options;
 
     private string FormatAnnotation(string format, TestResult testResult)
     {
@@ -89,7 +81,7 @@ public class TestLoggerContext
             // Report failed test results to job annotations
             if (args.Result.Outcome == TestOutcome.Failed)
             {
-                _github.CreateErrorAnnotation(
+                github.CreateErrorAnnotation(
                     FormatAnnotationTitle(args.Result),
                     FormatAnnotationMessage(args.Result),
                     args.Result.TryGetSourceFilePath(),
@@ -141,7 +133,7 @@ public class TestLoggerContext
                 TestResults = testResults
             };
 
-            _github.CreateSummary(template.Render());
+            github.CreateSummary(template.Render());
         }
     }
 }
