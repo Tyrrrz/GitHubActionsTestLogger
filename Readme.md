@@ -57,12 +57,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
+        uses: actions/setup-dotnet@v4
 
       - name: Build & test
         run: dotnet test --configuration Release --logger GitHubActions
