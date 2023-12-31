@@ -166,9 +166,10 @@
             base.WriteLiteral(
                 literal
                     // Remove indentation
-                    .Replace("    ", "")
+                    .Replace("    ", "", StringComparison.Ordinal)
                     // Remove linebreaks
-                    .Replace("\r", "").Replace("\n", "")
+                    .Replace("\r", "", StringComparison.Ordinal)
+                    .Replace("\n", "", StringComparison.Ordinal)
             );
         }
         else

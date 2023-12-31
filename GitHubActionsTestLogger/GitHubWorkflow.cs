@@ -19,7 +19,10 @@ public partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summary
         // URL-encode certain characters to ensure they don't get parsed as command tokens
         // https://pakstech.com/blog/github-actions-workflow-commands
         static string Escape(string value) =>
-            value.Replace("%", "%25").Replace("\n", "%0A").Replace("\r", "%0D");
+            value
+                .Replace("%", "%25", StringComparison.Ordinal)
+                .Replace("\n", "%0A", StringComparison.Ordinal)
+                .Replace("\r", "%0D", StringComparison.Ordinal);
 
         var formattedOptions = options
             ?.Select(kvp => Escape(kvp.Key) + '=' + Escape(kvp.Value))

@@ -46,12 +46,6 @@ internal static class StringExtensions
         return index >= 0 ? str.Substring(index + sub.Length, str.Length - index - sub.Length) : "";
     }
 
-    public static string Indent(this string str, int spaces)
-    {
-        var indentUnit = new string(' ', spaces);
-        return indentUnit + str.Replace("\n", "\n" + new string(' ', spaces));
-    }
-
     public static int? TryParseInt(this string? str) =>
         int.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)
             ? result
