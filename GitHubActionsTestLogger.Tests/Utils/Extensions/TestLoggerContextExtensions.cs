@@ -20,7 +20,7 @@ internal static class TestLoggerContextExtensions
         context.HandleTestRunStart(
             new TestRunStartEventArgs(
                 new TestRunCriteria(
-                    new[] { testSuiteFilePath },
+                    [testSuiteFilePath],
                     1,
                     true,
                     // lang=xml
