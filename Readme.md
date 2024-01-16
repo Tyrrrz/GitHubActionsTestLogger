@@ -66,6 +66,24 @@ jobs:
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
+By default, the logger will only report failed tests in the job summary and annotations.
+If you want the summary to include detailed information about passed and skipped tests as well, update the workflow as follows:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ...
+
+      - name: Build & test
+        run: >
+          dotnet test
+          --configuration Release
+          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true"
+```
+
 > **Important**:
 > Ensure that your test project references the latest version of **Microsoft.NET.Test.Sdk**.
 > Older versions of this package may not be compatible with the logger.
@@ -165,9 +183,15 @@ If you want to link passed tests to their corresponding source definitions, make
 
 **Default**: `false`.
 
+> **Warning**:
+> If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
+
 #### Include skipped tests in summary
 
 Use the `summary.includeSkippedTests` option to specify whether skipped tests should be included in the summary.
 If you want to link skipped tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `false`.
+
+> **Warning**:
+> If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
