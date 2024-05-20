@@ -4,7 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsTestLogger", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{71B00042-147C-45E0-AD34-9B6841E665E3}"
 ProjectSection(SolutionItems) = preProject
-	Changelog.md = Changelog.md
 	License.txt = License.txt
 	Readme.md = Readme.md
 	Directory.Build.props = Directory.Build.props
