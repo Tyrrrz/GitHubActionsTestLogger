@@ -56,10 +56,10 @@ public partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summary
             options["file"] = filePath;
 
         if (line is not null)
-            options["line"] = line.ToString();
+            options["line"] = line.Value.ToString();
 
         if (column is not null)
-            options["col"] = column.ToString();
+            options["col"] = column.Value.ToString();
 
         InvokeCommand("error", message, options);
     }
