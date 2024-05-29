@@ -13,7 +13,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 {
     private readonly object _lock = new();
     private TestRunCriteria? _testRunCriteria;
-    private readonly List<TestResult> _testResults = new();
+    private readonly List<TestResult> _testResults = [];
 
     public TestLoggerOptions Options { get; } = options;
 
@@ -137,7 +137,9 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 !Options.SummaryIncludeNotFoundTests
                 && testRunStatistics.OverallOutcome == TestOutcome.NotFound
             )
+            {
                 return;
+            }
 
             github.CreateSummary(template.Render());
         }

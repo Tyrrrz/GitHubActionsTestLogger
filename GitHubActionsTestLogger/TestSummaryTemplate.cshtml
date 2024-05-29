@@ -23,8 +23,9 @@
         {
             TestOutcome.Passed => "🟢",
             TestOutcome.Failed => "🔴",
+            TestOutcome.Skipped => "🟡",
             TestOutcome.NotFound => "⚪️",
-            _ => "🟡"
+            _ => "\u2753"
         };
     }
 
@@ -107,10 +108,12 @@
                         {
                             TestOutcome.Passed => "🟩",
                             TestOutcome.Failed => "🟥",
-                            _ => "🟨"
+                            TestOutcome.Skipped => "🟨",
+                            TestOutcome.NotFound => "⬜",
+                            _ => "\u2753"
                         };
 
-                        // Use display name if it's different from the fully qualified name,
+                        // Use the display name if it's different from the fully qualified name,
                         // otherwise use the minimally qualified name.
                         var testName = !string.Equals(
                             testResult.TestCase.DisplayName,
@@ -179,8 +182,8 @@
         }
     }
 
-    // Using params here to write multiple lines as a workaround
-    // for the fact that Razor does not support raw string literals.
+    // Using params here to write multiple lines as a workaround for the
+    // fact that Razor does not support multiline raw string literals.
     private void WriteMarkdown(params string?[] lines)
     {
         // Two line breaks are required to separate markdown from HTML
