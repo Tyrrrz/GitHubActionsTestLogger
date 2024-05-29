@@ -11,23 +11,13 @@ internal record TestRunStatistics(
     TimeSpan OverallDuration
 )
 {
-    public TestOutcome OverallOutcome
-    {
-        get
+    public TestOutcome OverallOutcome { get; } =
+        true switch
         {
-            if (FailedTestCount > 0)
-                return TestOutcome.Failed;
-
-            if (PassedTestCount > 0)
-                return TestOutcome.Passed;
-
-            if (SkippedTestCount > 0)
-                return TestOutcome.Skipped;
-
-            if (TotalTestCount == 0)
-                return TestOutcome.NotFound;
-
-            return TestOutcome.None;
-        }
-    }
+            _ when FailedTestCount > 0 => TestOutcome.Failed,
+            _ when PassedTestCount > 0 => TestOutcome.Passed,
+            _ when SkippedTestCount > 0 => TestOutcome.Skipped,
+            _ when TotalTestCount == 0 => TestOutcome.NotFound,
+            _ => TestOutcome.None
+        };
 }

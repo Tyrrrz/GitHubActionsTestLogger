@@ -20,7 +20,22 @@ public class InitializationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context?.Options.Should().Be(TestLoggerOptions.Default);
+        logger.Context?.Options.Should().BeEquivalentTo(TestLoggerOptions.Default);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_with_an_empty_configuration()
+    {
+        // Arrange
+        var logger = new TestLogger();
+        var events = new FakeTestLoggerEvents();
+
+        // Act
+        logger.Initialize(events, new Dictionary<string, string?>());
+
+        // Assert
+        logger.Context.Should().NotBeNull();
+        logger.Context?.Options.Should().BeEquivalentTo(TestLoggerOptions.Default);
     }
 
     [Fact]
@@ -35,7 +50,8 @@ public class InitializationSpecs
             ["annotations.titleFormat"] = "TitleFormat",
             ["annotations.messageFormat"] = "MessageFormat",
             ["summary.includePassedTests"] = "true",
-            ["summary.includeSkippedTests"] = "true"
+            ["summary.includeSkippedTests"] = "true",
+            ["summary.includeNotFoundTests"] = "true"
         };
 
         // Act
@@ -47,5 +63,6 @@ public class InitializationSpecs
         logger.Context?.Options.AnnotationMessageFormat.Should().Be("MessageFormat");
         logger.Context?.Options.SummaryIncludePassedTests.Should().BeTrue();
         logger.Context?.Options.SummaryIncludeSkippedTests.Should().BeTrue();
+        logger.Context?.Options.SummaryIncludeNotFoundTests.Should().BeTrue();
     }
 }
