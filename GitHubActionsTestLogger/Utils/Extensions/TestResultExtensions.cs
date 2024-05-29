@@ -28,21 +28,20 @@ internal static class TestResultExtensions
 
         return StackFrame
             .ParseMany(testResult.ErrorStackTrace)
-            .LastOrDefault(
-                f =>
-                    // Sync method call
-                    // e.g. MyTests.EnsureOnePlusOneEqualsTwo()
-                    f.MethodCall.StartsWith(
-                        testMethodFullyQualifiedName,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                    ||
-                    // Async method call
-                    // e.g. MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
-                    f.MethodCall.Contains(
-                        '<' + testMethodName + '>',
-                        StringComparison.OrdinalIgnoreCase
-                    )
+            .LastOrDefault(f =>
+                // Sync method call
+                // e.g. MyTests.EnsureOnePlusOneEqualsTwo()
+                f.MethodCall.StartsWith(
+                    testMethodFullyQualifiedName,
+                    StringComparison.OrdinalIgnoreCase
+                )
+                ||
+                // Async method call
+                // e.g. MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
+                f.MethodCall.Contains(
+                    '<' + testMethodName + '>',
+                    StringComparison.OrdinalIgnoreCase
+                )
             );
     }
 

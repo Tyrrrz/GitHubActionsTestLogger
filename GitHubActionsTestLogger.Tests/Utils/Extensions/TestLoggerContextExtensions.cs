@@ -25,12 +25,12 @@ internal static class TestLoggerContextExtensions
                     true,
                     // lang=xml
                     $"""
-            <RunSettings>
-                <RunConfiguration>
-                    <TargetFrameworkVersion>{targetFrameworkName}</TargetFrameworkVersion>
-                </RunConfiguration>
-            </RunSettings>
-            """
+                    <RunSettings>
+                        <RunConfiguration>
+                            <TargetFrameworkVersion>{targetFrameworkName}</TargetFrameworkVersion>
+                        </RunConfiguration>
+                    </RunSettings>
+                    """
                 )
             )
         );
@@ -43,14 +43,14 @@ internal static class TestLoggerContextExtensions
                 new TestRunStatistics(
                     new Dictionary<TestOutcome, long>
                     {
-                        [TestOutcome.Passed] = testResults.Count(
-                            r => r.Outcome == TestOutcome.Passed
+                        [TestOutcome.Passed] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Passed
                         ),
-                        [TestOutcome.Failed] = testResults.Count(
-                            r => r.Outcome == TestOutcome.Failed
+                        [TestOutcome.Failed] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Failed
                         ),
-                        [TestOutcome.Skipped] = testResults.Count(
-                            r => r.Outcome == TestOutcome.Skipped
+                        [TestOutcome.Skipped] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Skipped
                         ),
                         [TestOutcome.None] = testResults.Count(r => r.Outcome == TestOutcome.None)
                     }

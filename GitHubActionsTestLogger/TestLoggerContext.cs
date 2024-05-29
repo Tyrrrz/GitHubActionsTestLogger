@@ -117,11 +117,10 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
             );
 
             var testResults = _testResults
-                .Where(
-                    r =>
-                        r.Outcome == TestOutcome.Failed
-                        || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
-                        || r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
+                .Where(r =>
+                    r.Outcome == TestOutcome.Failed
+                    || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
+                    || r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
                 )
                 .ToArray();
 
