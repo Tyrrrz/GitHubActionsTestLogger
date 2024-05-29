@@ -24,7 +24,7 @@ public class InitializationSpecs
     }
 
     [Fact]
-    public void I_can_use_the_logger_with_empty_configuration()
+    public void I_can_use_the_logger_with_an_empty_configuration()
     {
         // Arrange
         var logger = new TestLogger();
