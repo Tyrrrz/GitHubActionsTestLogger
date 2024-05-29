@@ -195,15 +195,12 @@ If you want to link skipped tests to their corresponding source definitions, mak
 
 > **Warning**:
 > If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
-> 
 
 #### Include not found tests in summary
 
-Use the `summary.includeNotFoundTests` option to specify whether test assemblies that did not yield any runnable tests should be included in the summary.
+Use the `summary.includeNotFoundTests` option to specify whether empty test assemblies should be included in the summary.
 
-Using [test filters](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests) might result in some test assemblies
-not yielding **any** tests. This might be done on purpose in which case reporting these may not be helpful. 
-
-The default behavior is to include test assemblies without any tests in the report.
+Using [test filters](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests) might result in some test assemblies not yielding any matching tests.
+This might be done on purpose in which case reporting these may not be helpful. 
 
 **Default**: `true`.
