@@ -206,6 +206,3 @@ not yielding **any** tests. This might be done on purpose in which case reportin
 The default behavior is to include test assemblies without any tests in the report.
 
 **Default**: `true`.
-
-> **Warning**:
-> If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
