@@ -133,6 +133,12 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 TestResults = testResults
             };
 
+            if (
+                !Options.SummaryIncludeNotFoundTests
+                && testRunStatistics.OverallOutcome == TestOutcome.NotFound
+            )
+                return;
+
             github.CreateSummary(template.Render());
         }
     }

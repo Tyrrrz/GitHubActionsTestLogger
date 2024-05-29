@@ -24,6 +24,9 @@ internal record TestRunStatistics(
             if (SkippedTestCount > 0)
                 return TestOutcome.Skipped;
 
+            if (TotalTestCount == 0)
+                return TestOutcome.NotFound;
+
             return TestOutcome.None;
         }
     }

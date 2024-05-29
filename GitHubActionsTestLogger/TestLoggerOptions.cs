@@ -12,6 +12,8 @@ public partial class TestLoggerOptions
     public bool SummaryIncludePassedTests { get; init; }
 
     public bool SummaryIncludeSkippedTests { get; init; }
+
+    public bool SummaryIncludeNotFoundTests { get; init; } = true;
 }
 
 public partial class TestLoggerOptions
@@ -33,5 +35,8 @@ public partial class TestLoggerOptions
             SummaryIncludeSkippedTests =
                 parameters.GetValueOrDefault("summary.includeSkippedTests")?.Pipe(bool.Parse)
                 ?? Default.SummaryIncludeSkippedTests,
+            SummaryIncludeNotFoundTests =
+                parameters.GetValueOrDefault("summary.includeNotFoundTests")?.Pipe(bool.Parse)
+                ?? Default.SummaryIncludeSkippedTests
         };
 }

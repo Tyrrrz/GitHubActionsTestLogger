@@ -184,4 +184,46 @@ public class SummarySpecs(ITestOutputHelper testOutput)
 
         testOutput.WriteLine(output);
     }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_a_summary_that_reports_empty_test_assemblies()
+    {
+        // Arrange
+        using var summaryWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(TextWriter.Null, summaryWriter),
+            TestLoggerOptions.Default
+        );
+
+        // Act
+        context.SimulateTestRun();
+
+        // Assert
+        var output = summaryWriter.ToString().Trim();
+        output.Should().Contain("⚪️ FakeTests");
+
+        testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public void I_can_use_the_logger_to_produce_no_summary_for_empty_test_assemblies_using_options()
+    {
+        // Arrange
+        using var summaryWriter = new StringWriter();
+
+        var context = new TestLoggerContext(
+            new GitHubWorkflow(TextWriter.Null, summaryWriter),
+            new TestLoggerOptions { SummaryIncludeNotFoundTests = false }
+        );
+
+        // Act
+        context.SimulateTestRun();
+
+        // Assert
+        var output = summaryWriter.ToString().Trim();
+        output.Should().BeNullOrEmpty();
+
+        testOutput.WriteLine(output);
+    }
 }
