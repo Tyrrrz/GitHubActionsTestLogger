@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -11,7 +12,7 @@ namespace GitHubActionsTestLogger;
 
 public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 {
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private TestRunCriteria? _testRunCriteria;
     private readonly List<TestResult> _testResults = [];
 
@@ -68,7 +69,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
     public void HandleTestRunStart(TestRunStartEventArgs args)
     {
-        lock (_lock)
+        using (_lock.EnterScope())
         {
             _testRunCriteria = args.TestRunCriteria;
         }
@@ -76,7 +77,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
     public void HandleTestResult(TestResultEventArgs args)
     {
-        lock (_lock)
+        using (_lock.EnterScope())
         {
             // Report failed test results to job annotations
             if (args.Result.Outcome == TestOutcome.Failed)
@@ -96,7 +97,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
-        lock (_lock)
+        using (_lock.EnterScope())
         {
             var testSuite =
                 _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension)
