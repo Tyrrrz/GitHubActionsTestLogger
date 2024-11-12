@@ -51,7 +51,7 @@ public class InitializationSpecs
             ["annotations.messageFormat"] = "MessageFormat",
             ["summary.includePassedTests"] = "true",
             ["summary.includeSkippedTests"] = "true",
-            ["summary.includeNotFoundTests"] = "true"
+            ["summary.includeNotFoundTests"] = "true",
         };
 
         // Act

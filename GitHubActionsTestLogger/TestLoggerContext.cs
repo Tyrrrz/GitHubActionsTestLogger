@@ -130,7 +130,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 TestSuite = testSuite,
                 TargetFramework = targetFramework,
                 TestRunStatistics = testRunStatistics,
-                TestResults = testResults
+                TestResults = testResults,
             };
 
             if (

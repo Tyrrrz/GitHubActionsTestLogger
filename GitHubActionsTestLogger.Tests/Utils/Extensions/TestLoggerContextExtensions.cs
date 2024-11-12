@@ -14,7 +14,7 @@ internal static class TestLoggerContextExtensions
         this TestLoggerContext context,
         string testSuiteFilePath,
         string targetFrameworkName,
-        params TestResult[] testResults
+        params IReadOnlyList<TestResult> testResults
     )
     {
         context.HandleTestRunStart(
@@ -52,7 +52,7 @@ internal static class TestLoggerContextExtensions
                         [TestOutcome.Skipped] = testResults.Count(r =>
                             r.Outcome == TestOutcome.Skipped
                         ),
-                        [TestOutcome.None] = testResults.Count(r => r.Outcome == TestOutcome.None)
+                        [TestOutcome.None] = testResults.Count(r => r.Outcome == TestOutcome.None),
                     }
                 ),
                 false,
@@ -67,11 +67,11 @@ internal static class TestLoggerContextExtensions
     public static void SimulateTestRun(
         this TestLoggerContext context,
         string testSuiteName,
-        params TestResult[] testResults
+        params IReadOnlyList<TestResult> testResults
     ) => context.SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
 
     public static void SimulateTestRun(
         this TestLoggerContext context,
-        params TestResult[] testResults
+        params IReadOnlyList<TestResult> testResults
     ) => context.SimulateTestRun("FakeTests.dll", testResults);
 }

@@ -12,7 +12,7 @@ internal class TestResultBuilder
                 Id = Guid.NewGuid(),
                 Source = "FakeTests.dll",
                 FullyQualifiedName = "FakeTests.FakeTest",
-                DisplayName = "FakeTest"
+                DisplayName = "FakeTest",
             }
         );
 

@@ -160,7 +160,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test>",
-                AnnotationMessageFormat = "[@test]"
+                AnnotationMessageFormat = "[@test]",
             }
         );
 
@@ -189,7 +189,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@traits.Category -> @test>",
-                AnnotationMessageFormat = "[@traits.Category -> @test]"
+                AnnotationMessageFormat = "[@traits.Category -> @test]",
             }
         );
 
@@ -223,7 +223,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test: @error>",
-                AnnotationMessageFormat = "[@test: @error]"
+                AnnotationMessageFormat = "[@test: @error]",
             }
         );
 
@@ -256,7 +256,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test: @trace>",
-                AnnotationMessageFormat = "[@test: @trace]"
+                AnnotationMessageFormat = "[@test: @trace]",
             }
         );
 
@@ -289,7 +289,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             new TestLoggerOptions
             {
                 AnnotationTitleFormat = "<@test (@framework)>",
-                AnnotationMessageFormat = "[@test (@framework)]"
+                AnnotationMessageFormat = "[@test (@framework)]",
             }
         );
 

@@ -184,7 +184,7 @@
 
     // Using params here to write multiple lines as a workaround for the
     // fact that Razor does not support multiline raw string literals.
-    private void WriteMarkdown(params string?[] lines)
+    private void WriteMarkdown(params IEnumerable<string?> lines)
     {
         // Two line breaks are required to separate markdown from HTML
         base.WriteLiteral("\n\n");
