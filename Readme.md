@@ -123,7 +123,7 @@ jobs:
 > [Learn more](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file).
 
 > **Warning**:
-> Source information collection is not supported on legacy .NET Framework.
+> Source information collection may not work properly with legacy .NET Framework.
 
 ### Customizing behavior
 
