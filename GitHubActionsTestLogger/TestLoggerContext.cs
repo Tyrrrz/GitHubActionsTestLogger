@@ -125,6 +125,21 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 )
                 .ToArray();
 
+            if (
+                testRunStatistics.OverallOutcome == TestOutcome.Passed
+                && !Options.SummaryIncludePassedTests
+            )
+            {
+                return;
+            }
+            if (
+                testRunStatistics.OverallOutcome == TestOutcome.Skipped
+                && !Options.SummaryIncludeSkippedTests
+            )
+            {
+                return;
+            }
+
             var template = new TestSummaryTemplate
             {
                 TestSuite = testSuite,
