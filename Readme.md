@@ -84,13 +84,16 @@ jobs:
           --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true"
 ```
 
+> **Warning**:
+> The new testing platform (i.e. `Microsoft.Testing.Platform`) [does not support custom test loggers](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/41).
+> To use **GitHub Actions Test Logger**, make sure to use the classic testing experience (`vstest`) instead.
+
 > **Important**:
 > Ensure that your test project references the latest version of **Microsoft.NET.Test.Sdk**.
 > Older versions of this package may not be compatible with the logger.
 
 > **Important**:
-> If you are using **.NET SDK v2.2 or lower**, you need to set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project.
-> [Learn more](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
+> If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
 ### Collecting source information
 
@@ -119,8 +122,7 @@ jobs:
 ```
 
 > **Note**:
-> This option can also be enabled by setting the corresponding property in a `.runsettings` file instead.
-> [Learn more](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file).
+> This option can also be enabled by setting the corresponding property in a [`.runsettings` file](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file) instead.
 
 > **Warning**:
 > Source information collection may not work properly with legacy .NET Framework.
