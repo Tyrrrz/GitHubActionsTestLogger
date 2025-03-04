@@ -33,7 +33,9 @@ internal class TestResultBuilder
         return this;
     }
 
-    public TestResultBuilder SetOutcome(TestOutcome outcome)
+    public TestResultBuilder SetOutcome(
+        Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome outcome
+    )
     {
         _testResult.Outcome = outcome;
         return this;

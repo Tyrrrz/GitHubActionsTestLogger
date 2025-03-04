@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,15 +11,97 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger;
 
+public interface ITestRunCriteria
+{
+    string? TargetFramework { get; }
+    IEnumerable<string>? Sources { get; }
+}
+
+public sealed class VSTestTestRunCriteria : ITestRunCriteria
+{
+    public string? TargetFramework { get; private set; }
+    public IEnumerable<string>? Sources { get; private set; }
+
+    public static VSTestTestRunCriteria Convert(TestRunCriteria testRunCriteria)
+    {
+        return new VSTestTestRunCriteria
+        {
+            TargetFramework = testRunCriteria.TryGetTargetFramework(),
+            Sources = testRunCriteria.Sources,
+        };
+    }
+}
+
+public interface ITestRunComplete
+{
+    long? PassedTests { get; }
+    long? FailedTests { get; }
+    long? SkippedTests { get; }
+    long? ExecutedTests { get; }
+    TimeSpan ElapsedTimeInRunningTests { get; }
+}
+
+public enum TestOutcome
+{
+    None = 0,
+    Passed = 1,
+    Failed = 2,
+    Skipped = 3,
+    NotFound = 4,
+}
+
+public interface ITestResult
+{
+    public string? DisplayName { get; set; }
+    public string FullyQualifiedName { get; set; }
+    Dictionary<string, string> Traits { get; set; }
+    string? ErrorMessage { get; set; }
+    string? ErrorStackTrace { get; set; }
+    TestOutcome Outcome { get; set; }
+
+    string? SourceFilePath { get; set; }
+    int? SourceFileLine { get; set; }
+    string MinimallyQualifiedName { get; set; }
+}
+
+public sealed class VSTestTestResult : ITestResult
+{
+    public string? DisplayName { get; set; }
+    public required Dictionary<string, string> Traits { get; set; }
+    public string? ErrorMessage { get; set; }
+    public string? ErrorStackTrace { get; set; }
+    public TestOutcome Outcome { get; set; }
+    public string? SourceFilePath { get; set; }
+    public int? SourceFileLine { get; set; }
+    public required string FullyQualifiedName { get; set; }
+    public required string MinimallyQualifiedName { get; set; }
+
+    public static VSTestTestResult Convert(TestResult testResult)
+    {
+        return new VSTestTestResult
+        {
+            FullyQualifiedName = testResult.TestCase.GetTypeFullyQualifiedName(),
+            MinimallyQualifiedName = testResult.TestCase.GetMinimallyQualifiedName(),
+            DisplayName = testResult.TestCase.DisplayName,
+            Traits = testResult.Traits.ToDictionary(t => t.Name, t => t.Value) ?? new(),
+            ErrorMessage = testResult.ErrorMessage,
+            ErrorStackTrace = testResult.ErrorStackTrace,
+            Outcome = (TestOutcome)testResult.Outcome,
+            SourceFilePath = testResult.TryGetSourceFilePath(),
+            SourceFileLine = testResult.TryGetSourceLine(),
+        };
+    }
+}
+
 public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 {
     private readonly Lock _lock = new();
-    private TestRunCriteria? _testRunCriteria;
-    private readonly List<TestResult> _testResults = [];
+    private ITestRunCriteria? _testRunCriteria;
+    private readonly List<ITestResult> _testResults = [];
 
     public TestLoggerOptions Options { get; } = options;
 
-    private string FormatAnnotation(string format, TestResult testResult)
+    private string FormatAnnotation(string format, ITestResult testResult)
     {
         var buffer = new StringBuilder(format);
 
@@ -27,17 +110,17 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
         // Name token
         buffer
-            .Replace("@test", testResult.TestCase.DisplayName)
+            .Replace("@test", testResult.DisplayName)
             // Backwards compat
-            .Replace("$test", testResult.TestCase.DisplayName);
+            .Replace("$test", testResult.DisplayName);
 
         // Trait tokens
-        foreach (var trait in testResult.Traits.Union(testResult.TestCase.Traits))
+        foreach (var trait in testResult.Traits.Union(testResult.Traits))
         {
             buffer
-                .Replace($"@traits.{trait.Name}", trait.Value)
+                .Replace($"@traits.{trait.Key}", trait.Value)
                 // Backwards compat
-                .Replace($"$traits.{trait.Name}", trait.Value);
+                .Replace($"$traits.{trait.Key}", trait.Value);
         }
 
         // Error message
@@ -54,48 +137,48 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
         // Target framework
         buffer
-            .Replace("@framework", _testRunCriteria?.TryGetTargetFramework() ?? "")
+            .Replace("@framework", _testRunCriteria?.TargetFramework ?? "")
             // Backwards compat
-            .Replace("$framework", _testRunCriteria?.TryGetTargetFramework() ?? "");
+            .Replace("$framework", _testRunCriteria?.TargetFramework ?? "");
 
         return buffer.Trim().ToString();
     }
 
-    private string FormatAnnotationTitle(TestResult testResult) =>
+    private string FormatAnnotationTitle(ITestResult testResult) =>
         FormatAnnotation(Options.AnnotationTitleFormat, testResult);
 
-    private string FormatAnnotationMessage(TestResult testResult) =>
+    private string FormatAnnotationMessage(ITestResult testResult) =>
         FormatAnnotation(Options.AnnotationMessageFormat, testResult);
 
-    public void HandleTestRunStart(TestRunStartEventArgs args)
+    public void HandleTestRunStart(ITestRunCriteria testRunCriteria)
     {
         using (_lock.EnterScope())
         {
-            _testRunCriteria = args.TestRunCriteria;
+            _testRunCriteria = testRunCriteria;
         }
     }
 
-    public void HandleTestResult(TestResultEventArgs args)
+    public void HandleTestResult(ITestResult testResult)
     {
         using (_lock.EnterScope())
         {
             // Report failed test results to job annotations
-            if (args.Result.Outcome == TestOutcome.Failed)
+            if (testResult.Outcome == TestOutcome.Failed)
             {
                 github.CreateErrorAnnotation(
-                    FormatAnnotationTitle(args.Result),
-                    FormatAnnotationMessage(args.Result),
-                    args.Result.TryGetSourceFilePath(),
-                    args.Result.TryGetSourceLine()
+                    FormatAnnotationTitle(testResult),
+                    FormatAnnotationMessage(testResult),
+                    testResult.SourceFilePath,
+                    testResult.SourceFileLine
                 );
             }
 
             // Record all test results to write them to the summary later
-            _testResults.Add(args.Result);
+            _testResults.Add(testResult);
         }
     }
 
-    public void HandleTestRunComplete(TestRunCompleteEventArgs args)
+    public void HandleTestRunComplete(ITestRunComplete args)
     {
         using (_lock.EnterScope())
         {
@@ -103,17 +186,14 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension)
                 ?? "Unknown Test Suite";
 
-            var targetFramework =
-                _testRunCriteria?.TryGetTargetFramework() ?? "Unknown Target Framework";
+            var targetFramework = _testRunCriteria?.TargetFramework ?? "Unknown Target Framework";
 
             var testRunStatistics = new TestRunStatistics(
-                (int?)args.TestRunStatistics?[TestOutcome.Passed]
-                    ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-                (int?)args.TestRunStatistics?[TestOutcome.Failed]
-                    ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
-                (int?)args.TestRunStatistics?[TestOutcome.Skipped]
+                (int?)args.PassedTests ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+                (int?)args.FailedTests ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+                (int?)args.SkippedTests
                     ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
-                (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
+                (int?)args.ExecutedTests ?? _testResults.Count,
                 args.ElapsedTimeInRunningTests
             );
 

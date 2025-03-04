@@ -16,7 +16,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             TestLoggerOptions.Default
         );
@@ -25,11 +25,17 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build(),
-            new TestResultBuilder().SetDisplayName("Test2").SetOutcome(TestOutcome.Passed).Build(),
-            new TestResultBuilder().SetDisplayName("Test3").SetOutcome(TestOutcome.Skipped).Build()
+            new TestResultBuilder()
+                .SetDisplayName("Test2")
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
+                .Build(),
+            new TestResultBuilder()
+                .SetDisplayName("Test3")
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
+                .Build()
         );
 
         // Assert
@@ -54,7 +60,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             TestLoggerOptions.Default
         );
@@ -66,7 +72,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetFullyQualifiedName(
                     "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
                 )
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
@@ -104,7 +110,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             TestLoggerOptions.Default
         );
@@ -116,7 +122,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetFullyQualifiedName(
                     "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
                 )
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
@@ -155,7 +161,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
@@ -166,7 +172,10 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .Build()
         );
 
         // Assert
@@ -184,7 +193,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
@@ -199,7 +208,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
                 .SetTrait("Document", "SS01")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .Build()
         );
 
@@ -218,7 +227,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
@@ -231,7 +240,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build()
         );
@@ -251,7 +260,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
@@ -264,7 +273,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
                 .Build()
         );
@@ -284,7 +293,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions
             {
@@ -299,7 +308,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             "FakeTargetFramework",
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
                 .Build()
         );
@@ -319,14 +328,17 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
             new TestLoggerOptions { AnnotationMessageFormat = "foo\\nbar" }
         );
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .Build()
         );
 
         // Assert

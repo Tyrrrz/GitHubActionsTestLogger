@@ -20,10 +20,21 @@
 
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
+	<Content Include="buildMultiTargeting/**">
+		<Pack>true</Pack>
+		<PackagePath>buildMultiTargeting</PackagePath>
+	</Content>
+	<TfmSpecificPackageFile Include="buildTransitive/**">
+		<PackagePath>buildTransitive/$(TargetFramework)</PackagePath>
+	</TfmSpecificPackageFile>
+	<TfmSpecificPackageFile Include="build/**">
+		<PackagePath>build/$(TargetFramework)</PackagePath>
+	</TfmSpecificPackageFile>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="0.30.6" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Testing.Platform" Version="1.6.2" />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.12.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />

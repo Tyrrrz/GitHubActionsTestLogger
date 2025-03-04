@@ -1,8 +1,8 @@
 ﻿@using System
 @using System.Collections.Generic
 @using System.Linq
+@using GitHubActionsTestLogger
 @using GitHubActionsTestLogger.Utils.Extensions
-@using Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 @inherits RazorBlade.HtmlTemplate
 
@@ -14,7 +14,7 @@
 
     public required TestRunStatistics TestRunStatistics { get; init; }
 
-    public required IReadOnlyList<TestResult> TestResults { get; init; }
+    public required IReadOnlyList<ITestResult> TestResults { get; init; }
 }
 
 <details>
@@ -69,15 +69,15 @@
 
     @{
         var testResultGroups = TestResults
-            .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
+            .GroupBy(r => r.FullyQualifiedName, StringComparer.Ordinal)
             .Select(g => new
             {
                 TypeFullyQualifiedName = g.Key,
-                TypeName = g.First().TestCase.GetTypeMinimallyQualifiedName(),
+                TypeName = g.First().MinimallyQualifiedName,
                 TestResults = g
                     .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
                     .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
-                    .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal)
+                    .ThenBy(r => r.DisplayName, StringComparer.Ordinal)
                     .ToArray()
             })
             .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
@@ -116,15 +116,15 @@
                         // Use the display name if it's different from the fully qualified name,
                         // otherwise use the minimally qualified name.
                         var testName = !string.Equals(
-                            testResult.TestCase.DisplayName,
-                            testResult.TestCase.FullyQualifiedName,
+                            testResult.DisplayName,
+                            testResult.FullyQualifiedName,
                             StringComparison.Ordinal)
-                            ? testResult.TestCase.DisplayName
-                            : testResult.TestCase.GetMinimallyQualifiedName();
+                            ? testResult.DisplayName
+                            : testResult.MinimallyQualifiedName;
 
                         // Test source permalink
-                        var filePath = testResult.TryGetSourceFilePath();
-                        var fileLine = testResult.TryGetSourceLine();
+                        var filePath = testResult.SourceFilePath;
+                        var fileLine = testResult.SourceFileLine;
                         var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
 
                         <li>

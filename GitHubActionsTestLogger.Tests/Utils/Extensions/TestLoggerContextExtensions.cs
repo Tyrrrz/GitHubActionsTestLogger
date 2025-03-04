@@ -5,13 +5,14 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
 
 namespace GitHubActionsTestLogger.Tests.Utils.Extensions;
 
 internal static class TestLoggerContextExtensions
 {
     public static void SimulateTestRun(
-        this TestLoggerContext context,
+        this VSTestTestLoggerContext context,
         string testSuiteFilePath,
         string targetFrameworkName,
         params IReadOnlyList<TestResult> testResults
@@ -41,18 +42,46 @@ internal static class TestLoggerContextExtensions
         context.HandleTestRunComplete(
             new TestRunCompleteEventArgs(
                 new TestRunStatistics(
-                    new Dictionary<TestOutcome, long>
+                    new Dictionary<
+                        Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome,
+                        long
+                    >
                     {
-                        [TestOutcome.Passed] = testResults.Count(r =>
-                            r.Outcome == TestOutcome.Passed
-                        ),
-                        [TestOutcome.Failed] = testResults.Count(r =>
-                            r.Outcome == TestOutcome.Failed
-                        ),
-                        [TestOutcome.Skipped] = testResults.Count(r =>
-                            r.Outcome == TestOutcome.Skipped
-                        ),
-                        [TestOutcome.None] = testResults.Count(r => r.Outcome == TestOutcome.None),
+                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed] =
+                            testResults.Count(r =>
+                                r.Outcome
+                                == Microsoft
+                                    .VisualStudio
+                                    .TestPlatform
+                                    .ObjectModel
+                                    .TestOutcome
+                                    .Passed
+                            ),
+                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed] =
+                            testResults.Count(r =>
+                                r.Outcome
+                                == Microsoft
+                                    .VisualStudio
+                                    .TestPlatform
+                                    .ObjectModel
+                                    .TestOutcome
+                                    .Failed
+                            ),
+                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped] =
+                            testResults.Count(r =>
+                                r.Outcome
+                                == Microsoft
+                                    .VisualStudio
+                                    .TestPlatform
+                                    .ObjectModel
+                                    .TestOutcome
+                                    .Skipped
+                            ),
+                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.None] =
+                            testResults.Count(r =>
+                                r.Outcome
+                                == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.None
+                            ),
                     }
                 ),
                 false,
@@ -65,13 +94,13 @@ internal static class TestLoggerContextExtensions
     }
 
     public static void SimulateTestRun(
-        this TestLoggerContext context,
+        this VSTestTestLoggerContext context,
         string testSuiteName,
         params IReadOnlyList<TestResult> testResults
     ) => context.SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
 
     public static void SimulateTestRun(
-        this TestLoggerContext context,
+        this VSTestTestLoggerContext context,
         params IReadOnlyList<TestResult> testResults
     ) => context.SimulateTestRun("FakeTests.dll", testResults);
 }

@@ -16,7 +16,7 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
             TestLoggerOptions.Default
         );
@@ -38,7 +38,7 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
             new TestLoggerOptions { SummaryIncludePassedTests = true }
         );
@@ -48,22 +48,22 @@ public class SummarySpecs(ITestOutputHelper testOutput)
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
-                .SetOutcome(TestOutcome.Passed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
-                .SetOutcome(TestOutcome.Passed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
-                .SetOutcome(TestOutcome.Passed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage4")
                 .Build()
         );
@@ -85,7 +85,7 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
             TestLoggerOptions.Default
         );
@@ -95,30 +95,30 @@ public class SummarySpecs(ITestOutputHelper testOutput)
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage1")
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage2")
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage3")
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
-                .SetOutcome(TestOutcome.Passed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test5")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test5")
-                .SetOutcome(TestOutcome.Skipped)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
                 .Build()
         );
 
@@ -144,7 +144,7 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
             new TestLoggerOptions { SummaryIncludeSkippedTests = true }
         );
@@ -154,22 +154,22 @@ public class SummarySpecs(ITestOutputHelper testOutput)
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
-                .SetOutcome(TestOutcome.Skipped)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
-                .SetOutcome(TestOutcome.Skipped)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
-                .SetOutcome(TestOutcome.Skipped)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
                 .Build(),
             new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage4")
                 .Build()
         );
@@ -191,7 +191,7 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
             TestLoggerOptions.Default
         );
@@ -212,7 +212,7 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new VSTestTestLoggerContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
             new TestLoggerOptions { SummaryIncludeNotFoundTests = false }
         );
