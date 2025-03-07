@@ -20,7 +20,7 @@ public class InitializationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context?.Options.Should().BeEquivalentTo(TestLoggerOptions.Default);
+        logger.Context?.Options.Should().BeEquivalentTo(TestReporterOptions.Default);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class InitializationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context?.Options.Should().BeEquivalentTo(TestLoggerOptions.Default);
+        logger.Context?.Options.Should().BeEquivalentTo(TestReporterOptions.Default);
     }
 
     [Fact]

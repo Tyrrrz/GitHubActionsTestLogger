@@ -11,7 +11,7 @@ namespace GitHubActionsTestLogger.Tests.Utils.Extensions;
 internal static class TestLoggerContextExtensions
 {
     public static void SimulateTestRun(
-        this TestLoggerContext context,
+        this TestReporterContext context,
         string testSuiteFilePath,
         string targetFrameworkName,
         params IReadOnlyList<TestResult> testResults
@@ -65,13 +65,13 @@ internal static class TestLoggerContextExtensions
     }
 
     public static void SimulateTestRun(
-        this TestLoggerContext context,
+        this TestReporterContext context,
         string testSuiteName,
         params IReadOnlyList<TestResult> testResults
     ) => context.SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
 
     public static void SimulateTestRun(
-        this TestLoggerContext context,
+        this TestReporterContext context,
         params IReadOnlyList<TestResult> testResults
     ) => context.SimulateTestRun("FakeTests.dll", testResults);
 }
