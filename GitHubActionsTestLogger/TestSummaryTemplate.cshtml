@@ -12,19 +12,19 @@
 
     public required string TargetFramework { get; init; }
 
-    public required TestRunStatistics TestRunStatistics { get; init; }
+    public required LoggerTestRunStatistics TestRunStatistics { get; init; }
 
-    public required IReadOnlyList<ITestResult> TestResults { get; init; }
+    public required IReadOnlyList<LoggerTestResult> TestResults { get; init; }
 }
 
 <details>
     @{
         var overallOutcomeEmoji = TestRunStatistics.OverallOutcome switch
         {
-            TestOutcome.Passed => "🟢",
-            TestOutcome.Failed => "🔴",
-            TestOutcome.Skipped => "🟡",
-            TestOutcome.NotFound => "⚪️",
+            LoggerTestOutcome.Passed => "🟢",
+            LoggerTestOutcome.Failed => "🔴",
+            LoggerTestOutcome.Skipped => "🟡",
+            LoggerTestOutcome.NotFound => "⚪️",
             _ => "\u2753"
         };
     }
@@ -75,20 +75,20 @@
                 TypeFullyQualifiedName = g.Key,
                 TypeName = g.First().MinimallyQualifiedName,
                 TestResults = g
-                    .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
-                    .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
+                    .OrderByDescending(r => r.Outcome == LoggerTestOutcome.Failed)
+                    .ThenByDescending(r => r.Outcome == LoggerTestOutcome.Passed)
                     .ThenBy(r => r.DisplayName, StringComparer.Ordinal)
                     .ToArray()
             })
-            .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
-            .ThenByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Passed))
+            .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == LoggerTestOutcome.Failed))
+            .ThenByDescending(g => g.TestResults.Any(r => r.Outcome == LoggerTestOutcome.Passed))
             .ThenBy(g => g.TypeName, StringComparer.Ordinal);
     }
 
     <ul>
         @foreach (var testResultGroup in testResultGroups)
         {
-            var failedTestCount = testResultGroup.TestResults.Count(r => r.Outcome == TestOutcome.Failed);
+            var failedTestCount = testResultGroup.TestResults.Count(r => r.Outcome == LoggerTestOutcome.Failed);
 
             <li>
                 <b>@testResultGroup.TypeName</b>
@@ -106,10 +106,10 @@
                     {
                         var outcomeEmoji = testResult.Outcome switch
                         {
-                            TestOutcome.Passed => "🟩",
-                            TestOutcome.Failed => "🟥",
-                            TestOutcome.Skipped => "🟨",
-                            TestOutcome.NotFound => "⬜",
+                            LoggerTestOutcome.Passed => "🟩",
+                            LoggerTestOutcome.Failed => "🟥",
+                            LoggerTestOutcome.Skipped => "🟨",
+                            LoggerTestOutcome.NotFound => "⬜",
                             _ => "\u2753"
                         };
 

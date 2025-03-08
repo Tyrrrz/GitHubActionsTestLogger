@@ -5,103 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using GitHubActionsTestLogger.Utils.Extensions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger;
-
-public interface ITestRunCriteria
-{
-    string? TargetFramework { get; }
-    IEnumerable<string>? Sources { get; }
-}
-
-public sealed class VSTestTestRunCriteria : ITestRunCriteria
-{
-    public string? TargetFramework { get; private set; }
-    public IEnumerable<string>? Sources { get; private set; }
-
-    public static VSTestTestRunCriteria Convert(TestRunCriteria testRunCriteria)
-    {
-        return new VSTestTestRunCriteria
-        {
-            TargetFramework = testRunCriteria.TryGetTargetFramework(),
-            Sources = testRunCriteria.Sources,
-        };
-    }
-}
-
-public interface ITestRunComplete
-{
-    long? PassedTests { get; }
-    long? FailedTests { get; }
-    long? SkippedTests { get; }
-    long? ExecutedTests { get; }
-    TimeSpan ElapsedTimeInRunningTests { get; }
-}
-
-public enum TestOutcome
-{
-    None = 0,
-    Passed = 1,
-    Failed = 2,
-    Skipped = 3,
-    NotFound = 4,
-}
-
-public interface ITestResult
-{
-    public string? DisplayName { get; set; }
-    public string FullyQualifiedName { get; set; }
-    Dictionary<string, string> Traits { get; set; }
-    string? ErrorMessage { get; set; }
-    string? ErrorStackTrace { get; set; }
-    TestOutcome Outcome { get; set; }
-
-    string? SourceFilePath { get; set; }
-    int? SourceFileLine { get; set; }
-    string MinimallyQualifiedName { get; set; }
-}
-
-public sealed class VSTestTestResult : ITestResult
-{
-    public string? DisplayName { get; set; }
-    public required Dictionary<string, string> Traits { get; set; }
-    public string? ErrorMessage { get; set; }
-    public string? ErrorStackTrace { get; set; }
-    public TestOutcome Outcome { get; set; }
-    public string? SourceFilePath { get; set; }
-    public int? SourceFileLine { get; set; }
-    public required string FullyQualifiedName { get; set; }
-    public required string MinimallyQualifiedName { get; set; }
-
-    public static VSTestTestResult Convert(TestResult testResult)
-    {
-        return new VSTestTestResult
-        {
-            FullyQualifiedName = testResult.TestCase.GetTypeFullyQualifiedName(),
-            MinimallyQualifiedName = testResult.TestCase.GetMinimallyQualifiedName(),
-            DisplayName = testResult.TestCase.DisplayName,
-            Traits = testResult.Traits.ToDictionary(t => t.Name, t => t.Value) ?? new(),
-            ErrorMessage = testResult.ErrorMessage,
-            ErrorStackTrace = testResult.ErrorStackTrace,
-            Outcome = (TestOutcome)testResult.Outcome,
-            SourceFilePath = testResult.TryGetSourceFilePath(),
-            SourceFileLine = testResult.TryGetSourceLine(),
-        };
-    }
-}
 
 public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 {
     private readonly Lock _lock = new();
-    private ITestRunCriteria? _testRunCriteria;
-    private readonly List<ITestResult> _testResults = [];
+    private LoggerTestRunCriteria? _testRunCriteria;
+    private readonly List<LoggerTestResult> _testResults = [];
 
     public TestLoggerOptions Options { get; } = options;
 
-    private string FormatAnnotation(string format, ITestResult testResult)
+    private string FormatAnnotation(string format, LoggerTestResult testResult)
     {
         var buffer = new StringBuilder(format);
 
@@ -144,13 +59,13 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
         return buffer.Trim().ToString();
     }
 
-    private string FormatAnnotationTitle(ITestResult testResult) =>
+    private string FormatAnnotationTitle(LoggerTestResult testResult) =>
         FormatAnnotation(Options.AnnotationTitleFormat, testResult);
 
-    private string FormatAnnotationMessage(ITestResult testResult) =>
+    private string FormatAnnotationMessage(LoggerTestResult testResult) =>
         FormatAnnotation(Options.AnnotationMessageFormat, testResult);
 
-    public void HandleTestRunStart(ITestRunCriteria testRunCriteria)
+    public void HandleTestRunStart(LoggerTestRunCriteria testRunCriteria)
     {
         using (_lock.EnterScope())
         {
@@ -158,12 +73,12 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
         }
     }
 
-    public void HandleTestResult(ITestResult testResult)
+    public void HandleTestResult(LoggerTestResult testResult)
     {
         using (_lock.EnterScope())
         {
             // Report failed test results to job annotations
-            if (testResult.Outcome == TestOutcome.Failed)
+            if (testResult.Outcome == LoggerTestOutcome.Failed)
             {
                 github.CreateErrorAnnotation(
                     FormatAnnotationTitle(testResult),
@@ -178,7 +93,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
         }
     }
 
-    public void HandleTestRunComplete(ITestRunComplete args)
+    public void HandleTestRunComplete(LoggerTestRunComplete args)
     {
         using (_lock.EnterScope())
         {
@@ -188,20 +103,22 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
             var targetFramework = _testRunCriteria?.TargetFramework ?? "Unknown Target Framework";
 
-            var testRunStatistics = new TestRunStatistics(
-                (int?)args.PassedTests ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-                (int?)args.FailedTests ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+            var testRunStatistics = new LoggerTestRunStatistics(
+                (int?)args.PassedTests
+                    ?? _testResults.Count(r => r.Outcome == LoggerTestOutcome.Passed),
+                (int?)args.FailedTests
+                    ?? _testResults.Count(r => r.Outcome == LoggerTestOutcome.Failed),
                 (int?)args.SkippedTests
-                    ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+                    ?? _testResults.Count(r => r.Outcome == LoggerTestOutcome.Skipped),
                 (int?)args.ExecutedTests ?? _testResults.Count,
                 args.ElapsedTimeInRunningTests
             );
 
             var testResults = _testResults
                 .Where(r =>
-                    r.Outcome == TestOutcome.Failed
-                    || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
-                    || r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
+                    r.Outcome == LoggerTestOutcome.Failed
+                    || r.Outcome == LoggerTestOutcome.Passed && Options.SummaryIncludePassedTests
+                    || r.Outcome == LoggerTestOutcome.Skipped && Options.SummaryIncludeSkippedTests
                 )
                 .ToArray();
 
@@ -215,7 +132,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
             if (
                 !Options.SummaryIncludeNotFoundTests
-                && testRunStatistics.OverallOutcome == TestOutcome.NotFound
+                && testRunStatistics.OverallOutcome == LoggerTestOutcome.NotFound
             )
             {
                 return;

@@ -1,9 +1,8 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger;
 
-internal record TestRunStatistics(
+public record LoggerTestRunStatistics(
     int PassedTestCount,
     int FailedTestCount,
     int SkippedTestCount,
@@ -11,13 +10,13 @@ internal record TestRunStatistics(
     TimeSpan OverallDuration
 )
 {
-    public TestOutcome OverallOutcome { get; } =
+    public LoggerTestOutcome OverallOutcome { get; } =
         true switch
         {
-            _ when FailedTestCount > 0 => TestOutcome.Failed,
-            _ when PassedTestCount > 0 => TestOutcome.Passed,
-            _ when SkippedTestCount > 0 => TestOutcome.Skipped,
-            _ when TotalTestCount == 0 => TestOutcome.NotFound,
-            _ => TestOutcome.None,
+            _ when FailedTestCount > 0 => LoggerTestOutcome.Failed,
+            _ when PassedTestCount > 0 => LoggerTestOutcome.Passed,
+            _ when SkippedTestCount > 0 => LoggerTestOutcome.Skipped,
+            _ when TotalTestCount == 0 => LoggerTestOutcome.NotFound,
+            _ => LoggerTestOutcome.None,
         };
 }

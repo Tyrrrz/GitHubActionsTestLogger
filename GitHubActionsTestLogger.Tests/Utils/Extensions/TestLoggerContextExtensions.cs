@@ -42,46 +42,18 @@ internal static class TestLoggerContextExtensions
         context.HandleTestRunComplete(
             new TestRunCompleteEventArgs(
                 new TestRunStatistics(
-                    new Dictionary<
-                        Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome,
-                        long
-                    >
+                    new Dictionary<TestOutcome, long>
                     {
-                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed] =
-                            testResults.Count(r =>
-                                r.Outcome
-                                == Microsoft
-                                    .VisualStudio
-                                    .TestPlatform
-                                    .ObjectModel
-                                    .TestOutcome
-                                    .Passed
-                            ),
-                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed] =
-                            testResults.Count(r =>
-                                r.Outcome
-                                == Microsoft
-                                    .VisualStudio
-                                    .TestPlatform
-                                    .ObjectModel
-                                    .TestOutcome
-                                    .Failed
-                            ),
-                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped] =
-                            testResults.Count(r =>
-                                r.Outcome
-                                == Microsoft
-                                    .VisualStudio
-                                    .TestPlatform
-                                    .ObjectModel
-                                    .TestOutcome
-                                    .Skipped
-                            ),
-                        [Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.None] =
-                            testResults.Count(r =>
-                                r.Outcome
-                                == Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.None
-                            ),
+                        [TestOutcome.Passed] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Passed
+                        ),
+                        [TestOutcome.Failed] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Failed
+                        ),
+                        [TestOutcome.Skipped] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Skipped
+                        ),
+                        [TestOutcome.None] = testResults.Count(r => r.Outcome == TestOutcome.None),
                     }
                 ),
                 false,

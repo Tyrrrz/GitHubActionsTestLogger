@@ -25,17 +25,11 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build(),
-            new TestResultBuilder()
-                .SetDisplayName("Test2")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed)
-                .Build(),
-            new TestResultBuilder()
-                .SetDisplayName("Test3")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test2").SetOutcome(TestOutcome.Passed).Build(),
+            new TestResultBuilder().SetDisplayName("Test3").SetOutcome(TestOutcome.Skipped).Build()
         );
 
         // Assert
@@ -72,7 +66,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetFullyQualifiedName(
                     "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
                 )
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
@@ -122,7 +116,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetFullyQualifiedName(
                     "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
                 )
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
@@ -172,10 +166,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert
@@ -208,7 +199,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
                 .SetTrait("Document", "SS01")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .Build()
         );
 
@@ -240,7 +231,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build()
         );
@@ -273,7 +264,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
                 .Build()
         );
@@ -308,7 +299,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             "FakeTargetFramework",
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
+                .SetOutcome(TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
                 .Build()
         );
@@ -335,10 +326,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert

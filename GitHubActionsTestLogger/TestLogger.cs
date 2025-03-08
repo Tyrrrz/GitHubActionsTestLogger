@@ -44,16 +44,18 @@ public class VSTestTestLoggerContext
 
     public void HandleTestResult(TestResultEventArgs args)
     {
-        _testLoggerContext.HandleTestResult(VSTestTestResult.Convert(args.Result));
+        _testLoggerContext.HandleTestResult(VSTestConverter.ConvertTestResult(args.Result));
     }
 
     public void HandleTestRunStart(TestRunStartEventArgs args)
     {
-        _testLoggerContext.HandleTestRunStart(VSTestTestRunCriteria.Convert(args.TestRunCriteria));
+        _testLoggerContext.HandleTestRunStart(
+            VSTestConverter.ConvertTestRunCriteria(args.TestRunCriteria)
+        );
     }
 
     public void HandleTestRunComplete(TestRunCompleteEventArgs args)
     {
-        _testLoggerContext.HandleTestRunComplete(VSTestTestRunComplete.Convert(args));
+        _testLoggerContext.HandleTestRunComplete(VSTestConverter.ConvertTestRunComplete(args));
     }
 }
