@@ -17,10 +17,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GitHubActionsTestLogger\GitHubActionsTestLogger.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
+
+  <!-- 
+      Reference the logger project, and manually import the props file. This manual import is necessary
+      because we are referencing the project directly. Instead of using a nuget package. Users of the nuget
+      package don't have to do this.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\GitHubActionsTestLogger\GitHubActionsTestLogger.csproj" />
+  </ItemGroup>
+  <Import Project="..\GitHubActionsTestLogger\buildMultiTargeting\GitHubActionsTestLogger.props"/>
+
 </Project>

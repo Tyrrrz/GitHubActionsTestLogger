@@ -17,5 +17,6 @@ public static class GitHubActionsReportExtensions
         CompositeExtensionFactory<GitHubActionsReporterDataConsumer> compositeExtensionFactory =
             new(serviceProvider => new GitHubActionsReporterDataConsumer(serviceProvider));
         builder.TestHost.AddDataConsumer(compositeExtensionFactory);
+        builder.CommandLine.AddProvider(() => new GitHubActionsCommandLineProvider());
     }
 }
