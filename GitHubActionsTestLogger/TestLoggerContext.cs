@@ -83,8 +83,8 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 github.CreateErrorAnnotation(
                     FormatAnnotationTitle(testResult),
                     FormatAnnotationMessage(testResult),
-                    testResult.SourceFilePath,
-                    testResult.SourceFileLine
+                    testResult.TryGetSourceFilePath(),
+                    testResult.TryGetSourceLine()
                 );
             }
 

@@ -15,8 +15,8 @@ public static class VSTestConverter
             MinimallyQualifiedName: testResult.TestCase.GetMinimallyQualifiedName(),
             FullyQualifiedName: testResult.TestCase.GetTypeFullyQualifiedName(),
             Traits: testResult.TestCase.Traits.ToDictionary(t => t.Name, t => t.Value) ?? new(),
-            SourceFilePath: testResult.TryGetSourceFilePath(),
-            SourceFileLine: testResult.TryGetSourceLine(),
+            SourceFilePath: testResult.TestCase.CodeFilePath,
+            SourceFileLine: testResult.TestCase.LineNumber,
             Outcome: (LoggerTestOutcome)testResult.Outcome,
             ErrorMessage: testResult.ErrorMessage,
             ErrorStackTrace: testResult.ErrorStackTrace
