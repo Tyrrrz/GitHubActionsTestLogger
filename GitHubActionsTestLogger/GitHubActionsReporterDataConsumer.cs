@@ -1,15 +1,14 @@
-﻿using Microsoft.Testing.Platform.Extensions.Messages;
-using Microsoft.Testing.Platform.Extensions.OutputDevice;
-using Microsoft.Testing.Platform.Extensions.TestHost;
-using Microsoft.Testing.Platform.TestHost;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Testing.Platform.Extensions.Messages;
+using Microsoft.Testing.Platform.Extensions.OutputDevice;
+using Microsoft.Testing.Platform.Extensions.TestHost;
+using Microsoft.Testing.Platform.TestHost;
 
 namespace GitHubActionsTestLogger;
 
@@ -57,20 +56,19 @@ internal sealed class GitHubActionsReporterDataConsumer
             var testResult = MTPConverter.ConvertTestNodeUpdateMessage(testNodeUpdate);
             switch (testResult.Outcome)
             {
-                case LoggerTestOutcome.None:
-                case LoggerTestOutcome.NotFound:
-                    throw new InvalidOperationException();
                 case LoggerTestOutcome.Passed:
                     Interlocked.Increment(ref _passedTests);
+                    _context.HandleTestResult(testResult);
                     break;
                 case LoggerTestOutcome.Failed:
                     Interlocked.Increment(ref _failedTests);
+                    _context.HandleTestResult(testResult);
                     break;
                 case LoggerTestOutcome.Skipped:
                     Interlocked.Increment(ref _skippedTests);
+                    _context.HandleTestResult(testResult);
                     break;
             }
-            _context.HandleTestResult(testResult);
         }
         catch (OperationCanceledException ex) when (ex.CancellationToken == cancellationToken)
         {
@@ -99,15 +97,17 @@ internal sealed class GitHubActionsReporterDataConsumer
     )
     {
         var assembly = Assembly.GetCallingAssembly().Location;
-        var runtimeFramework = TargetFrameworkParser.GetShortTargetFramework(RuntimeInformation.FrameworkDescription);
-        var targetFramework = TargetFrameworkParser.GetShortTargetFramework(Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName) ?? runtimeFramework;
-        var testRunCriteria = new LoggerTestRunCriteria
-        (
-            targetFramework,
-             [assembly]
-           
-
+        var runtimeFramework = TargetFrameworkParser.GetShortTargetFramework(
+            RuntimeInformation.FrameworkDescription
         );
+        var targetFramework =
+            TargetFrameworkParser.GetShortTargetFramework(
+                Assembly
+                    .GetEntryAssembly()
+                    ?.GetCustomAttribute<TargetFrameworkAttribute>()
+                    ?.FrameworkDisplayName
+            ) ?? runtimeFramework;
+        var testRunCriteria = new LoggerTestRunCriteria(targetFramework, [assembly]);
         _context.HandleTestRunStart(testRunCriteria);
         return Task.CompletedTask;
     }
@@ -125,7 +125,13 @@ internal static class TargetFrameworkParser
 
         // https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.runtimeinformation.frameworkdescription
         string netFramework = ".NET Framework";
-        if (frameworkDescription.StartsWith(netFramework, ignoreCase: false, CultureInfo.InvariantCulture))
+        if (
+            frameworkDescription.StartsWith(
+                netFramework,
+                ignoreCase: false,
+                CultureInfo.InvariantCulture
+            )
+        )
         {
             // .NET Framework 4.7.2
             if (frameworkDescription.Length < (netFramework.Length + 6))
@@ -161,7 +167,13 @@ internal static class TargetFrameworkParser
         }
 
         string netCore = ".NET Core";
-        if (frameworkDescription.StartsWith(netCore, ignoreCase: false, CultureInfo.InvariantCulture))
+        if (
+            frameworkDescription.StartsWith(
+                netCore,
+                ignoreCase: false,
+                CultureInfo.InvariantCulture
+            )
+        )
         {
             // .NET Core 3.1
             return frameworkDescription.Length >= (netCore.Length + 4)
@@ -180,3 +192,4 @@ internal static class TargetFrameworkParser
 
         return frameworkDescription;
     }
+}

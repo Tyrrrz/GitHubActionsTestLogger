@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "GitHubActionsTestLogger.Demo.MTP": {
+      "commandName": "Project",
+      "commandLineArgs": "--report-github-actions",
+      "environmentVariables": {
+        "GITHUB_STEP_SUMMARY": "./test-summary.md"
+      }
+    }
+  }
+}

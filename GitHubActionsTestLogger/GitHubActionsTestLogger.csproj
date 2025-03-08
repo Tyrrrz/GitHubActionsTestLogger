@@ -5,6 +5,9 @@
     <IsPackable>true</IsPackable>
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
+
+    <!-- Microsoft.Testing.Platform needs to access the current path. -->
+    <NoWarn>$(NoWarn);IL3000</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
