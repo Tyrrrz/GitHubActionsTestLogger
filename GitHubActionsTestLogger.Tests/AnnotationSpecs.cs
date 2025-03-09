@@ -16,9 +16,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestLoggerOptions.Default
+            TestReporterOptions.Default
         );
 
         // Act
@@ -54,9 +54,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestLoggerOptions.Default
+            TestReporterOptions.Default
         );
 
         // Act
@@ -104,9 +104,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestLoggerOptions.Default
+            TestReporterOptions.Default
         );
 
         // Act
@@ -155,9 +155,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+            new TestReporterOptions
             {
                 AnnotationTitleFormat = "<@test>",
                 AnnotationMessageFormat = "[@test]",
@@ -184,9 +184,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+            new TestReporterOptions
             {
                 AnnotationTitleFormat = "<@traits.Category -> @test>",
                 AnnotationMessageFormat = "[@traits.Category -> @test]",
@@ -218,9 +218,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+            new TestReporterOptions
             {
                 AnnotationTitleFormat = "<@test: @error>",
                 AnnotationMessageFormat = "[@test: @error]",
@@ -251,9 +251,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+            new TestReporterOptions
             {
                 AnnotationTitleFormat = "<@test: @trace>",
                 AnnotationMessageFormat = "[@test: @trace]",
@@ -284,9 +284,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+            new TestReporterOptions
             {
                 AnnotationTitleFormat = "<@test (@framework)>",
                 AnnotationMessageFormat = "[@test (@framework)]",
@@ -319,9 +319,9 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions { AnnotationMessageFormat = "foo\\nbar" }
+            new TestReporterOptions { AnnotationMessageFormat = "foo\\nbar" }
         );
 
         // Act

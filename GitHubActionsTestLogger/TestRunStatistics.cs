@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger;
 
