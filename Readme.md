@@ -85,7 +85,7 @@ jobs:
 ```
 
 > **Warning**:
-> The new testing platform (i.e. `Microsoft.Testing.Platform`) [does not support custom test loggers](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/41).
+> The new testing platform (i.e. `Microsoft.Testing.Platform`) [is not yet supported](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/41). This is because VSTest and MTP are using different extensibility models, and this project existed before MTP existed.
 > To use **GitHub Actions Test Logger**, make sure to use the classic testing experience (`vstest`) instead.
 
 > **Important**:
