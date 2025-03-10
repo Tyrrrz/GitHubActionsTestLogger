@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <ItemGroup>
+    <!--
+      !!! IMPORTANT !!!
+      DO NOT CHANGE OR REUSE THE GUID, IT'S IDENTIFYING THIS EXTENSION.
+    -->
+    <TestingPlatformBuilderHook Include="4B89CDFD-2703-4B67-8C6C-0FC48CF669A5" >
+      <DisplayName>GitHubActionsTestLogger</DisplayName>
+      <TypeFullName>GitHubActionsTestLogger.TestingPlatformBuilderHook</TypeFullName>
+    </TestingPlatformBuilderHook>
+  </ItemGroup>
+</Project>

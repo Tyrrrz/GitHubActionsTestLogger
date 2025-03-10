@@ -25,11 +25,17 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build(),
-            new TestResultBuilder().SetDisplayName("Test2").SetOutcome(TestOutcome.Passed).Build(),
-            new TestResultBuilder().SetDisplayName("Test3").SetOutcome(TestOutcome.Skipped).Build()
+            new TestResultBuilder()
+                .SetDisplayName("Test2")
+                .SetOutcome(LoggerTestOutcome.Passed)
+                .Build(),
+            new TestResultBuilder()
+                .SetDisplayName("Test3")
+                .SetOutcome(LoggerTestOutcome.Skipped)
+                .Build()
         );
 
         // Assert
@@ -66,7 +72,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetFullyQualifiedName(
                     "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
                 )
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
@@ -116,7 +122,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetFullyQualifiedName(
                     "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
                 )
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
@@ -166,7 +172,10 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(LoggerTestOutcome.Failed)
+                .Build()
         );
 
         // Assert
@@ -199,7 +208,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
                 .SetTrait("Document", "SS01")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .Build()
         );
 
@@ -231,7 +240,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build()
         );
@@ -264,7 +273,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         context.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
                 .Build()
         );
@@ -299,7 +308,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
             "FakeTargetFramework",
             new TestResultBuilder()
                 .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
+                .SetOutcome(LoggerTestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
                 .Build()
         );
@@ -326,7 +335,10 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         context.SimulateTestRun(
-            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new TestResultBuilder()
+                .SetDisplayName("Test1")
+                .SetOutcome(LoggerTestOutcome.Failed)
+                .Build()
         );
 
         // Assert
