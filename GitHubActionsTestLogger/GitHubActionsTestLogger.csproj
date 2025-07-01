@@ -25,13 +25,13 @@
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="1.0.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.14.0" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.14.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
     <PackageReference
       Include="RazorBlade"
-      Version="0.9.0"
+      Version="0.10.0"
       ExcludeAssets="compile;runtime"
       PrivateAssets="all"
     />
