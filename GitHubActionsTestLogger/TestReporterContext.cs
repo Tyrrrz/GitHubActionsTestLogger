@@ -5,9 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-
 using GitHubActionsTestLogger.Utils.Extensions;
-
 using Microsoft.Testing.Platform.Extensions.Messages;
 
 namespace GitHubActionsTestLogger;
@@ -20,7 +18,11 @@ public class TestReporterContext(GitHubWorkflow github, TestReporterOptions opti
 
     public TestReporterOptions Options { get; } = options;
 
-    private string FormatAnnotation(string format, TestNode testNode, TestNodeStateProperty testNodeStateProperty)
+    private string FormatAnnotation(
+        string format,
+        TestNode testNode,
+        TestNodeStateProperty testNodeStateProperty
+    )
     {
         var buffer = new StringBuilder(format);
 
@@ -73,17 +75,22 @@ public class TestReporterContext(GitHubWorkflow github, TestReporterOptions opti
         return buffer.Trim().ToString();
     }
 
-    private string FormatAnnotationTitle(TestNode testNode, TestNodeStateProperty testNodeStateProperty) =>
-        FormatAnnotation(Options.AnnotationTitleFormat, testNode, testNodeStateProperty);
+    private string FormatAnnotationTitle(
+        TestNode testNode,
+        TestNodeStateProperty testNodeStateProperty
+    ) => FormatAnnotation(Options.AnnotationTitleFormat, testNode, testNodeStateProperty);
 
-    private string FormatAnnotationMessage(TestNode testNode, TestNodeStateProperty testNodeStateProperty) =>
-        FormatAnnotation(Options.AnnotationMessageFormat, testNode, testNodeStateProperty);
+    private string FormatAnnotationMessage(
+        TestNode testNode,
+        TestNodeStateProperty testNodeStateProperty
+    ) => FormatAnnotation(Options.AnnotationMessageFormat, testNode, testNodeStateProperty);
 
     public void HandleTestResult(TestNodeUpdateMessage testNodeUpdateMessage)
     {
         using (_lock.EnterScope())
         {
-            var testNodeState = testNodeUpdateMessage.TestNode.Properties.Single<TestNodeStateProperty>();
+            var testNodeState =
+                testNodeUpdateMessage.TestNode.Properties.Single<TestNodeStateProperty>();
             // Report failed test results to job annotations
             if (testNodeState is FailedTestNodeStateProperty or ErrorTestNodeStateProperty)
             {
@@ -108,15 +115,13 @@ public class TestReporterContext(GitHubWorkflow github, TestReporterOptions opti
         }
     }
 
-
     public void HandleTestRunComplete()
     {
         using (_lock.EnterScope())
         {
             _stopwatch.Stop();
 
-            var testSuite = Assembly.GetEntryAssembly()?.GetName().Name
-                ?? "Unknown Test Suite";
+            var testSuite = Assembly.GetEntryAssembly()?.GetName().Name ?? "Unknown Test Suite";
 
             var targetFramework =
                 // See line 65

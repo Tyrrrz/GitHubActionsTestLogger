@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-
 using Microsoft.Testing.Platform.Extensions;
 
 namespace GitHubActionsTestLogger;

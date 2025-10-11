@@ -14,8 +14,12 @@ public static class GitHubReportExtensions
     {
         var extension = new GitHubTestReporterExtension();
 
-        var compositeExtension = new CompositeExtensionFactory<GitHubTestReporter>(serviceProvider => 
-            new GitHubTestReporter(extension, serviceProvider.GetCommandLineOptions()));
+        var compositeExtension = new CompositeExtensionFactory<GitHubTestReporter>(
+            serviceProvider => new GitHubTestReporter(
+                extension,
+                serviceProvider.GetCommandLineOptions()
+            )
+        );
         testApplicationBuilder.TestHost.AddDataConsumer(compositeExtension);
         testApplicationBuilder.TestHost.AddTestSessionLifetimeHandle(compositeExtension);
 

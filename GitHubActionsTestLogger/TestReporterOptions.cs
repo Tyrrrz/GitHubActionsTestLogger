@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-
 using Microsoft.Testing.Platform.CommandLine;
-
 using static GitHubActionsTestLogger.CliOptionsProvider;
 
 namespace GitHubActionsTestLogger;
@@ -25,17 +23,25 @@ public partial class TestReporterOptions
 
     public static TestReporterOptions Resolve(ICommandLineOptions commandLineOptions)
     {
-        var annotationTitleFormat = 
-            (commandLineOptions.TryGetOptionArgumentList(ReportGitHubTitleOption, out string[]? arguments)
-                ? arguments[0]
-                : null)
-            ?? Default.AnnotationTitleFormat;
+        var annotationTitleFormat =
+            (
+                commandLineOptions.TryGetOptionArgumentList(
+                    ReportGitHubTitleOption,
+                    out string[]? arguments
+                )
+                    ? arguments[0]
+                    : null
+            ) ?? Default.AnnotationTitleFormat;
 
         var annotationMessageFormat =
-            (commandLineOptions.TryGetOptionArgumentList(ReportGitHubMessageOption, out arguments)
-                ? arguments[0]
-                : null)
-            ?? Default.AnnotationMessageFormat;
+            (
+                commandLineOptions.TryGetOptionArgumentList(
+                    ReportGitHubMessageOption,
+                    out arguments
+                )
+                    ? arguments[0]
+                    : null
+            ) ?? Default.AnnotationMessageFormat;
 
         _ = commandLineOptions.TryGetOptionArgumentList(ReportGitHubSummaryOption, out arguments);
 
@@ -44,7 +50,7 @@ public partial class TestReporterOptions
             AnnotationTitleFormat = annotationTitleFormat,
             AnnotationMessageFormat = annotationMessageFormat,
             SummaryIncludePassedTests =
-                arguments?.Contains(ReportGitHubSummaryArguments.IncludePassedTests) == true 
+                arguments?.Contains(ReportGitHubSummaryArguments.IncludePassedTests) == true
                 || Default.SummaryIncludePassedTests,
             SummaryIncludeSkippedTests =
                 arguments?.Contains(ReportGitHubSummaryArguments.IncludeSkippedTests) == true
