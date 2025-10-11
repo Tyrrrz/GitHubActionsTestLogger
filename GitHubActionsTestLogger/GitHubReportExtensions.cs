@@ -19,8 +19,8 @@ public static class GitHubReportExtensions
         testApplicationBuilder.TestHost.AddDataConsumer(compositeExtension);
         testApplicationBuilder.TestHost.AddTestSessionLifetimeHandle(compositeExtension);
 
-        testApplicationBuilder.CommandLine.AddProvider(
-            () => new TestReporterOptionsProvider(extension)
+        testApplicationBuilder.CommandLine.AddProvider(() =>
+            new TestReporterOptionsProvider(extension)
         );
     }
 }
