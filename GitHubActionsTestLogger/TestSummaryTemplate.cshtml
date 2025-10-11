@@ -2,7 +2,6 @@
 @using System.Collections.Generic
 @using System.Linq
 @using GitHubActionsTestLogger.Utils.Extensions
-@using Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 @inherits RazorBlade.HtmlTemplate
 
@@ -21,10 +20,10 @@
     @{
         var overallOutcomeEmoji = TestRunStatistics.OverallOutcome switch
         {
+            TestOutcome.None => "⚪️",
             TestOutcome.Passed => "🟢",
             TestOutcome.Failed => "🔴",
             TestOutcome.Skipped => "🟡",
-            TestOutcome.NotFound => "⚪️",
             _ => "\u2753"
         };
     }
@@ -106,10 +105,10 @@
                     {
                         var outcomeEmoji = testResult.Outcome switch
                         {
+                            TestOutcome.None => "⬜",
                             TestOutcome.Passed => "🟩",
                             TestOutcome.Failed => "🟥",
                             TestOutcome.Skipped => "🟨",
-                            TestOutcome.NotFound => "⬜",
                             _ => "\u2753"
                         };
 

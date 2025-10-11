@@ -8,7 +8,7 @@ using GitHubActionsTestLogger.Utils.Extensions;
 namespace GitHubActionsTestLogger;
 
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
-public partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
+internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
 {
     private void InvokeCommand(
         string command,
@@ -78,7 +78,7 @@ public partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summary
     }
 }
 
-public partial class GitHubWorkflow
+internal partial class GitHubWorkflow
 {
     public static GitHubWorkflow Default { get; } =
         new(

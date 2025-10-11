@@ -7,7 +7,7 @@ using Microsoft.Testing.Platform.Extensions.CommandLine;
 
 namespace GitHubActionsTestLogger;
 
-internal sealed class CliOptionsProvider(GitHubTestReporterExtension extension)
+internal class TestReporterOptionsProvider(TestReporterExtension extension)
     : ICommandLineOptionsProvider
 {
     public const string ReportGitHubOption = "report-github";
@@ -26,6 +26,8 @@ internal sealed class CliOptionsProvider(GitHubTestReporterExtension extension)
     public string Version => extension.Version;
     public string DisplayName => extension.DisplayName;
     public string Description => extension.Description;
+
+    public Task<bool> IsEnabledAsync() => extension.IsEnabledAsync();
 
     public IReadOnlyCollection<CommandLineOption> GetCommandLineOptions() =>
         [
@@ -55,8 +57,6 @@ internal sealed class CliOptionsProvider(GitHubTestReporterExtension extension)
                 isHidden: false
             ),
         ];
-
-    public Task<bool> IsEnabledAsync() => extension.IsEnabledAsync();
 
     // This method is called once after all options are parsed and is used to validate the combination of options.
     public Task<ValidationResult> ValidateCommandLineOptionsAsync(
@@ -106,7 +106,7 @@ internal sealed class CliOptionsProvider(GitHubTestReporterExtension extension)
                 );
             }
 
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 if (
                     arguments[i] != ReportGitHubSummaryArguments.IncludePassedTests
