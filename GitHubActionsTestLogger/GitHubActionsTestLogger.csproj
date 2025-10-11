@@ -3,10 +3,15 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
-    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
-    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
+    <IsTrimmable
+      Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))"
+      >true</IsTrimmable
+    >
+    <IsAotCompatible
+      Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))"
+      >true</IsAotCompatible
+    >
   </PropertyGroup>
-
   <PropertyGroup>
     <Authors>$(Company)</Authors>
     <Description>Custom test logger that reports test results in a structured format that GitHub Actions understands</Description>
@@ -17,17 +22,19 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="0.30.6" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Testing.Platform" Version="1.6.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
-    <PackageReference Include="RazorBlade" Version="0.8.0" ExcludeAssets="compile;runtime" PrivateAssets="all" />
+    <PackageReference
+      Include="RazorBlade"
+      Version="0.10.0"
+      ExcludeAssets="compile;runtime"
+      PrivateAssets="all"
+    />
   </ItemGroup>
-
 </Project>
