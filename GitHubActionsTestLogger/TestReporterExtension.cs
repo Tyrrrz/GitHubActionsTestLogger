@@ -20,5 +20,6 @@ internal class TestReporterExtension : IExtension
 
     public string Description => "Reports test run information to GitHub Actions";
 
+    // TODO: this should probably check environment for GitHub Actions
     public Task<bool> IsEnabledAsync() => Task.FromResult(true);
 }
