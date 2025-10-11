@@ -16,9 +16,9 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
-            TestLoggerOptions.Default
+            TestReporterOptions.Default
         );
 
         // Act
@@ -38,9 +38,9 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
-            new TestLoggerOptions { SummaryIncludePassedTests = true }
+            new TestReporterOptions { SummaryIncludePassedTests = true }
         );
 
         // Act
@@ -85,9 +85,9 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
-            TestLoggerOptions.Default
+            TestReporterOptions.Default
         );
 
         // Act
@@ -144,9 +144,9 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
-            new TestLoggerOptions { SummaryIncludeSkippedTests = true }
+            new TestReporterOptions { SummaryIncludeSkippedTests = true }
         );
 
         // Act
@@ -191,9 +191,9 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
-            TestLoggerOptions.Default
+            TestReporterOptions.Default
         );
 
         // Act
@@ -212,9 +212,9 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         // Arrange
         using var summaryWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
+        var context = new TestReporterContext(
             new GitHubWorkflow(TextWriter.Null, summaryWriter),
-            new TestLoggerOptions { SummaryIncludeNotFoundTests = false }
+            new TestReporterOptions { SummaryIncludeNotFoundTests = false }
         );
 
         // Act

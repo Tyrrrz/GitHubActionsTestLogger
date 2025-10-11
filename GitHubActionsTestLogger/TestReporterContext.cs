@@ -1,24 +1,26 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
+
 using GitHubActionsTestLogger.Utils.Extensions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+using Microsoft.Testing.Platform.Extensions.Messages;
 
 namespace GitHubActionsTestLogger;
 
-public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
+public class TestReporterContext(GitHubWorkflow github, TestReporterOptions options)
 {
     private readonly Lock _lock = new();
-    private TestRunCriteria? _testRunCriteria;
-    private readonly List<TestResult> _testResults = [];
+    private readonly List<TestNode> _testResults = [];
+    private readonly Stopwatch _stopwatch = new();
 
-    public TestLoggerOptions Options { get; } = options;
+    public TestReporterOptions Options { get; } = options;
 
-    private string FormatAnnotation(string format, TestResult testResult)
+    private string FormatAnnotation(string format, TestNode testNode, TestNodeStateProperty testNodeStateProperty)
     {
         var buffer = new StringBuilder(format);
 
@@ -27,32 +29,42 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
 
         // Name token
         buffer
-            .Replace("@test", testResult.TestCase.DisplayName)
+            .Replace("@test", testNode.DisplayName)
             // Backwards compat
-            .Replace("$test", testResult.TestCase.DisplayName);
+            .Replace("$test", testNode.DisplayName);
 
         // Trait tokens
-        foreach (var trait in testResult.Traits.Union(testResult.TestCase.Traits))
+        // TODO: this is not enough, we would also need to handle properties from VSTest bridge
+        foreach (var metadataProperty in testNode.Properties.OfType<TestMetadataProperty>())
         {
             buffer
-                .Replace($"@traits.{trait.Name}", trait.Value)
+                .Replace($"@traits.{metadataProperty.Key}", metadataProperty.Value)
                 // Backwards compat
-                .Replace($"$traits.{trait.Name}", trait.Value);
+                .Replace($"$traits.{metadataProperty.Key}", metadataProperty.Value);
         }
+
+        Exception? exception = testNodeStateProperty switch
+        {
+            FailedTestNodeStateProperty failed => failed.Exception,
+            ErrorTestNodeStateProperty error => error.Exception,
+            _ => null,
+        };
 
         // Error message
         buffer
-            .Replace("@error", testResult.ErrorMessage ?? "")
+            .Replace("@error", exception?.Message ?? "")
             // Backwards compat
-            .Replace("$error", testResult.ErrorMessage ?? "");
+            .Replace("$error", exception?.Message ?? "");
 
         // Error trace
         buffer
-            .Replace("@trace", testResult.ErrorStackTrace ?? "")
+            .Replace("@trace", exception?.StackTrace ?? "")
             // Backwards compat
-            .Replace("$trace", testResult.ErrorStackTrace ?? "");
+            .Replace("$trace", exception?.StackTrace ?? "");
 
         // Target framework
+        // TODO: Copy logic from platform: https://github.com/microsoft/testfx/blob/main/src/Platform/Microsoft.Testing.Platform/OutputDevice/BrowserOutputDevice.cs#L78
+        // or ask for platform to expose it
         buffer
             .Replace("@framework", _testRunCriteria?.TryGetTargetFramework() ?? "")
             // Backwards compat
@@ -61,49 +73,53 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
         return buffer.Trim().ToString();
     }
 
-    private string FormatAnnotationTitle(TestResult testResult) =>
-        FormatAnnotation(Options.AnnotationTitleFormat, testResult);
+    private string FormatAnnotationTitle(TestNode testNode, TestNodeStateProperty testNodeStateProperty) =>
+        FormatAnnotation(Options.AnnotationTitleFormat, testNode, testNodeStateProperty);
 
-    private string FormatAnnotationMessage(TestResult testResult) =>
-        FormatAnnotation(Options.AnnotationMessageFormat, testResult);
+    private string FormatAnnotationMessage(TestNode testNode, TestNodeStateProperty testNodeStateProperty) =>
+        FormatAnnotation(Options.AnnotationMessageFormat, testNode, testNodeStateProperty);
 
-    public void HandleTestRunStart(TestRunStartEventArgs args)
+    public void HandleTestResult(TestNodeUpdateMessage testNodeUpdateMessage)
     {
         using (_lock.EnterScope())
         {
-            _testRunCriteria = args.TestRunCriteria;
-        }
-    }
-
-    public void HandleTestResult(TestResultEventArgs args)
-    {
-        using (_lock.EnterScope())
-        {
+            var testNodeState = testNodeUpdateMessage.TestNode.Properties.Single<TestNodeStateProperty>();
             // Report failed test results to job annotations
-            if (args.Result.Outcome == TestOutcome.Failed)
+            if (testNodeState is FailedTestNodeStateProperty or ErrorTestNodeStateProperty)
             {
                 github.CreateErrorAnnotation(
-                    FormatAnnotationTitle(args.Result),
-                    FormatAnnotationMessage(args.Result),
+                    FormatAnnotationTitle(testNodeUpdateMessage.TestNode, testNodeState),
+                    FormatAnnotationMessage(testNodeUpdateMessage.TestNode, testNodeState),
                     args.Result.TryGetSourceFilePath(),
                     args.Result.TryGetSourceLine()
                 );
             }
 
             // Record all test results to write them to the summary later
-            _testResults.Add(args.Result);
+            _testResults.Add(testNodeUpdateMessage.TestNode);
         }
     }
 
-    public void HandleTestRunComplete(TestRunCompleteEventArgs args)
+    public void HandleTestRunStart()
     {
         using (_lock.EnterScope())
         {
-            var testSuite =
-                _testRunCriteria?.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension)
+            _stopwatch.Start();
+        }
+    }
+
+
+    public void HandleTestRunComplete()
+    {
+        using (_lock.EnterScope())
+        {
+            _stopwatch.Stop();
+
+            var testSuite = Assembly.GetEntryAssembly()?.GetName().Name
                 ?? "Unknown Test Suite";
 
             var targetFramework =
+                // See line 65
                 _testRunCriteria?.TryGetTargetFramework() ?? "Unknown Target Framework";
 
             var testRunStatistics = new TestRunStatistics(
@@ -114,7 +130,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 (int?)args.TestRunStatistics?[TestOutcome.Skipped]
                     ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
                 (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
-                args.ElapsedTimeInRunningTests
+                _stopwatch.Elapsed
             );
 
             var testResults = _testResults
