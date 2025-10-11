@@ -66,9 +66,10 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
     public void CreateSummary(string content)
     {
-        // Other steps may have reported summaries that contain HTML tags,
-        // which can screw up markdown parsing, so we need to make sure
-        // there's at least two newlines before our summary to be safe.
+        // If the summary file already contains HTML content, we need to first add two newlines
+        // in order to switch GitHub's parser from HTML mode back to markdown mode.
+        // It's safe to do it unconditionally because, if the file is empty, these newlines
+        // will simply be ignored.
         // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
         summaryWriter.WriteLine();
         summaryWriter.WriteLine();
