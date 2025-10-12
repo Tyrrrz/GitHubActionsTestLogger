@@ -66,7 +66,8 @@ internal class TestReporter(TestReporterExtension extension, ICommandLineOptions
                     ErrorTestNodeStateProperty errorState => errorState.Exception,
                     TimeoutTestNodeStateProperty timeoutState => timeoutState.Exception,
                     _ => null,
-                }
+                },
+                state.Explanation
             )
         );
 

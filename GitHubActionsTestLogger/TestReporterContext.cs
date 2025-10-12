@@ -70,8 +70,8 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
                 github.CreateErrorAnnotation(
                     FormatAnnotationTitle(testResult),
                     FormatAnnotationMessage(testResult),
-                    args.Result.TryGetSourceFilePath(),
-                    args.Result.TryGetSourceLine()
+                    testResult.Definition.SourceFilePath,
+                    testResult.Definition.SourceFileLineNumber
                 );
             }
 

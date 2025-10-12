@@ -2,4 +2,9 @@
 
 namespace GitHubActionsTestLogger;
 
-internal record TestResult(TestDefinition Definition, TestOutcome Outcome, Exception? Exception);
+internal record TestResult(
+    TestDefinition Definition,
+    TestOutcome Outcome,
+    Exception? Exception,
+    string? FailExplanation
+);

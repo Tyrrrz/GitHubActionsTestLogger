@@ -68,15 +68,15 @@
 
     @{
         var testResultGroups = TestResults
-            .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
+            .GroupBy(r => r.Definition.TypeFullyQualifiedName, StringComparer.Ordinal)
             .Select(g => new
             {
                 TypeFullyQualifiedName = g.Key,
-                TypeName = g.First().TestCase.GetTypeMinimallyQualifiedName(),
+                TypeName = g.First().Definition.TypeMinimallyQualifiedName,
                 TestResults = g
                     .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
                     .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
-                    .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal)
+                    .ThenBy(r => r.Definition.DisplayName, StringComparer.Ordinal)
                     .ToArray()
             })
             .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
@@ -115,16 +115,14 @@
                         // Use the display name if it's different from the fully qualified name,
                         // otherwise use the minimally qualified name.
                         var testName = !string.Equals(
-                            testResult.TestCase.DisplayName,
-                            testResult.TestCase.FullyQualifiedName,
+                            testResult.Definition.DisplayName,
+                            testResult.Definition.FullyQualifiedName,
                             StringComparison.Ordinal)
-                            ? testResult.TestCase.DisplayName
-                            : testResult.TestCase.GetMinimallyQualifiedName();
+                            ? testResult.Definition.DisplayName
+                            : testResult.Definition.MinimallyQualifiedName;
 
                         // Test source permalink
-                        var filePath = testResult.TryGetSourceFilePath();
-                        var fileLine = testResult.TryGetSourceLine();
-                        var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
+                        var url = testResult.Definition.SourceFilePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, testResult.Definition.SourceFileLineNumber));
 
                         <li>
                             @outcomeEmoji
@@ -138,12 +136,12 @@
                                 @(" ")@testName
                             }
 
-                            @if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
+                            @if (!string.IsNullOrWhiteSpace(testResult.FailExplanation))
                             {
                                 WriteMarkdown(
                                     "```yml",
-                                    testResult.ErrorMessage,
-                                    testResult.ErrorStackTrace,
+                                    testResult.Exception?.Message,
+                                    testResult.Exception?.StackTrace,
                                     "```"
                                 );
                             }
@@ -160,14 +158,14 @@
 
 @functions
 {
-    // In order to produce HTML that's also valid Markdown, we need to
-    // remove some whitespace inside literals.
-    public new void WriteLiteral(string? literal)
+    // We need to override the WriteLiteral(...) method to rewrite some literals
+    // so that the generated HTML appears correctly in Markdown.
+    protected override void WriteLiteral(string? value)
     {
-        if (!string.IsNullOrEmpty(literal))
+        if (!string.IsNullOrEmpty(value))
         {
             base.WriteLiteral(
-                literal
+                value
                     // Remove indentation
                     .Replace("    ", "", StringComparison.Ordinal)
                     // Remove linebreaks
@@ -177,7 +175,7 @@
         }
         else
         {
-            base.WriteLiteral(literal);
+            base.WriteLiteral(value);
         }
     }
 
