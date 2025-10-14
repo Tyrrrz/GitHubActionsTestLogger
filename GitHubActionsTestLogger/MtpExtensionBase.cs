@@ -19,7 +19,7 @@ internal abstract class MtpExtensionBase : IExtension
 
     public string DisplayName => "GitHub Actions Test Logger";
 
-    public string Description => "Reports test run information to GitHub Actions";
+    public string Description => "Reports test results to GitHub Actions";
 
     public Task<bool> IsEnabledAsync() => Task.FromResult(GitHubEnvironment.IsRunningInActions);
 }

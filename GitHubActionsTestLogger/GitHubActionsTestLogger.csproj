@@ -13,8 +13,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Authors>$(Company)</Authors>
-    <Description>Custom test logger that reports test results in a structured format that GitHub Actions understands</Description>
-    <PackageTags>github actions test logger</PackageTags>
+    <Description>Reports .NET test results to GitHub Actions</Description>
+    <PackageTags>github actions test result logger reporter</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/GitHubActionsTestLogger</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/releases</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
