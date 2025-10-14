@@ -2,28 +2,29 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GitHubActionsTestLogger.Bridge;
+using GitHubActionsTestLogger.GitHub;
+using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using TestOutcome = GitHubActionsTestLogger.Bridge.TestOutcome;
-using TestResult = GitHubActionsTestLogger.Bridge.TestResult;
-using TestRunStatistics = GitHubActionsTestLogger.Bridge.TestRunStatistics;
+using TestOutcome = GitHubActionsTestLogger.Reporting.TestOutcome;
+using TestResult = GitHubActionsTestLogger.Reporting.TestResult;
+using TestRunStatistics = GitHubActionsTestLogger.Reporting.TestRunStatistics;
 
 namespace GitHubActionsTestLogger;
 
 [FriendlyName("GitHubActions")]
 [ExtensionUri("logger://tyrrrz/ghactions/v2")]
-public class TestLogger : ITestLoggerWithParameters
+public class VsTestLogger : ITestLoggerWithParameters
 {
     // VSTest may theoretically not produce test run statistics at the end of the test session, so we build it
     // manually by collecting all test results.
     private List<TestResult> _testResults = [];
 
-    internal TestReporterContext? Context { get; private set; }
+    internal TestReportingContext? Context { get; private set; }
 
-    internal void Initialize(TestLoggerEvents events, TestReporterContext context)
+    internal void Initialize(TestLoggerEvents events, TestReportingContext context)
     {
         Context = context;
 
@@ -32,14 +33,14 @@ public class TestLogger : ITestLoggerWithParameters
         events.TestRunComplete += (_, args) => OnTestRunComplete(args);
     }
 
-    internal void Initialize(TestLoggerEvents events, TestReporterOptions options) =>
-        Initialize(events, new TestReporterContext(GitHubWorkflow.Default, options));
+    internal void Initialize(TestLoggerEvents events, TestReportingOptions options) =>
+        Initialize(events, new TestReportingContext(GitHubWorkflow.Default, options));
 
     public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
-        Initialize(events, TestReporterOptions.Default);
+        Initialize(events, TestReportingOptions.Default);
 
     public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters) =>
-        Initialize(events, TestReporterOptions.Resolve(parameters));
+        Initialize(events, TestReportingOptions.Resolve(parameters));
 
     private void OnTestRunStart(TestRunStartEventArgs args)
     {
@@ -63,14 +64,16 @@ public class TestLogger : ITestLoggerWithParameters
         if (Context is null)
             throw new InvalidOperationException("The logger is not initialized.");
 
+        var testDefinition = new TestDefinition(
+            args.Result.TestCase.Id.ToString(),
+            args.Result.TestCase.DisplayName,
+            args.Result.TryGetSourceFilePath(),
+            args.Result.TryGetSourceLine(),
+            args.Result.TestCase.Traits.ToDictionary(t => t.Name, t => t.Value)
+        );
+
         var testResult = new TestResult(
-            new TestDefinition(
-                args.Result.TestCase.Id.ToString(),
-                args.Result.TestCase.DisplayName,
-                args.Result.TryGetSourceFilePath(),
-                args.Result.TryGetSourceLine(),
-                args.Result.TestCase.Traits.ToDictionary(t => t.Name, t => t.Value)
-            ),
+            testDefinition,
             args.Result.Outcome switch
             {
                 Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed =>

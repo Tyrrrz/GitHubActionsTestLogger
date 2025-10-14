@@ -1,7 +1,7 @@
 ﻿@using System
 @using System.Collections.Generic
 @using System.Linq
-@using GitHubActionsTestLogger.Bridge
+@using GitHubActionsTestLogger.GitHub
 @using GitHubActionsTestLogger.Utils.Extensions
 
 @inherits RazorBlade.HtmlTemplate
@@ -123,7 +123,7 @@
                             : testResult.Definition.MinimallyQualifiedName;
 
                         // Test source permalink
-                        var url = testResult.Definition.SourceFilePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, testResult.Definition.SourceFileLineNumber));
+                        var url = testResult.Definition.SourceFilePath?.Pipe(p => GitHubEnvironment.TryGenerateFilePermalink(p, testResult.Definition.SourceFileLineNumber));
 
                         <li>
                             @outcomeEmoji

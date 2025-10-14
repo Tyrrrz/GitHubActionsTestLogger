@@ -1,12 +1,13 @@
 ﻿using System.Reflection;
 using System.Threading.Tasks;
+using GitHubActionsTestLogger.GitHub;
 using Microsoft.Testing.Platform.Extensions;
 
 namespace GitHubActionsTestLogger;
 
-internal class TestReporterExtension : IExtension
+internal class MtpLoggerExtension : IExtension
 {
-    private static readonly Assembly Assembly = typeof(TestReporterExtension).Assembly;
+    private static readonly Assembly Assembly = typeof(MtpLoggerExtension).Assembly;
 
     public string Uid => "GitHubActionsTestLoggerExtension";
 
@@ -20,5 +21,5 @@ internal class TestReporterExtension : IExtension
 
     public string Description => "Reports test run information to GitHub Actions";
 
-    public Task<bool> IsEnabledAsync() => Task.FromResult(GitHubWorkflow.IsRunningInActions);
+    public Task<bool> IsEnabledAsync() => Task.FromResult(GitHubEnvironment.IsRunningInActions);
 }

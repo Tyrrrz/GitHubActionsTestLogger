@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
+using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Tests.Fakes;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class InitializationSpecs
+public class VsTestInitializationSpecs
 {
     [Fact]
     public void I_can_use_the_logger_with_the_default_configuration()
     {
         // Arrange
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
         var events = new FakeTestLoggerEvents();
 
         // Act
@@ -20,14 +21,14 @@ public class InitializationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context?.Options.Should().BeEquivalentTo(TestReporterOptions.Default);
+        logger.Context?.Options.Should().BeEquivalentTo(TestReportingOptions.Default);
     }
 
     [Fact]
     public void I_can_use_the_logger_with_an_empty_configuration()
     {
         // Arrange
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
         var events = new FakeTestLoggerEvents();
 
         // Act
@@ -35,14 +36,14 @@ public class InitializationSpecs
 
         // Assert
         logger.Context.Should().NotBeNull();
-        logger.Context?.Options.Should().BeEquivalentTo(TestReporterOptions.Default);
+        logger.Context?.Options.Should().BeEquivalentTo(TestReportingOptions.Default);
     }
 
     [Fact]
     public void I_can_use_the_logger_with_a_custom_configuration()
     {
         // Arrange
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         var events = new FakeTestLoggerEvents();
         var parameters = new Dictionary<string, string?>

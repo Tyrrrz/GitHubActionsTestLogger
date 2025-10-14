@@ -7,8 +7,7 @@ using Microsoft.Testing.Platform.Extensions.CommandLine;
 
 namespace GitHubActionsTestLogger;
 
-internal class TestReporterOptionsProvider(TestReporterExtension extension)
-    : ICommandLineOptionsProvider
+internal class MtpLoggerOptionsProvider(MtpLoggerExtension extension) : ICommandLineOptionsProvider
 {
     public const string ReportGitHubOption = "report-github";
     public const string ReportGitHubSummaryOption = "report-github-summary";

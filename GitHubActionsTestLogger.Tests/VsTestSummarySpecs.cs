@@ -1,14 +1,16 @@
 using System.IO;
 using FluentAssertions;
+using GitHubActionsTestLogger.GitHub;
+using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Tests.Fakes;
 using GitHubActionsTestLogger.Tests.Utils;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
 using Xunit.Abstractions;
+using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class SummarySpecs(ITestOutputHelper testOutput)
+public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 {
     [Fact]
     public void I_can_use_the_logger_to_produce_a_summary_that_includes_the_test_suite_name()
@@ -17,13 +19,13 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludeNotFoundTests = true }
+                new TestReportingOptions { SummaryIncludeNotFoundTests = true }
             )
         );
 
@@ -45,42 +47,42 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                TestReporterOptions.Default
+                TestReportingOptions.Default
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage1")
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage2")
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage3")
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test5")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test5")
                 .SetOutcome(TestOutcome.Skipped)
@@ -107,34 +109,34 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludePassedTests = true }
+                new TestReportingOptions { SummaryIncludePassedTests = true }
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -160,34 +162,34 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludePassedTests = false }
+                new TestReportingOptions { SummaryIncludePassedTests = false }
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -213,34 +215,34 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludeSkippedTests = true }
+                new TestReportingOptions { SummaryIncludeSkippedTests = true }
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -266,34 +268,34 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludeSkippedTests = false }
+                new TestReportingOptions { SummaryIncludeSkippedTests = false }
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -319,13 +321,13 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludeNotFoundTests = true }
+                new TestReportingOptions { SummaryIncludeNotFoundTests = true }
             )
         );
 
@@ -346,13 +348,13 @@ public class SummarySpecs(ITestOutputHelper testOutput)
         using var summaryWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReporterOptions { SummaryIncludeNotFoundTests = false }
+                new TestReportingOptions { SummaryIncludeNotFoundTests = false }
             )
         );
 

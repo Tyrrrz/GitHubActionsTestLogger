@@ -1,14 +1,16 @@
 using System.IO;
 using FluentAssertions;
+using GitHubActionsTestLogger.GitHub;
+using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Tests.Fakes;
 using GitHubActionsTestLogger.Tests.Utils;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
 using Xunit.Abstractions;
+using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class AnnotationSpecs(ITestOutputHelper testOutput)
+public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 {
     [Fact]
     public void I_can_use_the_logger_to_produce_annotations_for_failed_tests()
@@ -17,25 +19,31 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                TestReporterOptions.Default
+                TestReportingOptions.Default
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build(),
-            new TestResultBuilder().SetDisplayName("Test2").SetOutcome(TestOutcome.Passed).Build(),
-            new TestResultBuilder().SetDisplayName("Test3").SetOutcome(TestOutcome.Skipped).Build()
+            new VsTestResultBuilder()
+                .SetDisplayName("Test2")
+                .SetOutcome(TestOutcome.Passed)
+                .Build(),
+            new VsTestResultBuilder()
+                .SetDisplayName("Test3")
+                .SetOutcome(TestOutcome.Skipped)
+                .Build()
         );
 
         // Assert
@@ -61,19 +69,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                TestReporterOptions.Default
+                TestReportingOptions.Default
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("I can execute a command with buffering and cancel it immediately")
                 .SetFullyQualifiedName(
                     "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
@@ -117,19 +125,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                TestReporterOptions.Default
+                TestReportingOptions.Default
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("SendEnvelopeAsync_ItemRateLimit_DropsItem")
                 .SetFullyQualifiedName(
                     "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
@@ -174,13 +182,13 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReporterOptions
+                new TestReportingOptions
                 {
                     AnnotationTitleFormat = "<@test>",
                     AnnotationMessageFormat = "[@test]",
@@ -190,7 +198,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new VsTestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert
@@ -209,13 +217,13 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReporterOptions
+                new TestReportingOptions
                 {
                     AnnotationTitleFormat = "<@traits.Category -> @test>",
                     AnnotationMessageFormat = "[@traits.Category -> @test]",
@@ -225,7 +233,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
                 .SetTrait("Document", "SS01")
@@ -249,13 +257,13 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReporterOptions
+                new TestReportingOptions
                 {
                     AnnotationTitleFormat = "<@test: @error>",
                     AnnotationMessageFormat = "[@test: @error]",
@@ -265,7 +273,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
@@ -288,13 +296,13 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReporterOptions
+                new TestReportingOptions
                 {
                     AnnotationTitleFormat = "<@test: @trace>",
                     AnnotationMessageFormat = "[@test: @trace]",
@@ -304,7 +312,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
@@ -327,13 +335,13 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReporterOptions
+                new TestReportingOptions
                 {
                     AnnotationTitleFormat = "<@test (@framework)>",
                     AnnotationMessageFormat = "[@test (@framework)]",
@@ -345,7 +353,7 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         events.SimulateTestRun(
             "FakeTests.dll",
             "FakeTargetFramework",
-            new TestResultBuilder()
+            new VsTestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
@@ -368,19 +376,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         var events = new FakeTestLoggerEvents();
-        var logger = new TestLogger();
+        var logger = new VsTestLogger();
 
         logger.Initialize(
             events,
-            new TestReporterContext(
+            new TestReportingContext(
                 new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReporterOptions { AnnotationMessageFormat = "foo\\nbar" }
+                new TestReportingOptions { AnnotationMessageFormat = "foo\\nbar" }
             )
         );
 
         // Act
         events.SimulateTestRun(
-            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new VsTestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert

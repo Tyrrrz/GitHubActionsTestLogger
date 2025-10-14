@@ -5,7 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using GitHubActionsTestLogger.Bridge;
+using GitHubActionsTestLogger.GitHub;
+using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
@@ -17,7 +18,7 @@ namespace GitHubActionsTestLogger;
 /// <summary>
 /// A Microsoft.Testing.Platform extension that reports test run information to GitHub Actions.
 /// </summary>
-internal class TestReporter(TestReporterExtension extension, ICommandLineOptions commandLineOptions)
+internal class MtpLogger(MtpLoggerExtension extension, ICommandLineOptions commandLineOptions)
     :
     // This is the extension point to subscribe to data messages published to the platform.
     // The type should then be registered as a data consumer in the test host.
@@ -26,9 +27,9 @@ internal class TestReporter(TestReporterExtension extension, ICommandLineOptions
         // The type should then be registered as a test session lifetime handler in the test host.
         ITestSessionLifetimeHandler
 {
-    private readonly TestReporterContext _context = new(
+    private readonly TestReportingContext _context = new(
         GitHubWorkflow.Default,
-        TestReporterOptions.Resolve(commandLineOptions)
+        TestReportingOptions.Resolve(commandLineOptions)
     );
 
     // MTP does not provide a built-in way to measure test run duration, so we do it manually
@@ -93,23 +94,33 @@ internal class TestReporter(TestReporterExtension extension, ICommandLineOptions
 
         var exception = state.TryGetException();
 
+        var testDefinition = new TestDefinition(
+            message.TestNode.Uid.Value,
+            message.TestNode.DisplayName,
+            null, // TODO: SourceFilePath
+            null, // TODO: SourceFileLineNumber
+            message
+                .TestNode.Properties.OfType<TestMetadataProperty>()
+                .ToDictionary(p => p.Key, p => p.Value)
+        );
+
         var testResult = new TestResult(
-            new TestDefinition(
-                message.TestNode.Uid.Value,
-                message.TestNode.DisplayName,
-                null, // TODO: SourceFilePath
-                null, // TODO: SourceFileLineNumber
-                message
-                    .TestNode.Properties.OfType<TestMetadataProperty>()
-                    .ToDictionary(p => p.Key, p => p.Value)
-            ),
-            state.ToTestOutcome(),
+            testDefinition,
+            state switch
+            {
+                PassedTestNodeStateProperty => TestOutcome.Passed,
+                FailedTestNodeStateProperty => TestOutcome.Failed,
+                ErrorTestNodeStateProperty => TestOutcome.Failed,
+                TimeoutTestNodeStateProperty => TestOutcome.Failed,
+                SkippedTestNodeStateProperty => TestOutcome.Skipped,
+                CancelledTestNodeStateProperty => TestOutcome.Skipped,
+                _ => TestOutcome.None,
+            },
             state.Explanation ?? exception?.Message,
             exception?.StackTrace
         );
 
         _context.HandleTestResult(testResult);
-
         _testResults.Add(testResult);
 
         return Task.CompletedTask;

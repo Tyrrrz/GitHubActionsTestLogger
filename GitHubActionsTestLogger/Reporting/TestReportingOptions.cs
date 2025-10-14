@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.Testing.Platform.CommandLine;
-using static GitHubActionsTestLogger.TestReporterOptionsProvider;
 
-namespace GitHubActionsTestLogger;
+namespace GitHubActionsTestLogger.Reporting;
 
-internal partial class TestReporterOptions
+internal partial class TestReportingOptions
 {
     public string AnnotationTitleFormat { get; init; } = "@test";
 
@@ -18,11 +17,11 @@ internal partial class TestReporterOptions
     public bool SummaryIncludeNotFoundTests { get; init; }
 }
 
-internal partial class TestReporterOptions
+internal partial class TestReportingOptions
 {
-    public static TestReporterOptions Default { get; } = new();
+    public static TestReportingOptions Default { get; } = new();
 
-    public static TestReporterOptions Resolve(IReadOnlyDictionary<string, string?> parameters) =>
+    public static TestReportingOptions Resolve(IReadOnlyDictionary<string, string?> parameters) =>
         new()
         {
             AnnotationTitleFormat =
@@ -42,22 +41,24 @@ internal partial class TestReporterOptions
                 ?? Default.SummaryIncludeNotFoundTests,
         };
 
-    public static TestReporterOptions Resolve(ICommandLineOptions commandLineOptions)
+    public static TestReportingOptions Resolve(ICommandLineOptions commandLineOptions)
     {
         var annotationTitleFormat =
-            commandLineOptions.TryGetOptionArgument(ReportGitHubTitleOption)
-            ?? Default.AnnotationTitleFormat;
+            commandLineOptions.TryGetOptionArgument(
+                MtpLoggerOptionsProvider.ReportGitHubTitleOption
+            ) ?? Default.AnnotationTitleFormat;
 
         var annotationMessageFormat =
-            commandLineOptions.TryGetOptionArgument(ReportGitHubMessageOption)
-            ?? Default.AnnotationMessageFormat;
+            commandLineOptions.TryGetOptionArgument(
+                MtpLoggerOptionsProvider.ReportGitHubMessageOption
+            ) ?? Default.AnnotationMessageFormat;
 
         // TODO: wire these
         var summaryIncludePassedTests = Default.SummaryIncludePassedTests;
         var summaryIncludeSkippedTests = Default.SummaryIncludeSkippedTests;
         var summaryIncludeNotFoundTests = Default.SummaryIncludeNotFoundTests;
 
-        return new TestReporterOptions
+        return new TestReportingOptions
         {
             AnnotationTitleFormat = annotationTitleFormat,
             AnnotationMessageFormat = annotationMessageFormat,

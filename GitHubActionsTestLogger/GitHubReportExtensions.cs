@@ -11,16 +11,17 @@ public static class GitHubReportExtensions
     /// </summary>
     public static void AddGitHubReportProvider(this ITestApplicationBuilder testApplicationBuilder)
     {
-        var extension = new TestReporterExtension();
+        var extension = new MtpLoggerExtension();
 
-        var compositeExtension = new CompositeExtensionFactory<TestReporter>(
-            serviceProvider => new TestReporter(extension, serviceProvider.GetCommandLineOptions())
+        var compositeExtension = new CompositeExtensionFactory<MtpLogger>(
+            serviceProvider => new MtpLogger(extension, serviceProvider.GetCommandLineOptions())
         );
+
         testApplicationBuilder.TestHost.AddDataConsumer(compositeExtension);
         testApplicationBuilder.TestHost.AddTestSessionLifetimeHandle(compositeExtension);
 
         testApplicationBuilder.CommandLine.AddProvider(() =>
-            new TestReporterOptionsProvider(extension)
+            new MtpLoggerOptionsProvider(extension)
         );
     }
 }

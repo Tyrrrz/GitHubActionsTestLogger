@@ -5,7 +5,7 @@ using System.Linq;
 using GitHubActionsTestLogger.Utils;
 using GitHubActionsTestLogger.Utils.Extensions;
 
-namespace GitHubActionsTestLogger;
+namespace GitHubActionsTestLogger.GitHub;
 
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
 internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
@@ -81,56 +81,6 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
 internal partial class GitHubWorkflow
 {
-    public static bool IsRunningInActions { get; } =
-        string.Equals(
-            Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
-            "true",
-            StringComparison.OrdinalIgnoreCase
-        );
-
-    public static string? ServerUrl { get; } =
-        Environment.GetEnvironmentVariable("GITHUB_SERVER_URL");
-
-    public static string? RepositorySlug { get; } =
-        Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
-
-    public static string? WorkspacePath { get; } =
-        Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
-
-    public static string? CommitHash { get; } = Environment.GetEnvironmentVariable("GITHUB_SHA");
-
-    public static string? SummaryFilePath { get; } =
-        Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY");
-
-    public static string? TryGenerateFilePermalink(string filePath, int? line = null)
-    {
-        if (
-            string.IsNullOrWhiteSpace(ServerUrl)
-            || string.IsNullOrWhiteSpace(RepositorySlug)
-            || string.IsNullOrWhiteSpace(WorkspacePath)
-            || string.IsNullOrWhiteSpace(CommitHash)
-        )
-        {
-            return null;
-        }
-
-        var filePathRelative =
-            // If the file path starts with /_/ but the workspace path doesn't,
-            // then it's safe to assume that the file path has already been normalized
-            // by the Deterministic Build feature of MSBuild.
-            // In this case, we only need to remove the leading /_/ from the file path
-            // to get the correct relative path.
-            filePath.StartsWith("/_/", StringComparison.Ordinal)
-            && !WorkspacePath.StartsWith("/_/", StringComparison.Ordinal)
-                ? filePath[3..]
-                : PathEx.GetRelativePath(WorkspacePath, filePath);
-
-        var filePathRoute = filePathRelative.Replace('\\', '/').Trim('/');
-        var lineMarker = line?.Pipe(l => $"#L{l}");
-
-        return $"{ServerUrl}/{RepositorySlug}/blob/{CommitHash}/{filePathRoute}{lineMarker}";
-    }
-
     public static GitHubWorkflow Default { get; } =
         new(
             // Commands are written to the standard output
@@ -139,8 +89,11 @@ internal partial class GitHubWorkflow
             // We may need to write to the summary file from multiple test suites in parallel,
             // so we should use a stream that delays acquiring the file lock until the very last moment,
             // and employs retry logic to handle potential race conditions.
-            SummaryFilePath
-                ?.Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
+            GitHubEnvironment
+                .SummaryFilePath?.Pipe(f => new ContentionTolerantWriteFileStream(
+                    f,
+                    FileMode.Append
+                ))
                 .Pipe(s => new StreamWriter(s)) ?? TextWriter.Null
         );
 }

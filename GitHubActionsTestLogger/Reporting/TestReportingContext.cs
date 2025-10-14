@@ -3,12 +3,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using GitHubActionsTestLogger.Bridge;
+using GitHubActionsTestLogger.GitHub;
 using GitHubActionsTestLogger.Utils.Extensions;
 
-namespace GitHubActionsTestLogger;
+namespace GitHubActionsTestLogger.Reporting;
 
-internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions options)
+internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions options)
 {
     private readonly Lock _lock = new();
     private readonly Stopwatch _stopwatch = new();
@@ -16,7 +16,7 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
     private TestRunStartInfo? _testRunStartInfo;
     private readonly List<TestResult> _testResults = [];
 
-    public TestReporterOptions Options { get; } = options;
+    public TestReportingOptions Options { get; } = options;
 
     private string FormatAnnotation(string format, TestResult testResult)
     {

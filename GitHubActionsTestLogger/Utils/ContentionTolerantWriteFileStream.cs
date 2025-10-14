@@ -9,6 +9,10 @@ namespace GitHubActionsTestLogger.Utils;
 
 internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileMode) : Stream
 {
+    // Random is used to introduce variance in backoff delays.
+    // Fixed seed for reproducibility in tests and debugging.
+    private readonly Random _random = new(1173363);
+
     private readonly List<byte> _buffer = new(1024);
 
     [ExcludeFromCodeCoverage]
@@ -38,7 +42,7 @@ internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileM
             catch (IOException) when (retriesRemaining > 0)
             {
                 // Variance in delay to avoid overlapping back-offs
-                Thread.Sleep(RandomEx.Shared.Next(200, 1000));
+                Thread.Sleep(_random.Next(200, 1000));
             }
         }
     }

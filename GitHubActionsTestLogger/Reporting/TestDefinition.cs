@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GitHubActionsTestLogger.Bridge;
+namespace GitHubActionsTestLogger.Reporting;
 
 internal record TestDefinition(
     string Id,

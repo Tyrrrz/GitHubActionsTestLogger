@@ -1,4 +1,4 @@
-﻿namespace GitHubActionsTestLogger.Bridge;
+﻿namespace GitHubActionsTestLogger.Reporting;
 
 internal record TestResult(
     TestDefinition Definition,
