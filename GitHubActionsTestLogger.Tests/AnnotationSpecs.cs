@@ -1,7 +1,7 @@
 using System.IO;
 using FluentAssertions;
+using GitHubActionsTestLogger.Tests.Fakes;
 using GitHubActionsTestLogger.Tests.Utils;
-using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit;
 using Xunit.Abstractions;
@@ -16,13 +16,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestReporterOptions.Default
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                TestReporterOptions.Default
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
@@ -54,13 +60,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestReporterOptions.Default
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                TestReporterOptions.Default
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("I can execute a command with buffering and cancel it immediately")
                 .SetFullyQualifiedName(
@@ -104,13 +116,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestReporterOptions.Default
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                TestReporterOptions.Default
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("SendEnvelopeAsync_ItemRateLimit_DropsItem")
                 .SetFullyQualifiedName(
@@ -155,17 +173,23 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestReporterOptions
-            {
-                AnnotationTitleFormat = "<@test>",
-                AnnotationMessageFormat = "[@test]",
-            }
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                new TestReporterOptions
+                {
+                    AnnotationTitleFormat = "<@test>",
+                    AnnotationMessageFormat = "[@test]",
+                }
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
@@ -184,17 +208,23 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestReporterOptions
-            {
-                AnnotationTitleFormat = "<@traits.Category -> @test>",
-                AnnotationMessageFormat = "[@traits.Category -> @test]",
-            }
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                new TestReporterOptions
+                {
+                    AnnotationTitleFormat = "<@traits.Category -> @test>",
+                    AnnotationMessageFormat = "[@traits.Category -> @test]",
+                }
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
@@ -218,17 +248,23 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestReporterOptions
-            {
-                AnnotationTitleFormat = "<@test: @error>",
-                AnnotationMessageFormat = "[@test: @error]",
-            }
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                new TestReporterOptions
+                {
+                    AnnotationTitleFormat = "<@test: @error>",
+                    AnnotationMessageFormat = "[@test: @error]",
+                }
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
@@ -251,17 +287,23 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestReporterOptions
-            {
-                AnnotationTitleFormat = "<@test: @trace>",
-                AnnotationMessageFormat = "[@test: @trace]",
-            }
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                new TestReporterOptions
+                {
+                    AnnotationTitleFormat = "<@test: @trace>",
+                    AnnotationMessageFormat = "[@test: @trace]",
+                }
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
@@ -284,17 +326,23 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestReporterOptions
-            {
-                AnnotationTitleFormat = "<@test (@framework)>",
-                AnnotationMessageFormat = "[@test (@framework)]",
-            }
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                new TestReporterOptions
+                {
+                    AnnotationTitleFormat = "<@test (@framework)>",
+                    AnnotationMessageFormat = "[@test (@framework)]",
+                }
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             "FakeTests.dll",
             "FakeTargetFramework",
             new TestResultBuilder()
@@ -319,13 +367,19 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestReporterContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestReporterOptions { AnnotationMessageFormat = "foo\\nbar" }
+        var events = new FakeTestLoggerEvents();
+        var logger = new TestLogger();
+
+        logger.Initialize(
+            events,
+            new TestReporterContext(
+                new GitHubWorkflow(commandWriter, TextWriter.Null),
+                new TestReporterOptions { AnnotationMessageFormat = "foo\\nbar" }
+            )
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 

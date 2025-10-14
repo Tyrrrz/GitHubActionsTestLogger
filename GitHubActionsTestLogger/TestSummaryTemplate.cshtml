@@ -1,6 +1,7 @@
 ﻿@using System
 @using System.Collections.Generic
 @using System.Linq
+@using GitHubActionsTestLogger.Bridge
 @using GitHubActionsTestLogger.Utils.Extensions
 
 @inherits RazorBlade.HtmlTemplate
@@ -136,12 +137,12 @@
                                 @(" ")@testName
                             }
 
-                            @if (!string.IsNullOrWhiteSpace(testResult.FailExplanation))
+                            @if (!string.IsNullOrWhiteSpace(testResult.ErrorMessage))
                             {
                                 WriteMarkdown(
                                     "```yml",
-                                    testResult.Exception?.Message,
-                                    testResult.Exception?.StackTrace,
+                                    testResult.ErrorMessage,
+                                    testResult.ErrorStackTrace,
                                     "```"
                                 );
                             }

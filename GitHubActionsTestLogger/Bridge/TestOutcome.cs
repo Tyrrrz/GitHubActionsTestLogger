@@ -1,6 +1,6 @@
 ﻿using Microsoft.Testing.Platform.Extensions.Messages;
 
-namespace GitHubActionsTestLogger;
+namespace GitHubActionsTestLogger.Bridge;
 
 internal enum TestOutcome
 {

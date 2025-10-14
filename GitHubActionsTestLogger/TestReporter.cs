@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using GitHubActionsTestLogger.Bridge;
+using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.TestHost;
@@ -26,6 +31,13 @@ internal class TestReporter(TestReporterExtension extension, ICommandLineOptions
         TestReporterOptions.Resolve(commandLineOptions)
     );
 
+    // MTP does not provide a built-in way to measure test run duration, so we do it manually
+    private readonly Stopwatch _stopwatch = new();
+
+    // MTP does not produce test run statistics at the end of the test session, so we build it
+    // manually by collecting all test results.
+    private List<TestResult> _testResults = [];
+
     public Type[] DataTypesConsumed { get; } = [typeof(TestNodeUpdateMessage)];
 
     public string Uid => extension.Uid;
@@ -35,6 +47,31 @@ internal class TestReporter(TestReporterExtension extension, ICommandLineOptions
 
     public Task<bool> IsEnabledAsync() => extension.IsEnabledAsync();
 
+    public Task OnTestSessionStartingAsync(
+        SessionUid sessionUid,
+        CancellationToken cancellationToken
+    )
+    {
+        _stopwatch.Restart();
+        _testResults = [];
+
+        var testAssembly = Assembly.GetEntryAssembly();
+
+        _context.HandleTestRunStart(
+            new TestRunStartInfo(
+                sessionUid.Value,
+                // MTP test host runs within the test assembly, so we can infer the test suite name
+                // and target framework directly from the assembly metadata.
+                testAssembly?.GetName().Name,
+                testAssembly
+                    ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
+                    ?.FrameworkName
+            )
+        );
+
+        return Task.CompletedTask;
+    }
+
     public Task ConsumeAsync(
         IDataProducer dataProducer,
         IData value,
@@ -42,49 +79,59 @@ internal class TestReporter(TestReporterExtension extension, ICommandLineOptions
     )
     {
         if (value is not TestNodeUpdateMessage message)
+        {
             throw new InvalidOperationException(
-                $"Unexpected data type: {value.GetType().FullName}"
+                $"Unexpected data type: {value.GetType().FullName}."
             );
+        }
 
         var state = message.TestNode.Properties.SingleOrDefault<TestNodeStateProperty>();
         if (state is null)
+        {
             throw new InvalidOperationException("Test node state property is missing.");
+        }
 
-        _context.HandleTestResult(
-            new TestResult(
-                new TestDefinition(
-                    message.TestNode.Uid.Value,
-                    message.TestNode.DisplayName,
-                    message
-                        .TestNode.Properties.OfType<TestMetadataProperty>()
-                        .ToDictionary(p => p.Key, p => p.Value)
-                ),
-                state.ToTestOutcome(),
-                state switch
-                {
-                    FailedTestNodeStateProperty failedState => failedState.Exception,
-                    ErrorTestNodeStateProperty errorState => errorState.Exception,
-                    TimeoutTestNodeStateProperty timeoutState => timeoutState.Exception,
-                    _ => null,
-                },
-                state.Explanation
-            )
+        var exception = state.TryGetException();
+
+        var testResult = new TestResult(
+            new TestDefinition(
+                message.TestNode.Uid.Value,
+                message.TestNode.DisplayName,
+                null, // TODO: SourceFilePath
+                null, // TODO: SourceFileLineNumber
+                message
+                    .TestNode.Properties.OfType<TestMetadataProperty>()
+                    .ToDictionary(p => p.Key, p => p.Value)
+            ),
+            state.ToTestOutcome(),
+            state.Explanation ?? exception?.Message,
+            exception?.StackTrace
         );
+
+        _context.HandleTestResult(testResult);
+
+        _testResults.Add(testResult);
 
         return Task.CompletedTask;
     }
-
-    public Task OnTestSessionStartingAsync(
-        SessionUid sessionUid,
-        CancellationToken cancellationToken
-    ) => Task.CompletedTask;
 
     public Task OnTestSessionFinishingAsync(
         SessionUid sessionUid,
         CancellationToken cancellationToken
     )
     {
-        _context.HandleTestRunComplete();
+        _stopwatch.Stop();
+
+        var testRunStatistics = new TestRunStatistics(
+            _testResults.Count(r => r.Outcome == TestOutcome.Passed),
+            _testResults.Count(r => r.Outcome == TestOutcome.Failed),
+            _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
+            _testResults.Count,
+            _stopwatch.Elapsed
+        );
+
+        _context.HandleTestRunEnd(testRunStatistics);
+
         return Task.CompletedTask;
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace GitHubActionsTestLogger;
+namespace GitHubActionsTestLogger.Bridge;
 
 internal record TestDefinition(
     string Id,
     string DisplayName,
+    string? SourceFilePath,
+    int? SourceFileLineNumber,
     IReadOnlyDictionary<string, string> Properties
 )
 {
@@ -19,10 +21,4 @@ internal record TestDefinition(
 
     // TODO
     public string MinimallyQualifiedName => DisplayName;
-
-    // TODO
-    public string? SourceFilePath => null;
-
-    // TODO
-    public int? SourceFileLineNumber => null;
 }

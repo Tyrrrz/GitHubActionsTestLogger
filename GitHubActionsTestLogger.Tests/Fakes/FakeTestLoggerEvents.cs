@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -16,4 +19,72 @@ internal class FakeTestLoggerEvents : TestLoggerEvents
     public override event EventHandler<TestRunMessageEventArgs>? DiscoveryMessage;
     public override event EventHandler<DiscoveredTestsEventArgs>? DiscoveredTests;
     public override event EventHandler<DiscoveryCompleteEventArgs>? DiscoveryComplete;
+
+    public void RaiseTestRunStart(TestRunStartEventArgs args) => TestRunStart?.Invoke(this, args);
+
+    public void RaiseTestResult(TestResultEventArgs args) => TestResult?.Invoke(this, args);
+
+    public void RaiseTestRunComplete(TestRunCompleteEventArgs args) =>
+        TestRunComplete?.Invoke(this, args);
+
+    public void SimulateTestRun(
+        string testSuiteFilePath,
+        string targetFrameworkName,
+        params IReadOnlyList<TestResult> testResults
+    )
+    {
+        RaiseTestRunStart(
+            new TestRunStartEventArgs(
+                new TestRunCriteria(
+                    [testSuiteFilePath],
+                    1,
+                    true,
+                    // lang=xml
+                    $"""
+                    <RunSettings>
+                        <RunConfiguration>
+                            <TargetFrameworkVersion>{targetFrameworkName}</TargetFrameworkVersion>
+                        </RunConfiguration>
+                    </RunSettings>
+                    """
+                )
+            )
+        );
+
+        foreach (var testResult in testResults)
+            RaiseTestResult(new TestResultEventArgs(testResult));
+
+        RaiseTestRunComplete(
+            new TestRunCompleteEventArgs(
+                new TestRunStatistics(
+                    new Dictionary<TestOutcome, long>
+                    {
+                        [TestOutcome.Passed] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Passed
+                        ),
+                        [TestOutcome.Failed] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Failed
+                        ),
+                        [TestOutcome.Skipped] = testResults.Count(r =>
+                            r.Outcome == TestOutcome.Skipped
+                        ),
+                        [TestOutcome.None] = testResults.Count(r => r.Outcome == TestOutcome.None),
+                    }
+                ),
+                false,
+                false,
+                null,
+                [],
+                TimeSpan.FromSeconds(1.234)
+            )
+        );
+    }
+
+    public void SimulateTestRun(
+        string testSuiteName,
+        params IReadOnlyList<TestResult> testResults
+    ) => SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
+
+    public void SimulateTestRun(params IReadOnlyList<TestResult> testResults) =>
+        SimulateTestRun("FakeTests.dll", testResults);
 }

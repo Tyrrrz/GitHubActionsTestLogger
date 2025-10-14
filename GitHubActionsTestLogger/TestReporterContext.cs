@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
+using GitHubActionsTestLogger.Bridge;
 using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger;
@@ -13,13 +13,7 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
     private readonly Lock _lock = new();
     private readonly Stopwatch _stopwatch = new();
 
-    private readonly string? _testSuiteName = Assembly.GetEntryAssembly()?.GetName().Name;
-
-    private readonly string? _targetFrameworkName = Assembly
-        .GetEntryAssembly()
-        ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
-        ?.FrameworkName;
-
+    private TestRunStartInfo? _testRunStartInfo;
     private readonly List<TestResult> _testResults = [];
 
     public TestReporterOptions Options { get; } = options;
@@ -36,20 +30,16 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
 
         // Properties
         foreach (var property in testResult.Definition.Properties)
-        {
             buffer.Replace($"@traits.{property.Key}", property.Value);
-        }
 
         // Error message
-        buffer.Replace("@error", testResult.Exception?.Message ?? "");
+        buffer.Replace("@error", testResult.ErrorMessage ?? "");
 
         // Error trace
-        buffer.Replace("@trace", testResult.Exception?.StackTrace ?? "");
+        buffer.Replace("@trace", testResult.ErrorStackTrace ?? "");
 
         // Target framework
-        // TODO: Copy logic from platform: https://github.com/microsoft/testfx/blob/main/src/Platform/Microsoft.Testing.Platform/OutputDevice/BrowserOutputDevice.cs#L78
-        // or ask for platform to expose it
-        buffer.Replace("@framework", _targetFrameworkName ?? "");
+        buffer.Replace("@framework", _testRunStartInfo?.FrameworkName ?? "");
 
         return buffer.Trim().ToString();
     }
@@ -59,6 +49,15 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
 
     private string FormatAnnotationMessage(TestResult testResult) =>
         FormatAnnotation(Options.AnnotationMessageFormat, testResult);
+
+    public void HandleTestRunStart(TestRunStartInfo startInfo)
+    {
+        using (_lock.EnterScope())
+        {
+            _stopwatch.Start();
+            _testRunStartInfo = startInfo;
+        }
+    }
 
     public void HandleTestResult(TestResult testResult)
     {
@@ -80,32 +79,16 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
         }
     }
 
-    public void HandleTestRunStart()
-    {
-        using (_lock.EnterScope())
-        {
-            _stopwatch.Start();
-        }
-    }
-
-    public void HandleTestRunComplete()
+    public void HandleTestRunEnd(TestRunStatistics statistics)
     {
         using (_lock.EnterScope())
         {
             _stopwatch.Stop();
 
-            var testRunStatistics = new TestRunStatistics(
-                _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-                _testResults.Count(r => r.Outcome == TestOutcome.Failed),
-                _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
-                _testResults.Count,
-                _stopwatch.Elapsed
-            );
-
             // Don't render empty summary for projects with no tests
             if (
                 !Options.SummaryIncludeNotFoundTests
-                && testRunStatistics.OverallOutcome == TestOutcome.None
+                && statistics.OverallOutcome == TestOutcome.None
             )
             {
                 return;
@@ -121,9 +104,9 @@ internal class TestReporterContext(GitHubWorkflow github, TestReporterOptions op
 
             var template = new TestSummaryTemplate
             {
-                TestSuite = _testSuiteName ?? "Unknown Test Suite",
-                TargetFramework = _targetFrameworkName ?? "Unknown Target Framework",
-                TestRunStatistics = testRunStatistics,
+                TestSuite = _testRunStartInfo?.SuiteName ?? "Unknown Test Suite",
+                TargetFramework = _testRunStartInfo?.FrameworkName ?? "Unknown Target Framework",
+                TestRunStatistics = statistics,
                 TestResults = testResults,
             };
 

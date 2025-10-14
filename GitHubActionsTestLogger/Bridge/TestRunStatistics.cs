@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GitHubActionsTestLogger;
+namespace GitHubActionsTestLogger.Bridge;
 
 internal record TestRunStatistics(
     int PassedTestCount,
