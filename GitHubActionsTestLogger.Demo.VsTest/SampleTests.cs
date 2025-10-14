@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace GitHubActionsTestLogger.Demo;
+namespace GitHubActionsTestLogger.Demo.VsTest;
 
 public class SampleTests
 {

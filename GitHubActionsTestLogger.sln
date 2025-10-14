@@ -11,7 +11,9 @@ EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsTestLogger.Tests", "GitHubActionsTestLogger.Tests\GitHubActionsTestLogger.Tests.csproj", "{AB9190BD-F358-4765-9068-A1EEB668463B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsTestLogger.Demo", "GitHubActionsTestLogger.Demo\GitHubActionsTestLogger.Demo.csproj", "{2EAAD162-BE96-49E7-9CEC-029921010292}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsTestLogger.Demo.Mtp", "GitHubActionsTestLogger.Demo.Mtp\GitHubActionsTestLogger.Demo.Mtp.csproj", "{2EAAD162-BE96-49E7-9CEC-029921010292}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsTestLogger.Demo.VsTest", "GitHubActionsTestLogger.Demo.VsTest\GitHubActionsTestLogger.Demo.VsTest.csproj", "{CFC4E6D7-78DE-42BA-9A9A-3B6C5581457A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,5 +33,9 @@ Global
 		{2EAAD162-BE96-49E7-9CEC-029921010292}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EAAD162-BE96-49E7-9CEC-029921010292}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EAAD162-BE96-49E7-9CEC-029921010292}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFC4E6D7-78DE-42BA-9A9A-3B6C5581457A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFC4E6D7-78DE-42BA-9A9A-3B6C5581457A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFC4E6D7-78DE-42BA-9A9A-3B6C5581457A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFC4E6D7-78DE-42BA-9A9A-3B6C5581457A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
