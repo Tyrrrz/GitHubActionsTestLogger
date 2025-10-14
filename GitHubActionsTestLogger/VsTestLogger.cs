@@ -69,7 +69,8 @@ public class VsTestLogger : ITestLoggerWithParameters
             args.Result.TestCase.DisplayName,
             args.Result.TryGetSourceFilePath(),
             args.Result.TryGetSourceLine(),
-            args.Result.TestCase.Traits.ToDictionary(t => t.Name, t => t.Value)
+            args.Result.Traits.Union(args.Result.TestCase.Traits)
+                .ToDictionary(t => t.Name, t => t.Value)
         );
 
         var testResult = new TestResult(
