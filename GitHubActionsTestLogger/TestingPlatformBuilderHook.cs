@@ -12,5 +12,5 @@ public static class TestingPlatformBuilderHook
     /// Adds GitHub report support to the Testing Platform Builder.
     /// </summary>
     public static void AddExtensions(ITestApplicationBuilder testApplicationBuilder, string[] _) =>
-        testApplicationBuilder.AddGitHubReportProvider();
+        testApplicationBuilder.AddGitHubActionsReport();
 }

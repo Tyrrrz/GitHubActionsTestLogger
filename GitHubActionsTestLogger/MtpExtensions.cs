@@ -4,12 +4,12 @@ using Microsoft.Testing.Platform.Services;
 
 namespace GitHubActionsTestLogger;
 
-public static class GitHubReportExtensions
+public static class MtpExtensions
 {
     /// <summary>
     /// Adds GitHub Actions reporting support to the Testing Platform Builder.
     /// </summary>
-    public static void AddGitHubReportProvider(this ITestApplicationBuilder testApplicationBuilder)
+    public static void AddGitHubActionsReport(this ITestApplicationBuilder testApplicationBuilder)
     {
         var extension = new MtpLoggerExtension();
 
