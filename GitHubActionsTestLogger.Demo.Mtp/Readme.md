@@ -1,4 +1,4 @@
-# GitHub Actions Test Logger `Microsoft.Testing.Platform` Demo
+# GitHub Actions Test Logger Demo (`Microsoft.Testing.Platform`)
 
 To run the demo tests, use the following command:
 
