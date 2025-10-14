@@ -15,7 +15,7 @@ using TestRunStatistics = GitHubActionsTestLogger.Reporting.TestRunStatistics;
 namespace GitHubActionsTestLogger;
 
 [FriendlyName("GitHubActions")]
-[ExtensionUri("logger://tyrrrz/ghactions/v2")]
+[ExtensionUri("logger://tyrrrz/ghactions/v3")]
 public class VsTestLogger : ITestLoggerWithParameters
 {
     // VSTest may theoretically not produce test run statistics at the end of the test session, so we build it
