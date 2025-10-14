@@ -15,9 +15,6 @@ using Microsoft.Testing.Platform.TestHost;
 
 namespace GitHubActionsTestLogger;
 
-/// <summary>
-/// A Microsoft.Testing.Platform extension that reports test run information to GitHub Actions.
-/// </summary>
 internal class MtpLogger(ICommandLineOptions commandLineOptions)
     : MtpExtensionBase,
         // This is the extension point to subscribe to data messages published to the platform.

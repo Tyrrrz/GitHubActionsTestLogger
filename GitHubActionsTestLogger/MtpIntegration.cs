@@ -9,7 +9,9 @@ public static class MtpIntegration
     /// <summary>
     /// Adds GitHub Actions reporting support to the Testing Platform Builder.
     /// </summary>
-    public static void AddGitHubActionsReport(this ITestApplicationBuilder testApplicationBuilder)
+    public static void AddGitHubActionsReporting(
+        this ITestApplicationBuilder testApplicationBuilder
+    )
     {
         var compositeExtension = new CompositeExtensionFactory<MtpLogger>(
             serviceProvider => new MtpLogger(serviceProvider.GetCommandLineOptions())

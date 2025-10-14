@@ -9,8 +9,8 @@ namespace GitHubActionsTestLogger;
 public static class TestingPlatformBuilderHook
 {
     /// <summary>
-    /// Adds GitHub report support to the Testing Platform Builder.
+    /// Adds GitHub Actions reporting support to the Testing Platform Builder.
     /// </summary>
     public static void AddExtensions(ITestApplicationBuilder testApplicationBuilder, string[] _) =>
-        testApplicationBuilder.AddGitHubActionsReport();
+        testApplicationBuilder.AddGitHubActionsReporting();
 }
