@@ -19,11 +19,10 @@ namespace GitHubActionsTestLogger;
 /// A Microsoft.Testing.Platform extension that reports test run information to GitHub Actions.
 /// </summary>
 internal class MtpLogger(ICommandLineOptions commandLineOptions)
-    :
-        MtpExtensionBase,
-    // This is the extension point to subscribe to data messages published to the platform.
-    // The type should then be registered as a data consumer in the test host.
-    IDataConsumer,
+    : MtpExtensionBase,
+        // This is the extension point to subscribe to data messages published to the platform.
+        // The type should then be registered as a data consumer in the test host.
+        IDataConsumer,
         // This is the extension point to subscribe to test session lifetime events.
         // The type should then be registered as a test session lifetime handler in the test host.
         ITestSessionLifetimeHandler
@@ -36,8 +35,7 @@ internal class MtpLogger(ICommandLineOptions commandLineOptions)
     // MTP does not provide a built-in way to measure test run duration, so we do it manually
     private readonly Stopwatch _stopwatch = new();
 
-    // MTP does not produce test run statistics at the end of the test session, so we build it
-    // by manually collecting all test results.
+    private TestRunStartInfo? _testRunStartInfo;
     private List<TestResult> _testResults = [];
 
     public Type[] DataTypesConsumed { get; } = [typeof(TestNodeUpdateMessage)];
@@ -48,21 +46,22 @@ internal class MtpLogger(ICommandLineOptions commandLineOptions)
     )
     {
         _stopwatch.Restart();
-        _testResults = [];
 
         var testAssembly = Assembly.GetEntryAssembly();
-
-        _context.HandleTestRunStart(
-            new TestRunStartInfo(
-                sessionUid.Value,
-                // MTP test host runs within the test assembly, so we can infer the test suite name
-                // and target framework directly from the assembly metadata.
-                testAssembly?.GetName().Name,
-                testAssembly
-                    ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
-                    ?.FrameworkName
-            )
+        var testRunStartInfo = new TestRunStartInfo(
+            sessionUid.Value,
+            // MTP test host runs within the test assembly, so we can infer the test suite name
+            // and target framework directly from the assembly metadata.
+            testAssembly?.GetName().Name,
+            testAssembly
+                ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
+                ?.FrameworkName
         );
+
+        _testRunStartInfo = testRunStartInfo;
+        _testResults = [];
+
+        _context.HandleTestRunStart(testRunStartInfo);
 
         return Task.CompletedTask;
     }
@@ -114,8 +113,8 @@ internal class MtpLogger(ICommandLineOptions commandLineOptions)
             exception?.StackTrace
         );
 
-        _context.HandleTestResult(testResult);
         _testResults.Add(testResult);
+        _context.HandleTestResult(testResult);
 
         return Task.CompletedTask;
     }
@@ -125,13 +124,14 @@ internal class MtpLogger(ICommandLineOptions commandLineOptions)
         CancellationToken cancellationToken
     )
     {
+        if (_testRunStartInfo is null)
+            throw new InvalidOperationException("The test run has not been started.");
+
         _stopwatch.Stop();
 
-        var testRunStatistics = new TestRunStatistics(
-            _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-            _testResults.Count(r => r.Outcome == TestOutcome.Failed),
-            _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
-            _testResults.Count,
+        var testRunStatistics = new TestRunEndInfo(
+            _testRunStartInfo,
+            _testResults,
             _stopwatch.Elapsed
         );
 

@@ -12,14 +12,14 @@
 
     public required string TargetFramework { get; init; }
 
-    public required TestRunStatistics TestRunStatistics { get; init; }
+    public required TestRunEndInfo TestRunEndInfo { get; init; }
 
     public required IReadOnlyList<TestResult> TestResults { get; init; }
 }
 
 <details>
     @{
-        var overallOutcomeEmoji = TestRunStatistics.OverallOutcome switch
+        var overallOutcomeEmoji = TestRunEndInfo.OverallOutcome switch
         {
             TestOutcome.None => "⚪️",
             TestOutcome.Passed => "🟢",
@@ -44,25 +44,25 @@
         <th width="99999">⧗&nbsp;&nbsp;Elapsed</th>
         <tr>
             <td align="center">
-                @(TestRunStatistics.PassedTestCount > 0
-                    ? TestRunStatistics.PassedTestCount.ToString()
+                @(TestRunEndInfo.PassedTestCount > 0
+                    ? TestRunEndInfo.PassedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @(TestRunStatistics.FailedTestCount > 0
-                    ? TestRunStatistics.FailedTestCount.ToString()
+                @(TestRunEndInfo.FailedTestCount > 0
+                    ? TestRunEndInfo.FailedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @(TestRunStatistics.SkippedTestCount > 0
-                    ? TestRunStatistics.SkippedTestCount.ToString()
+                @(TestRunEndInfo.SkippedTestCount > 0
+                    ? TestRunEndInfo.SkippedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @TestRunStatistics.TotalTestCount
+                @TestRunEndInfo.TotalTestCount
             </td>
             <td align="center">
-                @TestRunStatistics.OverallDuration.ToHumanString()
+                @TestRunEndInfo.Duration.ToHumanString()
             </td>
         </tr>
     </table>

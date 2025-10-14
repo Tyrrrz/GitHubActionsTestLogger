@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using TestOutcome = GitHubActionsTestLogger.Reporting.TestOutcome;
 using TestResult = GitHubActionsTestLogger.Reporting.TestResult;
-using TestRunStatistics = GitHubActionsTestLogger.Reporting.TestRunStatistics;
 
 namespace GitHubActionsTestLogger;
 
@@ -18,8 +17,7 @@ namespace GitHubActionsTestLogger;
 [ExtensionUri("logger://tyrrrz/ghactions/v3")]
 public class VsTestLogger : ITestLoggerWithParameters
 {
-    // VSTest may theoretically not produce test run statistics at the end of the test session,
-    // so we build a backup by manually collecting all test results.
+    private TestRunStartInfo? _testRunStartInfo;
     private List<TestResult> _testResults = [];
 
     internal TestReportingContext? Context { get; private set; }
@@ -47,16 +45,16 @@ public class VsTestLogger : ITestLoggerWithParameters
         if (Context is null)
             throw new InvalidOperationException("The logger is not initialized.");
 
+        var testRunStartInfo = new TestRunStartInfo(
+            args.TestRunCriteria.TestSessionInfo?.Id.ToString() ?? Guid.NewGuid().ToString(),
+            args.TestRunCriteria.Sources?.FirstOrDefault()?.Pipe(Path.GetFileNameWithoutExtension),
+            args.TestRunCriteria.TryGetTargetFramework()
+        );
+
+        _testRunStartInfo = testRunStartInfo;
         _testResults = [];
 
-        Context.HandleTestRunStart(
-            new TestRunStartInfo(
-                args.TestRunCriteria.TestSessionInfo?.Id.ToString() ?? Guid.NewGuid().ToString(),
-                args.TestRunCriteria.Sources?.FirstOrDefault()
-                    ?.Pipe(Path.GetFileNameWithoutExtension),
-                args.TestRunCriteria.TryGetTargetFramework()
-            )
-        );
+        Context.HandleTestRunStart(testRunStartInfo);
     }
 
     private void OnTestResult(TestResultEventArgs args)
@@ -89,8 +87,8 @@ public class VsTestLogger : ITestLoggerWithParameters
             args.Result.ErrorStackTrace
         );
 
-        Context.HandleTestResult(testResult);
         _testResults.Add(testResult);
+        Context.HandleTestResult(testResult);
     }
 
     private void OnTestRunComplete(TestRunCompleteEventArgs args)
@@ -98,23 +96,15 @@ public class VsTestLogger : ITestLoggerWithParameters
         if (Context is null)
             throw new InvalidOperationException("The logger is not initialized.");
 
-        Context.HandleTestRunEnd(
-            new TestRunStatistics(
-                (int?)
-                    args.TestRunStatistics?[
-                        Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Passed
-                    ] ?? _testResults.Count(r => r.Outcome == TestOutcome.Passed),
-                (int?)
-                    args.TestRunStatistics?[
-                        Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Failed
-                    ] ?? _testResults.Count(r => r.Outcome == TestOutcome.Failed),
-                (int?)
-                    args.TestRunStatistics?[
-                        Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome.Skipped
-                    ] ?? _testResults.Count(r => r.Outcome == TestOutcome.Skipped),
-                (int?)args.TestRunStatistics?.ExecutedTests ?? _testResults.Count,
-                args.ElapsedTimeInRunningTests
-            )
+        if (_testRunStartInfo is null)
+            throw new InvalidOperationException("The test run has not been started.");
+
+        var testRunEndInfo = new TestRunEndInfo(
+            _testRunStartInfo,
+            _testResults,
+            args.ElapsedTimeInRunningTests
         );
+
+        Context.HandleTestRunEnd(testRunEndInfo);
     }
 }

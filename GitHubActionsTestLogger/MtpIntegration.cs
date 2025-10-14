@@ -18,8 +18,6 @@ public static class MtpIntegration
         testApplicationBuilder.TestHost.AddDataConsumer(compositeExtension);
         testApplicationBuilder.TestHost.AddTestSessionLifetimeHandle(compositeExtension);
 
-        testApplicationBuilder.CommandLine.AddProvider(() =>
-            new MtpLoggerOptionsProvider()
-        );
+        testApplicationBuilder.CommandLine.AddProvider(() => new MtpLoggerOptionsProvider());
     }
 }

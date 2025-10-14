@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,7 +13,6 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
     private readonly Stopwatch _stopwatch = new();
 
     private TestRunStartInfo? _testRunStartInfo;
-    private readonly List<TestResult> _testResults = [];
 
     public TestReportingOptions Options { get; } = options;
 
@@ -50,12 +48,12 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
     private string FormatAnnotationMessage(TestResult testResult) =>
         FormatAnnotation(Options.AnnotationMessageFormat, testResult);
 
-    public void HandleTestRunStart(TestRunStartInfo startInfo)
+    public void HandleTestRunStart(TestRunStartInfo info)
     {
         using (_lock.EnterScope())
         {
             _stopwatch.Start();
-            _testRunStartInfo = startInfo;
+            _testRunStartInfo = info;
         }
     }
 
@@ -73,29 +71,23 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
                     testResult.Definition.SourceFileLineNumber
                 );
             }
-
-            // Record all test results to write them to the summary later
-            _testResults.Add(testResult);
         }
     }
 
-    public void HandleTestRunEnd(TestRunStatistics statistics)
+    public void HandleTestRunEnd(TestRunEndInfo info)
     {
         using (_lock.EnterScope())
         {
             _stopwatch.Stop();
 
             // Don't render empty summary for projects with no tests
-            if (
-                !Options.SummaryIncludeNotFoundTests
-                && statistics.OverallOutcome == TestOutcome.None
-            )
+            if (!Options.SummaryIncludeNotFoundTests && info.OverallOutcome == TestOutcome.None)
             {
                 return;
             }
 
-            var testResults = _testResults
-                .Where(r =>
+            var filteredTestResults = info
+                .TestResults.Where(r =>
                     r.Outcome == TestOutcome.Failed
                     || r.Outcome == TestOutcome.Passed && Options.SummaryIncludePassedTests
                     || r.Outcome == TestOutcome.Skipped && Options.SummaryIncludeSkippedTests
@@ -104,12 +96,13 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
 
             var template = new TestSummaryTemplate
             {
-                TestSuite = _testRunStartInfo?.SuiteName ?? "Unknown Test Suite",
-                TargetFramework = _testRunStartInfo?.FrameworkName ?? "Unknown Target Framework",
-                TestRunStatistics = statistics,
-                TestResults = testResults,
+                TestSuite = info.StartInfo.SuiteName ?? "Unknown Test Suite",
+                TargetFramework = info.StartInfo.FrameworkName ?? "Unknown Target Framework",
+                TestRunEndInfo = info,
+                TestResults = filteredTestResults,
             };
 
+            // Report the test run to the job summary
             github.CreateSummary(template.Render());
         }
     }
