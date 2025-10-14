@@ -7,7 +7,7 @@ using Microsoft.Testing.Platform.Extensions.CommandLine;
 
 namespace GitHubActionsTestLogger;
 
-internal class MtpLoggerOptionsProvider(MtpLoggerExtension extension) : ICommandLineOptionsProvider
+internal class MtpLoggerOptionsProvider : MtpExtensionBase, ICommandLineOptionsProvider
 {
     public const string ReportGitHubOption = "report-github";
     public const string ReportGitHubSummaryOption = "report-github-summary";
@@ -20,13 +20,6 @@ internal class MtpLoggerOptionsProvider(MtpLoggerExtension extension) : ICommand
         public const string IncludeSkippedTests = "includeSkippedTests";
         public const string IncludeNotFoundTests = "includeNotFoundTests";
     }
-
-    public string Uid => extension.Uid;
-    public string Version => extension.Version;
-    public string DisplayName => extension.DisplayName;
-    public string Description => extension.Description;
-
-    public Task<bool> IsEnabledAsync() => extension.IsEnabledAsync();
 
     public IReadOnlyCollection<CommandLineOption> GetCommandLineOptions() =>
         [

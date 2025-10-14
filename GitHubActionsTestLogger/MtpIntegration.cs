@@ -4,24 +4,22 @@ using Microsoft.Testing.Platform.Services;
 
 namespace GitHubActionsTestLogger;
 
-public static class MtpExtensions
+public static class MtpIntegration
 {
     /// <summary>
     /// Adds GitHub Actions reporting support to the Testing Platform Builder.
     /// </summary>
     public static void AddGitHubActionsReport(this ITestApplicationBuilder testApplicationBuilder)
     {
-        var extension = new MtpLoggerExtension();
-
         var compositeExtension = new CompositeExtensionFactory<MtpLogger>(
-            serviceProvider => new MtpLogger(extension, serviceProvider.GetCommandLineOptions())
+            serviceProvider => new MtpLogger(serviceProvider.GetCommandLineOptions())
         );
 
         testApplicationBuilder.TestHost.AddDataConsumer(compositeExtension);
         testApplicationBuilder.TestHost.AddTestSessionLifetimeHandle(compositeExtension);
 
         testApplicationBuilder.CommandLine.AddProvider(() =>
-            new MtpLoggerOptionsProvider(extension)
+            new MtpLoggerOptionsProvider()
         );
     }
 }

@@ -18,8 +18,8 @@ namespace GitHubActionsTestLogger;
 [ExtensionUri("logger://tyrrrz/ghactions/v3")]
 public class VsTestLogger : ITestLoggerWithParameters
 {
-    // VSTest may theoretically not produce test run statistics at the end of the test session, so we build it
-    // manually by collecting all test results.
+    // VSTest may theoretically not produce test run statistics at the end of the test session,
+    // so we build a backup by manually collecting all test results.
     private List<TestResult> _testResults = [];
 
     internal TestReportingContext? Context { get; private set; }

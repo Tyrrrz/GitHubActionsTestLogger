@@ -18,8 +18,9 @@ namespace GitHubActionsTestLogger;
 /// <summary>
 /// A Microsoft.Testing.Platform extension that reports test run information to GitHub Actions.
 /// </summary>
-internal class MtpLogger(MtpLoggerExtension extension, ICommandLineOptions commandLineOptions)
+internal class MtpLogger(ICommandLineOptions commandLineOptions)
     :
+        MtpExtensionBase,
     // This is the extension point to subscribe to data messages published to the platform.
     // The type should then be registered as a data consumer in the test host.
     IDataConsumer,
@@ -36,17 +37,10 @@ internal class MtpLogger(MtpLoggerExtension extension, ICommandLineOptions comma
     private readonly Stopwatch _stopwatch = new();
 
     // MTP does not produce test run statistics at the end of the test session, so we build it
-    // manually by collecting all test results.
+    // by manually collecting all test results.
     private List<TestResult> _testResults = [];
 
     public Type[] DataTypesConsumed { get; } = [typeof(TestNodeUpdateMessage)];
-
-    public string Uid => extension.Uid;
-    public string Version => extension.Version;
-    public string DisplayName => extension.DisplayName;
-    public string Description => extension.Description;
-
-    public Task<bool> IsEnabledAsync() => extension.IsEnabledAsync();
 
     public Task OnTestSessionStartingAsync(
         SessionUid sessionUid,

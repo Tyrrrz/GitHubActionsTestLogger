@@ -5,9 +5,9 @@ using Microsoft.Testing.Platform.Extensions;
 
 namespace GitHubActionsTestLogger;
 
-internal class MtpLoggerExtension : IExtension
+internal abstract class MtpExtensionBase : IExtension
 {
-    private static readonly Assembly Assembly = typeof(MtpLoggerExtension).Assembly;
+    private static readonly Assembly Assembly = typeof(MtpExtensionBase).Assembly;
 
     public string Uid => "GitHubActionsTestLoggerExtension";
 
