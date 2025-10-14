@@ -69,11 +69,11 @@
 
     @{
         var testResultGroups = TestResults
-            .GroupBy(r => r.Definition.TypeFullyQualifiedName, StringComparer.Ordinal)
+            .GroupBy(r => r.Definition.TypeSymbol.FullyQualifiedName, StringComparer.Ordinal)
             .Select(g => new
             {
                 TypeFullyQualifiedName = g.Key,
-                TypeName = g.First().Definition.TypeMinimallyQualifiedName,
+                TypeName = g.First().Definition.TypeSymbol.MinimallyQualifiedName,
                 TestResults = g
                     .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
                     .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
@@ -117,10 +117,10 @@
                         // otherwise use the minimally qualified name.
                         var testName = !string.Equals(
                             testResult.Definition.DisplayName,
-                            testResult.Definition.FullyQualifiedName,
+                            testResult.Definition.Symbol.FullyQualifiedName,
                             StringComparison.Ordinal)
                             ? testResult.Definition.DisplayName
-                            : testResult.Definition.MinimallyQualifiedName;
+                            : testResult.Definition.Symbol.MinimallyQualifiedName;
 
                         // Test source permalink
                         var url = testResult.Definition.SourceFilePath?.Pipe(p => GitHubEnvironment.TryGenerateFilePermalink(p, testResult.Definition.SourceFileLineNumber));

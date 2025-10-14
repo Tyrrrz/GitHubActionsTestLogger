@@ -65,6 +65,14 @@ public class VsTestLogger : ITestLoggerWithParameters
         var testDefinition = new TestDefinition(
             args.Result.TestCase.Id.ToString(),
             args.Result.TestCase.DisplayName,
+            new SymbolReference(
+                args.Result.TestCase.GetMinimallyQualifiedName(),
+                args.Result.TestCase.FullyQualifiedName
+            ),
+            new SymbolReference(
+                args.Result.TestCase.GetTypeMinimallyQualifiedName(),
+                args.Result.TestCase.GetTypeFullyQualifiedName()
+            ),
             args.Result.TryGetSourceFilePath(),
             args.Result.TryGetSourceLine(),
             args.Result.Traits.Union(args.Result.TestCase.Traits)
