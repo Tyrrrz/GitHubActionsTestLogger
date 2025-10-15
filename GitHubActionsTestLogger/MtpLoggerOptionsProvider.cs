@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using GitHubActionsTestLogger.Reporting;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions;
 using Microsoft.Testing.Platform.Extensions.CommandLine;
@@ -9,110 +9,49 @@ namespace GitHubActionsTestLogger;
 
 internal class MtpLoggerOptionsProvider : MtpExtensionBase, ICommandLineOptionsProvider
 {
-    public const string ReportGitHubOption = "report-github";
-    public const string ReportGitHubSummaryOption = "report-github-summary";
-    public const string ReportGitHubTitleOption = "report-github-title";
-    public const string ReportGitHubMessageOption = "report-github-message";
-
-    public static class ReportGitHubSummaryArguments
-    {
-        public const string IncludePassedTests = "includePassedTests";
-        public const string IncludeSkippedTests = "includeSkippedTests";
-        public const string IncludeNotFoundTests = "includeNotFoundTests";
-    }
-
     public IReadOnlyCollection<CommandLineOption> GetCommandLineOptions() =>
         [
             new(
-                ReportGitHubOption,
-                "Reports test run information to GitHub Actions",
-                ArgumentArity.Zero,
-                isHidden: false
-            ),
-            // TODO: Do you prefer multiple zero argument options or a single option with argument?
-            new(
-                ReportGitHubSummaryOption,
-                "Defines the information to include in the summary",
-                ArgumentArity.OneOrMore,
-                isHidden: false
-            ),
-            new(
-                ReportGitHubTitleOption,
-                "Defines the annotation title format used for reporting test failures",
+                TestReportingOptions.CommandLineNames.AnnotationsTitleFormat,
+                $"Specifies the title format for GitHub Annotations. See documentation for available replacement tokens. Default is '{TestReportingOptions.Default.AnnotationTitleFormat}'.",
                 ArgumentArity.ExactlyOne,
-                isHidden: false
+                false
             ),
             new(
-                ReportGitHubMessageOption,
-                "Defines the annotation message format used for reporting test failures",
+                TestReportingOptions.CommandLineNames.AnnotationsMessageFormat,
+                $"Specifies the message format for GitHub Annotations. See documentation for available replacement tokens. Default is '{TestReportingOptions.Default.AnnotationMessageFormat}'.",
                 ArgumentArity.ExactlyOne,
-                isHidden: false
+                false
+            ),
+            new(
+                TestReportingOptions.CommandLineNames.SummaryIncludePassedTests,
+                $"Whether to include passed tests (in addition to failed tests) in the GitHub Actions summary. Default is '{TestReportingOptions.Default.SummaryIncludePassedTests}'.",
+                ArgumentArity.ZeroOrOne,
+                false
+            ),
+            new(
+                TestReportingOptions.CommandLineNames.SummaryIncludeSkippedTests,
+                $"Whether to include skipped tests (in addition to failed tests) in the GitHub Actions summary. Default is '{TestReportingOptions.Default.SummaryIncludeSkippedTests}'.",
+                ArgumentArity.ZeroOrOne,
+                false
+            ),
+            new(
+                TestReportingOptions.CommandLineNames.SummaryAllowEmpty,
+                $"Whether to produce a summary entry for test runs where no tests were executed. Default is '{TestReportingOptions.Default.SummaryAllowEmpty}'.",
+                ArgumentArity.ZeroOrOne,
+                false
             ),
         ];
 
     // This method is called once after all options are parsed and is used to validate the combination of options.
     public Task<ValidationResult> ValidateCommandLineOptionsAsync(
         ICommandLineOptions commandLineOptions
-    )
-    {
-        // We just want to validate that the sub options are set only if the main option is set.
-        if (commandLineOptions.IsOptionSet(ReportGitHubOption))
-        {
-            return ValidationResult.ValidTask;
-        }
-
-        if (
-            commandLineOptions.IsOptionSet(ReportGitHubSummaryOption)
-            || commandLineOptions.IsOptionSet(ReportGitHubTitleOption)
-            || commandLineOptions.IsOptionSet(ReportGitHubMessageOption)
-        )
-        {
-            return ValidationResult.InvalidTask(
-                "The options 'report-github-summary', 'report-github-title', and 'report-github-message' can only be used if 'report-github' is set."
-            );
-        }
-
-        return ValidationResult.ValidTask;
-    }
+    ) => ValidationResult.ValidTask;
 
     // This method is called once per option declared and is used to validate the arguments of the given option.
     // The arity of the option is checked before this method is called.
     public Task<ValidationResult> ValidateOptionArgumentsAsync(
         CommandLineOption commandOption,
         string[] arguments
-    )
-    {
-        if (commandOption.Name == ReportGitHubSummaryOption)
-        {
-            if (arguments.Length > 3)
-            {
-                return ValidationResult.InvalidTask(
-                    $"The option '{ReportGitHubSummaryOption}' can have at most 3 arguments."
-                );
-            }
-
-            if (arguments.Distinct().Count() != arguments.Length)
-            {
-                return ValidationResult.InvalidTask(
-                    $"The option '{ReportGitHubSummaryOption}' cannot have duplicate arguments."
-                );
-            }
-
-            for (var i = 0; i < arguments.Length; i++)
-            {
-                if (
-                    arguments[i] != ReportGitHubSummaryArguments.IncludePassedTests
-                    && arguments[i] != ReportGitHubSummaryArguments.IncludeSkippedTests
-                    && arguments[i] != ReportGitHubSummaryArguments.IncludeNotFoundTests
-                )
-                {
-                    return ValidationResult.InvalidTask(
-                        $"The option '{ReportGitHubSummaryOption}' can only have the arguments '{ReportGitHubSummaryArguments.IncludePassedTests}', '{ReportGitHubSummaryArguments.IncludeSkippedTests}', and '{ReportGitHubSummaryArguments.IncludeNotFoundTests}'."
-                    );
-                }
-            }
-        }
-
-        return ValidationResult.ValidTask;
-    }
+    ) => ValidationResult.ValidTask;
 }

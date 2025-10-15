@@ -2,8 +2,7 @@ using System.IO;
 using FluentAssertions;
 using GitHubActionsTestLogger.GitHub;
 using GitHubActionsTestLogger.Reporting;
-using GitHubActionsTestLogger.Tests.Fakes;
-using GitHubActionsTestLogger.Tests.Utils;
+using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
 using Xunit.Abstractions;
 using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
@@ -25,7 +24,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
             events,
             new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludeNotFoundTests = true }
+                new TestReportingOptions { SummaryAllowEmpty = true }
             )
         );
 
@@ -315,7 +314,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_a_summary_that_includes_empty_test_suites()
+    public void I_can_use_the_logger_to_produce_a_summary_that_includes_empty_test_runs()
     {
         // Arrange
         using var summaryWriter = new StringWriter();
@@ -327,7 +326,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
             events,
             new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludeNotFoundTests = true }
+                new TestReportingOptions { SummaryAllowEmpty = true }
             )
         );
 
@@ -342,7 +341,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_a_summary_that_does_not_include_empty_test_suites()
+    public void I_can_use_the_logger_to_produce_a_summary_that_does_not_include_empty_test_runs()
     {
         // Arrange
         using var summaryWriter = new StringWriter();
@@ -354,7 +353,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
             events,
             new TestReportingContext(
                 new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludeNotFoundTests = false }
+                new TestReportingOptions { SummaryAllowEmpty = false }
             )
         );
 

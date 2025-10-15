@@ -10,61 +10,83 @@ internal partial class TestReportingOptions
 
     public string AnnotationMessageFormat { get; init; } = "@error";
 
+    public bool SummaryAllowEmpty { get; init; }
+
     public bool SummaryIncludePassedTests { get; init; } = true;
 
     public bool SummaryIncludeSkippedTests { get; init; } = true;
-
-    public bool SummaryIncludeNotFoundTests { get; init; }
 }
 
 internal partial class TestReportingOptions
 {
     public static TestReportingOptions Default { get; } = new();
+}
+
+internal partial class TestReportingOptions
+{
+    public static class CommandLineNames
+    {
+        public const string MtpPrefix = "github-";
+        public const string AnnotationsTitleFormat = "annotations-title-format";
+        public const string AnnotationsMessageFormat = "annotations-message-format";
+        public const string SummaryAllowEmpty = "summary-allow-empty";
+        public const string SummaryIncludePassedTests = "summary-include-passed-tests";
+        public const string SummaryIncludeSkippedTests = "summary-include-skipped-tests";
+    }
 
     public static TestReportingOptions Resolve(IReadOnlyDictionary<string, string?> parameters) =>
         new()
         {
             AnnotationTitleFormat =
-                parameters.GetValueOrDefault("annotations.titleFormat")
+                parameters.GetValueOrDefault(CommandLineNames.AnnotationsTitleFormat)
                 ?? Default.AnnotationTitleFormat,
             AnnotationMessageFormat =
-                parameters.GetValueOrDefault("annotations.messageFormat")
+                parameters.GetValueOrDefault(CommandLineNames.AnnotationsMessageFormat)
                 ?? Default.AnnotationMessageFormat,
+            SummaryAllowEmpty =
+                parameters.GetValueOrDefault(CommandLineNames.SummaryAllowEmpty)?.Pipe(bool.Parse)
+                ?? Default.SummaryAllowEmpty,
             SummaryIncludePassedTests =
-                parameters.GetValueOrDefault("summary.includePassedTests")?.Pipe(bool.Parse)
-                ?? Default.SummaryIncludePassedTests,
+                parameters
+                    .GetValueOrDefault(CommandLineNames.SummaryIncludePassedTests)
+                    ?.Pipe(bool.Parse) ?? Default.SummaryIncludePassedTests,
             SummaryIncludeSkippedTests =
-                parameters.GetValueOrDefault("summary.includeSkippedTests")?.Pipe(bool.Parse)
-                ?? Default.SummaryIncludeSkippedTests,
-            SummaryIncludeNotFoundTests =
-                parameters.GetValueOrDefault("summary.includeNotFoundTests")?.Pipe(bool.Parse)
-                ?? Default.SummaryIncludeNotFoundTests,
+                parameters
+                    .GetValueOrDefault(CommandLineNames.SummaryIncludeSkippedTests)
+                    ?.Pipe(bool.Parse) ?? Default.SummaryIncludeSkippedTests,
         };
 
-    public static TestReportingOptions Resolve(ICommandLineOptions commandLineOptions)
-    {
-        var annotationTitleFormat =
-            commandLineOptions.TryGetOptionArgument(
-                MtpLoggerOptionsProvider.ReportGitHubTitleOption
-            ) ?? Default.AnnotationTitleFormat;
-
-        var annotationMessageFormat =
-            commandLineOptions.TryGetOptionArgument(
-                MtpLoggerOptionsProvider.ReportGitHubMessageOption
-            ) ?? Default.AnnotationMessageFormat;
-
-        // TODO: wire these
-        var summaryIncludePassedTests = Default.SummaryIncludePassedTests;
-        var summaryIncludeSkippedTests = Default.SummaryIncludeSkippedTests;
-        var summaryIncludeNotFoundTests = Default.SummaryIncludeNotFoundTests;
-
-        return new TestReportingOptions
+    public static TestReportingOptions Resolve(ICommandLineOptions commandLineOptions) =>
+        new()
         {
-            AnnotationTitleFormat = annotationTitleFormat,
-            AnnotationMessageFormat = annotationMessageFormat,
-            SummaryIncludePassedTests = summaryIncludePassedTests,
-            SummaryIncludeSkippedTests = summaryIncludeSkippedTests,
-            SummaryIncludeNotFoundTests = summaryIncludeNotFoundTests,
+            AnnotationTitleFormat =
+                commandLineOptions.GetOptionArgumentOrDefault(
+                    CommandLineNames.MtpPrefix + CommandLineNames.AnnotationsTitleFormat
+                ) ?? Default.AnnotationTitleFormat,
+            AnnotationMessageFormat =
+                commandLineOptions.GetOptionArgumentOrDefault(
+                    CommandLineNames.MtpPrefix + CommandLineNames.AnnotationsMessageFormat
+                ) ?? Default.AnnotationMessageFormat,
+            SummaryAllowEmpty =
+                commandLineOptions
+                    .GetOptionArgumentOrDefault(
+                        CommandLineNames.MtpPrefix + CommandLineNames.SummaryAllowEmpty,
+                        "true"
+                    )
+                    ?.Pipe(bool.Parse) ?? Default.SummaryAllowEmpty,
+            SummaryIncludePassedTests =
+                commandLineOptions
+                    .GetOptionArgumentOrDefault(
+                        CommandLineNames.MtpPrefix + CommandLineNames.SummaryIncludePassedTests,
+                        "true"
+                    )
+                    ?.Pipe(bool.Parse) ?? Default.SummaryIncludePassedTests,
+            SummaryIncludeSkippedTests =
+                commandLineOptions
+                    .GetOptionArgumentOrDefault(
+                        CommandLineNames.MtpPrefix + CommandLineNames.SummaryIncludeSkippedTests,
+                        "true"
+                    )
+                    ?.Pipe(bool.Parse) ?? Default.SummaryIncludeSkippedTests,
         };
-    }
 }

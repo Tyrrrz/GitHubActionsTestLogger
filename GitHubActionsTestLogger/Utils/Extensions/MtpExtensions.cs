@@ -6,9 +6,10 @@ namespace GitHubActionsTestLogger.Utils.Extensions;
 
 internal static class MtpExtensions
 {
-    public static string? TryGetOptionArgument(
+    public static string? GetOptionArgumentOrDefault(
         this ICommandLineOptions options,
-        string argumentName
+        string argumentName,
+        string? defaultValue = null
     )
     {
         if (
@@ -19,7 +20,7 @@ internal static class MtpExtensions
             return arguments[0];
         }
 
-        return null;
+        return defaultValue;
     }
 
     public static Exception? TryGetException(this TestNodeStateProperty state) =>

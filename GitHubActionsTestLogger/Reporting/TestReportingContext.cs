@@ -81,10 +81,8 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
             _stopwatch.Stop();
 
             // Don't render empty summary for projects with no tests
-            if (!Options.SummaryIncludeNotFoundTests && info.OverallOutcome == TestOutcome.None)
-            {
+            if (!Options.SummaryAllowEmpty && info.OverallOutcome == TestOutcome.None)
                 return;
-            }
 
             var filteredTestResults = info
                 .TestResults.Where(r =>

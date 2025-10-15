@@ -2,7 +2,7 @@
 using System.IO;
 using FluentAssertions;
 using GitHubActionsTestLogger.Reporting;
-using GitHubActionsTestLogger.Tests.Fakes;
+using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
 
 namespace GitHubActionsTestLogger.Tests;
@@ -48,11 +48,11 @@ public class VsTestInitializationSpecs
         var events = new FakeTestLoggerEvents();
         var parameters = new Dictionary<string, string?>
         {
-            ["annotations.titleFormat"] = "TitleFormat",
-            ["annotations.messageFormat"] = "MessageFormat",
-            ["summary.includePassedTests"] = "true",
-            ["summary.includeSkippedTests"] = "true",
-            ["summary.includeNotFoundTests"] = "true",
+            ["annotations-title-format"] = "TitleFormat",
+            ["annotations-message-format"] = "MessageFormat",
+            ["summary-allow-empty"] = "true",
+            ["summary-include-passed-tests"] = "true",
+            ["summary-include-skipped-tests"] = "true",
         };
 
         // Act
@@ -62,8 +62,8 @@ public class VsTestInitializationSpecs
         logger.Context.Should().NotBeNull();
         logger.Context?.Options.AnnotationTitleFormat.Should().Be("TitleFormat");
         logger.Context?.Options.AnnotationMessageFormat.Should().Be("MessageFormat");
+        logger.Context?.Options.SummaryAllowEmpty.Should().BeTrue();
         logger.Context?.Options.SummaryIncludePassedTests.Should().BeTrue();
         logger.Context?.Options.SummaryIncludeSkippedTests.Should().BeTrue();
-        logger.Context?.Options.SummaryIncludeNotFoundTests.Should().BeTrue();
     }
 }

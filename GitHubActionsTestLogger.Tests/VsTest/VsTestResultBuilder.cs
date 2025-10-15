@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace GitHubActionsTestLogger.Tests.Utils;
+namespace GitHubActionsTestLogger.Tests.VsTest;
 
 internal class VsTestResultBuilder
 {

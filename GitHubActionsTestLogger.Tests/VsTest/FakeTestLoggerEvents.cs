@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace GitHubActionsTestLogger.Tests.Fakes;
+namespace GitHubActionsTestLogger.Tests.VsTest;
 
 #pragma warning disable CS0067
 
