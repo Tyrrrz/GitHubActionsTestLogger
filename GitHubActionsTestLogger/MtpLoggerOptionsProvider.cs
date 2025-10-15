@@ -13,31 +13,36 @@ internal class MtpLoggerOptionsProvider : MtpExtensionBase, ICommandLineOptionsP
         [
             new(
                 TestReportingOptions.CommandLineNames.AnnotationsTitleFormat,
-                $"Specifies the title format for GitHub Annotations. See documentation for available replacement tokens. Default is '{TestReportingOptions.Default.AnnotationTitleFormat}'.",
+                $"Specifies the title format for GitHub Annotations. See documentation for available replacement tokens. " +
+                $"Default is '{TestReportingOptions.Default.AnnotationTitleFormat}'.",
                 ArgumentArity.ExactlyOne,
                 false
             ),
             new(
                 TestReportingOptions.CommandLineNames.AnnotationsMessageFormat,
-                $"Specifies the message format for GitHub Annotations. See documentation for available replacement tokens. Default is '{TestReportingOptions.Default.AnnotationMessageFormat}'.",
+                $"Specifies the message format for GitHub Annotations. See documentation for available replacement tokens. " +
+                $"Default is '{TestReportingOptions.Default.AnnotationMessageFormat}'.",
                 ArgumentArity.ExactlyOne,
                 false
             ),
             new(
                 TestReportingOptions.CommandLineNames.SummaryIncludePassedTests,
-                $"Whether to include passed tests (in addition to failed tests) in the GitHub Actions summary. Default is '{TestReportingOptions.Default.SummaryIncludePassedTests}'.",
+                $"Whether to include passed tests (in addition to failed tests) in the GitHub Actions summary. " +
+                $"Default is '{TestReportingOptions.Default.SummaryIncludePassedTests}'.",
                 ArgumentArity.ZeroOrOne,
                 false
             ),
             new(
                 TestReportingOptions.CommandLineNames.SummaryIncludeSkippedTests,
-                $"Whether to include skipped tests (in addition to failed tests) in the GitHub Actions summary. Default is '{TestReportingOptions.Default.SummaryIncludeSkippedTests}'.",
+                $"Whether to include skipped tests (in addition to failed tests) in the GitHub Actions summary. " +
+                $"Default is '{TestReportingOptions.Default.SummaryIncludeSkippedTests}'.",
                 ArgumentArity.ZeroOrOne,
                 false
             ),
             new(
                 TestReportingOptions.CommandLineNames.SummaryAllowEmpty,
-                $"Whether to produce a summary entry for test runs where no tests were executed. Default is '{TestReportingOptions.Default.SummaryAllowEmpty}'.",
+                $"Whether to produce a summary entry for test runs where no tests were executed. " +
+                $"Default is '{TestReportingOptions.Default.SummaryAllowEmpty}'.",
                 ArgumentArity.ZeroOrOne,
                 false
             ),
