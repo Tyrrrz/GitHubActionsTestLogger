@@ -178,31 +178,29 @@ Supports the same replacement tokens as [`annotations.titleFormat`](#custom-anno
 - `@error` → `AssertionException: Expected 'true' but found 'false'`
 - `@error\n@trace` → `AssertionException: Expected 'true' but found 'false'`, followed by stacktrace on the next line
 
-#### Include passed tests in summary
+#### Allow empty test summaries
+
+Use the `summary.allowEmpty` option to specify whether empty test runs should be included in the summary, for example as a result of using [test filters](https://learn.microsoft.com/dotnet/core/testing/selective-unit-tests).
+
+**Default**: `false`.
+
+#### Include passed tests in the summary
 
 Use the `summary.includePassedTests` option to specify whether passed tests should be included in the summary.
 If you want to link passed tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
-**Default**: `false`.
+**Default**: `true`.
 
 > **Warning**:
 > If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
 
-#### Include skipped tests in summary
+#### Include skipped tests in the summary
 
 Use the `summary.includeSkippedTests` option to specify whether skipped tests should be included in the summary.
 If you want to link skipped tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
-**Default**: `false`.
+**Default**: `true`.
 
 > **Warning**:
 > If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
 
-#### Include not found tests in summary
-
-Use the `summary.includeNotFoundTests` option to specify whether empty test assemblies should be included in the summary.
-
-Using [test filters](https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests) might result in some test assemblies not yielding any matching tests.
-This might be done on purpose in which case reporting these may not be helpful. 
-
-**Default**: `true`.
