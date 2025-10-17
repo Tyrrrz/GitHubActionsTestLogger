@@ -8,19 +8,25 @@ internal static class MtpExtensions
 {
     public static string? GetOptionArgumentOrDefault(
         this ICommandLineOptions options,
-        string argumentName,
+        string optionName,
         string? defaultValue = null
     )
     {
-        if (
-            options.TryGetOptionArgumentList(argumentName, out var arguments)
-            && arguments.Length > 0
-        )
+        if (options.TryGetOptionArgumentList(optionName, out var arguments) && arguments.Length > 0)
         {
             return arguments[0];
         }
 
         return defaultValue;
+    }
+
+    public static bool? GetOptionSwitchValue(this ICommandLineOptions options, string optionName)
+    {
+        // If set, accept either "true" or "false" or no argument (which implies "true")
+        if (options.IsOptionSet(optionName))
+            return bool.Parse(options.GetOptionArgumentOrDefault(optionName) ?? "true");
+
+        return null;
     }
 
     public static Exception? TryGetException(this TestNodeStateProperty state) =>

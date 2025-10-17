@@ -14,14 +14,14 @@ namespace GitHubActionsTestLogger;
 internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
 {
     private static readonly CommandLineOption IsEnabledOption = new(
-        "github-actions",
+        "report-github",
         $"Enables the GitHub Actions test reporter. Default is '{GitHubEnvironment.IsRunningInActions}'.",
-        ArgumentArity.Zero,
+        ArgumentArity.ZeroOrOne,
         false
     );
 
     private static readonly CommandLineOption AnnotationsTitleFormatOption = new(
-        "github-actions-annotations-title-format",
+        $"{IsEnabledOption.Name}-annotations-title-format",
         "Specifies the title format for GitHub Annotations. See documentation for available replacement tokens. "
             + $"Default is '{TestReportingOptions.Default.AnnotationTitleFormat}'.",
         ArgumentArity.ExactlyOne,
@@ -29,7 +29,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption AnnotationsMessageFormatOption = new(
-        "github-actions-annotations-message-format",
+        $"{IsEnabledOption.Name}-annotations-message-format",
         "Specifies the message format for GitHub Annotations. See documentation for available replacement tokens. "
             + $"Default is '{TestReportingOptions.Default.AnnotationMessageFormat}'.",
         ArgumentArity.ExactlyOne,
@@ -37,7 +37,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption SummaryAllowEmptyOption = new(
-        "github-actions-summary-allow-empty",
+        $"{IsEnabledOption.Name}-summary-allow-empty",
         "Whether to produce a summary entry for test runs where no tests were executed. "
             + $"Default is '{TestReportingOptions.Default.SummaryAllowEmpty}'.",
         ArgumentArity.ZeroOrOne,
@@ -45,7 +45,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption SummaryIncludePassedTestsOption = new(
-        "github-actions-summary-include-passed-tests",
+        $"{IsEnabledOption.Name}-summary-include-passed-tests",
         "Whether to include passed tests (in addition to failed tests) in the GitHub Actions summary. "
             + $"Default is '{TestReportingOptions.Default.SummaryIncludePassedTests}'.",
         ArgumentArity.ZeroOrOne,
@@ -53,7 +53,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption SummaryIncludeSkippedTestsOption = new(
-        "github-actions-summary-include-skipped-tests",
+        $"{IsEnabledOption.Name}-summary-include-skipped-tests",
         "Whether to include skipped tests (in addition to failed tests) in the GitHub Actions summary. "
             + $"Default is '{TestReportingOptions.Default.SummaryIncludeSkippedTests}'.",
         ArgumentArity.ZeroOrOne,
@@ -117,11 +117,11 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
 internal partial class MtpLoggerOptionsProvider
 {
     public static TestReportingOptions Resolve(
-        out bool isEnabled,
+        out bool? isEnabled,
         ICommandLineOptions commandLineOptions
     )
     {
-        isEnabled = commandLineOptions.IsOptionSet(IsEnabledOption.Name);
+        isEnabled = commandLineOptions.GetOptionSwitchValue(IsEnabledOption.Name);
 
         return new TestReportingOptions
         {

@@ -28,7 +28,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
     public MtpLogger(ICommandLineOptions commandLineOptions)
     {
         var options = MtpLoggerOptionsProvider.Resolve(out var isEnabled, commandLineOptions);
-        _isEnabled = isEnabled || GitHubEnvironment.IsRunningInActions;
+        _isEnabled = isEnabled ?? GitHubEnvironment.IsRunningInActions;
         _context = new TestReportingContext(GitHubWorkflow.Default, options);
     }
 
