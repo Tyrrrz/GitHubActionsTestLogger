@@ -81,19 +81,13 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
 internal partial class GitHubWorkflow
 {
-    public static GitHubWorkflow Default { get; } =
-        new(
-            // Commands are written to the standard output
-            Console.Out,
-            // Summary is written to the file specified by an environment variable.
-            // We may need to write to the summary file from multiple test suites in parallel,
-            // so we should use a stream that delays acquiring the file lock until the very last moment,
-            // and employs retry logic to handle potential race conditions.
-            GitHubEnvironment
-                .SummaryFilePath?.Pipe(f => new ContentionTolerantWriteFileStream(
-                    f,
-                    FileMode.Append
-                ))
-                .Pipe(s => new StreamWriter(s)) ?? TextWriter.Null
-        );
+    public static TextWriter DefaultCommandWriter => Console.Out;
+
+    public static TextWriter DefaultSummaryWriter => // Summary is written to the file specified by an environment variable.
+        // We may need to write to the summary file from multiple test suites in parallel,
+        // so we should use a stream that delays acquiring the file lock until the very last moment,
+        // and employs retry logic to handle potential race conditions.
+        GitHubEnvironment
+            .SummaryFilePath?.Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
+            .Pipe(s => new StreamWriter(s)) ?? TextWriter.Null;
 }

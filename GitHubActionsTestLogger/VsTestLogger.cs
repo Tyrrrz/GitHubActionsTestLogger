@@ -17,27 +17,25 @@ namespace GitHubActionsTestLogger;
 [ExtensionUri("logger://tyrrrz/ghactions/v3")]
 public class VsTestLogger : ITestLoggerWithParameters
 {
+    private TestReportingContext? _context;
     private TestRunStartInfo? _testRunStartInfo;
     private List<TestResult> _testResults = [];
 
-    internal TestReportingContext? Context { get; private set; }
-
-    internal void Initialize(TestLoggerEvents events, TestReportingContext context)
+    private void Initialize(TestLoggerEvents events, TestReportingContext context)
     {
-        Context = context;
+        _context = context;
 
         events.TestRunStart += (_, args) => OnTestRunStart(args);
         events.TestResult += (_, args) => OnTestResult(args);
         events.TestRunComplete += (_, args) => OnTestRunComplete(args);
     }
 
-    internal void Initialize(TestLoggerEvents events, TestReportingOptions options) =>
-        Initialize(events, new TestReportingContext(GitHubWorkflow.Default, options));
-
-    public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
-        Initialize(events, TestReportingOptions.Default);
-
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
+    public void Initialize(
+        TestLoggerEvents events,
+        Dictionary<string, string?> parameters,
+        TextWriter commandWriter,
+        TextWriter summaryWriter
+    )
     {
         var options = new TestReportingOptions
         {
@@ -58,12 +56,28 @@ public class VsTestLogger : ITestLoggerWithParameters
                 ?? TestReportingOptions.Default.SummaryIncludeSkippedTests,
         };
 
-        Initialize(events, options);
+        var context = new TestReportingContext(
+            new GitHubWorkflow(commandWriter, summaryWriter),
+            options
+        );
+
+        Initialize(events, context);
     }
+
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters) =>
+        Initialize(
+            events,
+            parameters,
+            GitHubWorkflow.DefaultCommandWriter,
+            GitHubWorkflow.DefaultSummaryWriter
+        );
+
+    public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
+        Initialize(events, []);
 
     private void OnTestRunStart(TestRunStartEventArgs args)
     {
-        if (Context is null)
+        if (_context is null)
             throw new InvalidOperationException("Logger is not initialized.");
 
         var testRunStartInfo = new TestRunStartInfo(
@@ -75,12 +89,12 @@ public class VsTestLogger : ITestLoggerWithParameters
         _testRunStartInfo = testRunStartInfo;
         _testResults = [];
 
-        Context.HandleTestRunStart(testRunStartInfo);
+        _context.HandleTestRunStart(testRunStartInfo);
     }
 
     private void OnTestResult(TestResultEventArgs args)
     {
-        if (Context is null)
+        if (_context is null)
             throw new InvalidOperationException("Logger is not initialized.");
 
         var testDefinition = new TestDefinition(
@@ -117,12 +131,12 @@ public class VsTestLogger : ITestLoggerWithParameters
         );
 
         _testResults.Add(testResult);
-        Context.HandleTestResult(testResult);
+        _context.HandleTestResult(testResult);
     }
 
     private void OnTestRunComplete(TestRunCompleteEventArgs args)
     {
-        if (Context is null)
+        if (_context is null)
             throw new InvalidOperationException("Logger is not initialized.");
 
         if (_testRunStartInfo is null)
@@ -134,6 +148,6 @@ public class VsTestLogger : ITestLoggerWithParameters
             args.ElapsedTimeInRunningTests
         );
 
-        Context.HandleTestRunEnd(testRunEndInfo);
+        _context.HandleTestRunEnd(testRunEndInfo);
     }
 }

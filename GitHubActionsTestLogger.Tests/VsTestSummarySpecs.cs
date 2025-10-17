@@ -1,7 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
-using GitHubActionsTestLogger.GitHub;
-using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
 using Xunit.Abstractions;
@@ -22,10 +21,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryAllowEmpty = true }
-            )
+            new Dictionary<string, string?> { ["summary-allow-empty"] = "true" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act
@@ -48,13 +46,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
         var events = new FakeTestLoggerEvents();
         var logger = new VsTestLogger();
 
-        logger.Initialize(
-            events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                TestReportingOptions.Default
-            )
-        );
+        logger.Initialize(events, [], TextWriter.Null, summaryWriter);
 
         // Act
         events.SimulateTestRun(
@@ -112,10 +104,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludePassedTests = true }
-            )
+            new Dictionary<string, string?> { ["summary-include-passed"] = "true" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act
@@ -165,10 +156,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludePassedTests = false }
-            )
+            new Dictionary<string, string?> { ["summary-include-passed"] = "false" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act
@@ -218,10 +208,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludeSkippedTests = true }
-            )
+            new Dictionary<string, string?> { ["summary-include-skipped"] = "true" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act
@@ -271,10 +260,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryIncludeSkippedTests = false }
-            )
+            new Dictionary<string, string?> { ["summary-include-skipped"] = "false" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act
@@ -324,10 +312,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryAllowEmpty = true }
-            )
+            new Dictionary<string, string?> { ["summary-allow-empty"] = "true" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act
@@ -351,10 +338,9 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(TextWriter.Null, summaryWriter),
-                new TestReportingOptions { SummaryAllowEmpty = false }
-            )
+            new Dictionary<string, string?> { ["summary-allow-empty"] = "false" },
+            TextWriter.Null,
+            summaryWriter
         );
 
         // Act

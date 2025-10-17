@@ -1,7 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
-using GitHubActionsTestLogger.GitHub;
-using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,13 +19,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
         var events = new FakeTestLoggerEvents();
         var logger = new VsTestLogger();
 
-        logger.Initialize(
-            events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                TestReportingOptions.Default
-            )
-        );
+        logger.Initialize(events, [], commandWriter, TextWriter.Null);
 
         // Act
         events.SimulateTestRun(
@@ -70,13 +63,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
         var events = new FakeTestLoggerEvents();
         var logger = new VsTestLogger();
 
-        logger.Initialize(
-            events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                TestReportingOptions.Default
-            )
-        );
+        logger.Initialize(events, [], commandWriter, TextWriter.Null);
 
         // Act
         events.SimulateTestRun(
@@ -126,13 +113,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
         var events = new FakeTestLoggerEvents();
         var logger = new VsTestLogger();
 
-        logger.Initialize(
-            events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                TestReportingOptions.Default
-            )
-        );
+        logger.Initialize(events, [], commandWriter, TextWriter.Null);
 
         // Act
         events.SimulateTestRun(
@@ -185,14 +166,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReportingOptions
-                {
-                    AnnotationTitleFormat = "<@test>",
-                    AnnotationMessageFormat = "[@test]",
-                }
-            )
+            new Dictionary<string, string?>
+            {
+                ["annotations-title"] = "<@test>",
+                ["annotations-message"] = "[@test]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
@@ -220,14 +200,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReportingOptions
-                {
-                    AnnotationTitleFormat = "<@traits.Category -> @test>",
-                    AnnotationMessageFormat = "[@traits.Category -> @test]",
-                }
-            )
+            new Dictionary<string, string?>
+            {
+                ["annotations-title"] = "<@traits.Category -> @test>",
+                ["annotations-message"] = "[@traits.Category -> @test]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
@@ -260,14 +239,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReportingOptions
-                {
-                    AnnotationTitleFormat = "<@test: @error>",
-                    AnnotationMessageFormat = "[@test: @error]",
-                }
-            )
+            new Dictionary<string, string?>
+            {
+                ["annotations-title"] = "<@test: @error>",
+                ["annotations-message"] = "[@test: @error]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
@@ -299,14 +277,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReportingOptions
-                {
-                    AnnotationTitleFormat = "<@test: @trace>",
-                    AnnotationMessageFormat = "[@test: @trace]",
-                }
-            )
+            new Dictionary<string, string?>
+            {
+                ["annotations-title"] = "<@test: @trace>",
+                ["annotations-message"] = "[@test: @trace]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
@@ -338,14 +315,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReportingOptions
-                {
-                    AnnotationTitleFormat = "<@test (@framework)>",
-                    AnnotationMessageFormat = "[@test (@framework)]",
-                }
-            )
+            new Dictionary<string, string?>
+            {
+                ["annotations-title"] = "<@test (@framework)>",
+                ["annotations-message"] = "[@test (@framework)]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
@@ -379,10 +355,9 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         logger.Initialize(
             events,
-            new TestReportingContext(
-                new GitHubWorkflow(commandWriter, TextWriter.Null),
-                new TestReportingOptions { AnnotationMessageFormat = "foo\\nbar" }
-            )
+            new Dictionary<string, string?> { ["annotations-message"] = "foo\\nbar" },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act

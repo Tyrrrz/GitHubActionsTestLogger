@@ -25,11 +25,11 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
     private TestRunStartInfo? _testRunStartInfo;
     private List<TestResult> _testResults = [];
 
-    public MtpLogger(ICommandLineOptions commandLineOptions)
+    public MtpLogger(GitHubWorkflow gitHubWorkflow, ICommandLineOptions commandLineOptions)
     {
         var options = MtpLoggerOptionsProvider.Resolve(out var isEnabled, commandLineOptions);
         _isEnabled = isEnabled ?? GitHubEnvironment.IsRunningInActions;
-        _context = new TestReportingContext(GitHubWorkflow.Default, options);
+        _context = new TestReportingContext(gitHubWorkflow, options);
     }
 
     public string Uid => "GitHubActionsTestLogger";
