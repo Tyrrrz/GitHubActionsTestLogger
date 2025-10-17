@@ -37,13 +37,34 @@ public class VsTestLogger : ITestLoggerWithParameters
     public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
         Initialize(events, TestReportingOptions.Default);
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters) =>
-        Initialize(events, TestReportingOptions.Resolve(parameters));
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
+    {
+        var options = new TestReportingOptions
+        {
+            AnnotationTitleFormat =
+                parameters.GetValueOrDefault("annotations-title")
+                ?? TestReportingOptions.Default.AnnotationTitleFormat,
+            AnnotationMessageFormat =
+                parameters.GetValueOrDefault("annotations-message")
+                ?? TestReportingOptions.Default.AnnotationMessageFormat,
+            SummaryAllowEmpty =
+                parameters.GetValueOrDefault("summary-allow-empty")?.Pipe(bool.Parse)
+                ?? TestReportingOptions.Default.SummaryAllowEmpty,
+            SummaryIncludePassedTests =
+                parameters.GetValueOrDefault("summary-include-passed")?.Pipe(bool.Parse)
+                ?? TestReportingOptions.Default.SummaryIncludePassedTests,
+            SummaryIncludeSkippedTests =
+                parameters.GetValueOrDefault("summary-include-skipped")?.Pipe(bool.Parse)
+                ?? TestReportingOptions.Default.SummaryIncludeSkippedTests,
+        };
+
+        Initialize(events, options);
+    }
 
     private void OnTestRunStart(TestRunStartEventArgs args)
     {
         if (Context is null)
-            throw new InvalidOperationException("The logger is not initialized.");
+            throw new InvalidOperationException("Logger is not initialized.");
 
         var testRunStartInfo = new TestRunStartInfo(
             args.TestRunCriteria.TestSessionInfo?.Id.ToString() ?? Guid.NewGuid().ToString(),
@@ -60,7 +81,7 @@ public class VsTestLogger : ITestLoggerWithParameters
     private void OnTestResult(TestResultEventArgs args)
     {
         if (Context is null)
-            throw new InvalidOperationException("The logger is not initialized.");
+            throw new InvalidOperationException("Logger is not initialized.");
 
         var testDefinition = new TestDefinition(
             args.Result.TestCase.Id.ToString(),
@@ -102,10 +123,10 @@ public class VsTestLogger : ITestLoggerWithParameters
     private void OnTestRunComplete(TestRunCompleteEventArgs args)
     {
         if (Context is null)
-            throw new InvalidOperationException("The logger is not initialized.");
+            throw new InvalidOperationException("Logger is not initialized.");
 
         if (_testRunStartInfo is null)
-            throw new InvalidOperationException("The test run has not been started.");
+            throw new InvalidOperationException("Test run has not been started.");
 
         var testRunEndInfo = new TestRunEndInfo(
             _testRunStartInfo,

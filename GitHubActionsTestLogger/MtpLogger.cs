@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHubActionsTestLogger.GitHub;
@@ -15,27 +16,33 @@ using Microsoft.Testing.Platform.TestHost;
 
 namespace GitHubActionsTestLogger;
 
-internal class MtpLogger(ICommandLineOptions commandLineOptions)
-    : MtpExtensionBase,
-        // This is the extension point to subscribe to data messages published to the platform.
-        // The type should then be registered as a data consumer in the test host.
-        IDataConsumer,
-        // This is the extension point to subscribe to test session lifetime events.
-        // The type should then be registered as a test session lifetime handler in the test host.
-        ITestSessionLifetimeHandler
+internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
 {
-    private readonly TestReportingContext _context = new(
-        GitHubWorkflow.Default,
-        TestReportingOptions.Resolve(commandLineOptions)
-    );
-
-    // MTP does not provide a built-in way to measure test run duration, so we do it manually
+    private readonly bool _isEnabled;
+    private readonly TestReportingContext _context;
     private readonly Stopwatch _stopwatch = new();
 
     private TestRunStartInfo? _testRunStartInfo;
     private List<TestResult> _testResults = [];
 
+    public MtpLogger(ICommandLineOptions commandLineOptions)
+    {
+        var options = MtpLoggerOptionsProvider.Resolve(out var isEnabled, commandLineOptions);
+        _isEnabled = isEnabled || GitHubEnvironment.IsRunningInActions;
+        _context = new TestReportingContext(GitHubWorkflow.Default, options);
+    }
+
+    public string Uid => "GitHubActionsTestLogger";
+
+    public string Version { get; } = typeof(MtpLogger).Assembly.TryGetVersionString() ?? "1.0.0";
+
+    public string DisplayName => "GitHub Actions Test Logger";
+
+    public string Description => "Reports test results to GitHub Actions";
+
     public Type[] DataTypesConsumed { get; } = [typeof(TestNodeUpdateMessage)];
+
+    public Task<bool> IsEnabledAsync() => Task.FromResult(_isEnabled);
 
     public Task OnTestSessionStartingAsync(
         SessionUid sessionUid,
@@ -44,15 +51,16 @@ internal class MtpLogger(ICommandLineOptions commandLineOptions)
     {
         _stopwatch.Restart();
 
+        // MTP test host runs within the test assembly, so we can infer the test suite name
+        // and target framework directly from the assembly metadata.
         var testAssembly = Assembly.GetEntryAssembly();
+
         var testRunStartInfo = new TestRunStartInfo(
             sessionUid.Value,
-            // MTP test host runs within the test assembly, so we can infer the test suite name
-            // and target framework directly from the assembly metadata.
             testAssembly?.GetName().Name,
             testAssembly
                 ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
-                ?.FrameworkName
+                ?.FrameworkName ?? RuntimeInformation.FrameworkDescription
         );
 
         _testRunStartInfo = testRunStartInfo;
@@ -135,7 +143,7 @@ internal class MtpLogger(ICommandLineOptions commandLineOptions)
     )
     {
         if (_testRunStartInfo is null)
-            throw new InvalidOperationException("The test run has not been started.");
+            throw new InvalidOperationException("Test run has not been started.");
 
         _stopwatch.Stop();
 

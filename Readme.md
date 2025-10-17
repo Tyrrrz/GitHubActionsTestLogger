@@ -143,12 +143,12 @@ jobs:
         run: >
           dotnet test
           --configuration Release
-          --logger "GitHubActions;annotations.titleFormat=@test;annotations.messageFormat=@error"
+          --logger "GitHubActions;annotations-title=@test;annotations-message=@error"
 ```
 
 #### Custom annotation title
 
-Use the `annotations.titleFormat` option to specify the annotation title format used for reporting test failures.
+Use the `annotations-title` option to specify the annotation title format used for reporting test failures.
 
 The following replacement tokens are available:
 
@@ -168,8 +168,8 @@ The following replacement tokens are available:
 
 #### Custom annotation message
 
-Use the `annotations.messageFormat` option to specify the annotation message format used for reporting test failures.
-Supports the same replacement tokens as [`annotations.titleFormat`](#custom-annotation-title).
+Use the `annotations-message` option to specify the annotation message format used for reporting test failures.
+Supports the same replacement tokens as [`annotations-title-format`](#custom-annotation-title).
 
 **Default**: `@error`.
 
@@ -180,13 +180,13 @@ Supports the same replacement tokens as [`annotations.titleFormat`](#custom-anno
 
 #### Allow empty test summaries
 
-Use the `summary.allowEmpty` option to specify whether empty test runs should be included in the summary, for example as a result of using [test filters](https://learn.microsoft.com/dotnet/core/testing/selective-unit-tests).
+Use the `summary-allow-empty` option to specify whether empty test runs should be included in the summary, for example as a result of using [test filters](https://learn.microsoft.com/dotnet/core/testing/selective-unit-tests).
 
 **Default**: `false`.
 
 #### Include passed tests in the summary
 
-Use the `summary.includePassedTests` option to specify whether passed tests should be included in the summary.
+Use the `summary-include-passed` option to specify whether passed tests should be included in the summary.
 If you want to link passed tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `true`.
@@ -196,7 +196,7 @@ If you want to link passed tests to their corresponding source definitions, make
 
 #### Include skipped tests in the summary
 
-Use the `summary.includeSkippedTests` option to specify whether skipped tests should be included in the summary.
+Use the `summary-include-skipped` option to specify whether skipped tests should be included in the summary.
 If you want to link skipped tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `true`.

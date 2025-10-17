@@ -48,11 +48,11 @@ public class VsTestInitializationSpecs
         var events = new FakeTestLoggerEvents();
         var parameters = new Dictionary<string, string?>
         {
-            ["annotations-title-format"] = "TitleFormat",
-            ["annotations-message-format"] = "MessageFormat",
+            ["annotations-title"] = "TitleFormat",
+            ["annotations-message"] = "MessageFormat",
             ["summary-allow-empty"] = "true",
-            ["summary-include-passed-tests"] = "true",
-            ["summary-include-skipped-tests"] = "true",
+            ["summary-include-passed"] = "true",
+            ["summary-include-skipped"] = "true",
         };
 
         // Act
