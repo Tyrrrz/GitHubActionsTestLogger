@@ -3,7 +3,7 @@
 To run the demo tests, use the following command:
 
 ```console
-$ dotnet test -p:IsTestProject=true --github-actions
+$ dotnet test -p:IsTestProject=true -- --github-actions
 ```
 
 To produce a test summary, provide the output file path by setting the `GITHUB_STEP_SUMMARY` environment variable:
