@@ -19,9 +19,8 @@
     <img src="favicon.png" alt="Icon" />
 </p>
 
-**GitHub Actions Test Logger** is a custom logger for `dotnet test` that integrates with GitHub Actions.
-When using this logger, failed tests are listed in job annotations and highlighted in code diffs.
-Additionally, this logger also generates a job summary that contains detailed information about the executed test run.
+**GitHub Actions Test Logger** is an extension for VSTest and MTP that reports test results via GitHub Actions.
+It lists failed tests in job annotations, highlights them in code diffs, and produces a detailed job summary with information about the executed test run.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
 
@@ -45,48 +44,35 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ## Usage
 
-To use **GitHub Actions Test Logger**, install it in your test project and modify your GitHub Actions workflow by adding `--logger GitHubActions` to `dotnet test`:
+**GitHub Actions Test Logger** is available for both the classic **VSTest** test runner and the newer **Microsoft.Testing.Platform**.
+
+### [Microsoft.Testing.Platform](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro)
+
+Simply install the package in your test project.
+The provided test reporter will automatically be detected and enabled when running in a GitHub Actions environment.
+
+### [VSTest](https://github.com/microsoft/vstest)
+
+Install the package in your test project and specify the logger when running `dotnet test`:
 
 ```yaml
 name: main
 on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+build:
+  runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Install .NET
-        uses: actions/setup-dotnet@v4
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
 
-      - name: Build & test
-        run: dotnet test --configuration Release --logger GitHubActions
+    - name: Build & test
+      run: dotnet test --configuration Release --logger GitHubActions
 ```
-
-By default, the logger will only report failed tests in the job summary and annotations.
-If you want the summary to include detailed information about passed and skipped tests as well, update the workflow as follows:
-
-```yaml
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      # ...
-
-      - name: Build & test
-        run: >
-          dotnet test
-          --configuration Release
-          --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true"
-```
-
-> **Warning**:
-> The new testing platform (i.e. `Microsoft.Testing.Platform`) [is not yet supported](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/41). This is because VSTest and MTP are using different extensibility models, and this project existed before MTP existed.
-> To use **GitHub Actions Test Logger**, make sure to use the classic testing experience (`vstest`) instead.
 
 > **Important**:
 > Ensure that your test project references the latest version of **Microsoft.NET.Test.Sdk**.
@@ -95,10 +81,10 @@ jobs:
 > **Important**:
 > If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
-### Collecting source information
+#### Collecting source information
 
 **GitHub Actions Test Logger** can leverage source information to link reported test results to the locations in the source code where the corresponding tests are defined.
-By default, `dotnet test` does not collect source information, so the logger relies on stack traces to extract it manually.
+By default, VSTest does not collect source information, so the logger relies on stack traces to extract it manually.
 This approach only works for failed tests, and even then may not always be fully accurate.
 
 To instruct the runner to collect source information, add the `RunConfiguration.CollectSourceInformation=true` argument to the command as shown below:
@@ -129,7 +115,29 @@ jobs:
 
 ### Customizing behavior
 
-When running `dotnet test`, you can customize the logger's behavior by passing additional options:
+When running `dotnet test`, you can customize the logger's behavior by passing additional options on the command line:
+
+**Microsoft.Testing.Platform**:
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ...
+
+      - name: Build & test
+        run: >
+          dotnet test
+          --configuration Release
+          --
+          --report-github
+          --report-github-annotations-title=@test
+          --report-github-annotations-message=@error
+```
+
+**VSTest**:
 
 ```yml
 jobs:
@@ -148,7 +156,7 @@ jobs:
 
 #### Custom annotation title
 
-Use the `annotations-title` option to specify the annotation title format used for reporting test failures.
+Use the `[--report-github-]annotations-title` option to specify the annotation title format used for reporting test failures.
 
 The following replacement tokens are available:
 
@@ -168,7 +176,7 @@ The following replacement tokens are available:
 
 #### Custom annotation message
 
-Use the `annotations-message` option to specify the annotation message format used for reporting test failures.
+Use the `[--report-github-]annotations-message` option to specify the annotation message format used for reporting test failures.
 Supports the same replacement tokens as [`annotations-title-format`](#custom-annotation-title).
 
 **Default**: `@error`.
@@ -180,13 +188,13 @@ Supports the same replacement tokens as [`annotations-title-format`](#custom-ann
 
 #### Allow empty test summaries
 
-Use the `summary-allow-empty` option to specify whether empty test runs should be included in the summary, for example as a result of using [test filters](https://learn.microsoft.com/dotnet/core/testing/selective-unit-tests).
+Use the `[--report-github-]summary-allow-empty` option to specify whether empty test runs should be included in the summary, for example as a result of using [test filters](https://learn.microsoft.com/dotnet/core/testing/selective-unit-tests).
 
 **Default**: `false`.
 
 #### Include passed tests in the summary
 
-Use the `summary-include-passed` option to specify whether passed tests should be included in the summary.
+Use the `[--report-github-]summary-include-passed` option to specify whether passed tests should be included in the summary.
 If you want to link passed tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `true`.
@@ -196,7 +204,7 @@ If you want to link passed tests to their corresponding source definitions, make
 
 #### Include skipped tests in the summary
 
-Use the `summary-include-skipped` option to specify whether skipped tests should be included in the summary.
+Use the `[--report-github-]summary-include-skipped` option to specify whether skipped tests should be included in the summary.
 If you want to link skipped tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `true`.
