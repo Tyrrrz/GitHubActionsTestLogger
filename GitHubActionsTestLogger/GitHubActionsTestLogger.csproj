@@ -28,7 +28,7 @@
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="1.1.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Testing.Platform" Version="1.6.2" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.14.1" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="18.0.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
     <PackageReference
