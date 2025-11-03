@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
 
@@ -29,6 +30,26 @@ internal static class MtpExtensions
         return null;
     }
 
+    public static string? TryGetTypeFullyQualifiedName(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestMethodIdentifierProperty>() is { } method
+            ? string.Join(".", method.Namespace, method.TypeName)
+            : null;
+
+    public static string? TryGetTypeMinimallyQualifiedName(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestMethodIdentifierProperty>() is { } method
+            ? method.TypeName
+            : null;
+
+    public static string? TryGetFullyQualifiedName(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestMethodIdentifierProperty>() is { } method
+            ? string.Join(".", method.Namespace, method.TypeName, method.MethodName)
+            : null;
+
+    public static string? TryGetMinimallyQualifiedName(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestMethodIdentifierProperty>() is { } method
+            ? string.Join(".", method.TypeName, method.MethodName)
+            : null;
+
     public static Exception? TryGetException(this TestNodeStateProperty state) =>
         state switch
         {
@@ -37,4 +58,45 @@ internal static class MtpExtensions
             TimeoutTestNodeStateProperty timeoutState => timeoutState.Exception,
             _ => null,
         };
+
+    public static Exception? TryGetException(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestNodeStateProperty>()?.TryGetException();
+
+    public static StackFrame? TryGetTestStackFrame(this TestNode test)
+    {
+        var testMethodFullyQualifiedName = test.TryGetFullyQualifiedName();
+        if (string.IsNullOrWhiteSpace(testMethodFullyQualifiedName))
+            return null;
+
+        var testMethodName = testMethodFullyQualifiedName.SubstringAfterLast(
+            ".",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+        return test.TryGetException()
+            ?.StackTrace?.Pipe(StackFrame.ParseMany)
+            .LastOrDefault(f =>
+                // Sync method call
+                // e.g. MyTests.EnsureOnePlusOneEqualsTwo()
+                f.MethodCall.StartsWith(
+                    testMethodFullyQualifiedName,
+                    StringComparison.OrdinalIgnoreCase
+                )
+                ||
+                // Async method call
+                // e.g. MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
+                f.MethodCall.Contains(
+                    '<' + testMethodName + '>',
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+    }
+
+    public static string? TryGetSourceFilePath(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestFileLocationProperty>()?.FilePath
+        ?? test.TryGetTestStackFrame()?.FilePath;
+
+    public static int? TryGetSourceLine(this TestNode test) =>
+        test.Properties.SingleOrDefault<TestFileLocationProperty>()?.LineSpan.Start.Line
+        ?? test.TryGetTestStackFrame()?.Line;
 }

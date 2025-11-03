@@ -88,28 +88,21 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
             message.TestNode.Properties.SingleOrDefault<TestNodeStateProperty>()
             ?? throw new InvalidOperationException("Test node state property is missing.");
 
-        var method =
-            message.TestNode.Properties.SingleOrDefault<TestMethodIdentifierProperty>() ??
-            // We assume that the test is always defined by a method, because MTP does not
-            // appear to have a way to represent tests defined by other means.
-            throw new InvalidOperationException("Test method identifier property is missing.");
-
-        var location = message.TestNode.Properties.SingleOrDefault<TestFileLocationProperty>();
         var exception = state.TryGetException();
 
         var testDefinition = new TestDefinition(
             message.TestNode.Uid.Value,
             message.TestNode.DisplayName,
             new SymbolReference(
-                method.MethodName,
-                string.Join(".", method.Namespace, method.TypeName, method.MethodName)
+                message.TestNode.TryGetMinimallyQualifiedName() ?? message.TestNode.DisplayName,
+                message.TestNode.TryGetFullyQualifiedName() ?? message.TestNode.DisplayName
             ),
             new SymbolReference(
-                method.TypeName,
-                string.Join(".", method.Namespace, method.TypeName)
+                message.TestNode.TryGetTypeMinimallyQualifiedName() ?? "<>",
+                message.TestNode.TryGetTypeFullyQualifiedName() ?? "<>"
             ),
-            location?.FilePath,
-            location?.LineSpan.Start.Line,
+            message.TestNode.TryGetSourceFilePath(),
+            message.TestNode.TryGetSourceLine(),
             message
                 .TestNode.Properties.OfType<TestMetadataProperty>()
                 .ToDictionary(p => p.Key, p => p.Value)
