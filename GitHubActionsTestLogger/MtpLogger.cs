@@ -10,9 +10,10 @@ using GitHubActionsTestLogger.GitHub;
 using GitHubActionsTestLogger.Reporting;
 using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.Testing.Platform.CommandLine;
+using Microsoft.Testing.Platform.Extensions;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.TestHost;
-using Microsoft.Testing.Platform.TestHost;
+using Microsoft.Testing.Platform.Services;
 
 namespace GitHubActionsTestLogger;
 
@@ -44,10 +45,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
 
     public Task<bool> IsEnabledAsync() => Task.FromResult(_isEnabled);
 
-    public Task OnTestSessionStartingAsync(
-        SessionUid sessionUid,
-        CancellationToken cancellationToken
-    )
+    public Task OnTestSessionStartingAsync(ITestSessionContext testSessionContext)
     {
         _stopwatch.Restart();
 
@@ -56,7 +54,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         var testAssembly = Assembly.GetEntryAssembly();
 
         var testRunStartInfo = new TestRunStartInfo(
-            sessionUid.Value,
+            testSessionContext.SessionUid.Value,
             testAssembly?.GetName().Name,
             testAssembly
                 ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
@@ -130,10 +128,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         return Task.CompletedTask;
     }
 
-    public Task OnTestSessionFinishingAsync(
-        SessionUid sessionUid,
-        CancellationToken cancellationToken
-    )
+    public Task OnTestSessionFinishingAsync(ITestSessionContext testSessionContext)
     {
         if (_testRunStartInfo is null)
             throw new InvalidOperationException("Test run has not been started.");
