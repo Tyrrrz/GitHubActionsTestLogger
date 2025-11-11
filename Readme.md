@@ -19,7 +19,7 @@
     <img src="favicon.png" alt="Icon" />
 </p>
 
-**GitHub Actions Test Logger** is an extension for VSTest and MTP that reports test results via GitHub Actions.
+**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** that integrates test reporting with GitHub Actions.
 It lists failed tests in job annotations, highlights them in code diffs, and produces a detailed job summary with information about the executed test run.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
@@ -50,6 +50,10 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 Simply install the package in your test project.
 The provided test reporter will automatically be detected and enabled when running in a GitHub Actions environment.
+
+> **Important**:
+> Ensure that your test project references the latest version of **Microsoft.Testing.Platform**.
+> Older versions of this package may not be compatible with the logger.
 
 ### [VSTest](https://github.com/microsoft/vstest)
 
