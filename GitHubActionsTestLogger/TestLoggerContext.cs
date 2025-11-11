@@ -141,7 +141,7 @@ public class TestLoggerContext(GitHubWorkflow github, TestLoggerOptions options)
                 return;
             }
 
-            github.CreateSummary(template.Render());
+            github.CreateSummary(template.RenderAsync().GetAwaiter().GetResult());
         }
     }
 }
