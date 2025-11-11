@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using GitHubActionsTestLogger.GitHub;
 using GitHubActionsTestLogger.Utils.Extensions;
 
@@ -9,7 +10,7 @@ namespace GitHubActionsTestLogger.Reporting;
 
 internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions options)
 {
-    private readonly Lock _lock = new();
+    private readonly SemaphoreSlim _lock = new(1, 1);
     private readonly Stopwatch _stopwatch = new();
 
     private TestRunStartInfo? _testRunStartInfo;
@@ -48,18 +49,32 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
     private string FormatAnnotationMessage(TestResult testResult) =>
         FormatAnnotation(Options.AnnotationMessageFormat, testResult);
 
-    public void HandleTestRunStart(TestRunStartInfo info)
+    public async Task HandleTestRunStartAsync(
+        TestRunStartInfo info,
+        CancellationToken cancellationToken = default
+    )
     {
-        using (_lock.EnterScope())
+        await _lock.WaitAsync(cancellationToken);
+
+        try
         {
             _stopwatch.Start();
             _testRunStartInfo = info;
         }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
-    public void HandleTestResult(TestResult testResult)
+    public async Task HandleTestResultAsync(
+        TestResult testResult,
+        CancellationToken cancellationToken = default
+    )
     {
-        using (_lock.EnterScope())
+        await _lock.WaitAsync(cancellationToken);
+
+        try
         {
             // Report failed test results to job annotations
             if (testResult.Outcome == TestOutcome.Failed)
@@ -72,11 +87,20 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
                 );
             }
         }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
-    public void HandleTestRunEnd(TestRunEndInfo info)
+    public async Task HandleTestRunEndAsync(
+        TestRunEndInfo info,
+        CancellationToken cancellationToken = default
+    )
     {
-        using (_lock.EnterScope())
+        await _lock.WaitAsync(cancellationToken);
+
+        try
         {
             _stopwatch.Stop();
 
@@ -101,7 +125,11 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
             };
 
             // Report the test run to the job summary
-            github.CreateSummary(template.Render());
+            github.CreateSummary(await template.RenderAsync(cancellationToken));
+        }
+        finally
+        {
+            _lock.Release();
         }
     }
 }

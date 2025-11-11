@@ -89,7 +89,7 @@ public class VsTestLogger : ITestLoggerWithParameters
         _testRunStartInfo = testRunStartInfo;
         _testResults = [];
 
-        _context.HandleTestRunStart(testRunStartInfo);
+        _context.HandleTestRunStartAsync(testRunStartInfo).GetAwaiter().GetResult();
     }
 
     private void OnTestResult(TestResultEventArgs args)
@@ -131,7 +131,7 @@ public class VsTestLogger : ITestLoggerWithParameters
         );
 
         _testResults.Add(testResult);
-        _context.HandleTestResult(testResult);
+        _context.HandleTestResultAsync(testResult).GetAwaiter().GetResult();
     }
 
     private void OnTestRunComplete(TestRunCompleteEventArgs args)
@@ -148,6 +148,6 @@ public class VsTestLogger : ITestLoggerWithParameters
             args.ElapsedTimeInRunningTests
         );
 
-        _context.HandleTestRunEnd(testRunEndInfo);
+        _context.HandleTestRunEndAsync(testRunEndInfo).GetAwaiter().GetResult();
     }
 }

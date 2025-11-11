@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GitHubActionsTestLogger.Utils;
 
@@ -50,11 +51,14 @@ internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileM
     public override void Write(byte[] buffer, int offset, int count) =>
         _buffer.AddRange(buffer.Skip(offset).Take(count));
 
-    public override void Flush()
+    public override async Task FlushAsync(CancellationToken cancellationToken)
     {
         using var stream = CreateInnerStream();
-        stream.Write(_buffer.ToArray(), 0, _buffer.Count);
+        await stream.WriteAsync(_buffer.ToArray(), 0, _buffer.Count, cancellationToken);
     }
+
+    [ExcludeFromCodeCoverage]
+    public override void Flush() => FlushAsync().GetAwaiter().GetResult();
 
     [ExcludeFromCodeCoverage]
     protected override void Dispose(bool disposing)

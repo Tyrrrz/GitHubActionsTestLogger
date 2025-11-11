@@ -45,7 +45,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
 
     public Task<bool> IsEnabledAsync() => Task.FromResult(_isEnabled);
 
-    public Task OnTestSessionStartingAsync(ITestSessionContext testSessionContext)
+    public async Task OnTestSessionStartingAsync(ITestSessionContext testSessionContext)
     {
         _stopwatch.Restart();
 
@@ -64,12 +64,13 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         _testRunStartInfo = testRunStartInfo;
         _testResults = [];
 
-        _context.HandleTestRunStart(testRunStartInfo);
-
-        return Task.CompletedTask;
+        await _context.HandleTestRunStartAsync(
+            testRunStartInfo,
+            testSessionContext.CancellationToken
+        );
     }
 
-    public Task ConsumeAsync(
+    public async Task ConsumeAsync(
         IDataProducer dataProducer,
         IData value,
         CancellationToken cancellationToken
@@ -123,12 +124,10 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         );
 
         _testResults.Add(testResult);
-        _context.HandleTestResult(testResult);
-
-        return Task.CompletedTask;
+        await _context.HandleTestResultAsync(testResult, cancellationToken);
     }
 
-    public Task OnTestSessionFinishingAsync(ITestSessionContext testSessionContext)
+    public async Task OnTestSessionFinishingAsync(ITestSessionContext testSessionContext)
     {
         if (_testRunStartInfo is null)
             throw new InvalidOperationException("Test run has not been started.");
@@ -141,8 +140,9 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
             _stopwatch.Elapsed
         );
 
-        _context.HandleTestRunEnd(testRunStatistics);
-
-        return Task.CompletedTask;
+        await _context.HandleTestRunEndAsync(
+            testRunStatistics,
+            testSessionContext.CancellationToken
+        );
     }
 }
