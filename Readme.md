@@ -52,8 +52,8 @@ Simply install the package in your test project.
 The provided test reporter will automatically be detected and enabled when running in a GitHub Actions environment.
 
 > **Important**:
-> Ensure that your test project references the latest version of **Microsoft.Testing.Platform**.
-> Older versions of this package may not be compatible with the logger.
+> The logger has a peer dependency on **Microsoft.Testing.Platform**.
+> Your test project should already have a reference to this package, but make sure it is updated to the latest version.
 
 ### [VSTest](https://github.com/microsoft/vstest)
 
@@ -79,8 +79,8 @@ build:
 ```
 
 > **Important**:
-> Ensure that your test project references the latest version of **Microsoft.NET.Test.Sdk**.
-> Older versions of this package may not be compatible with the logger.
+> The logger has a peer dependency on **Microsoft.NET.Test.Sdk**.
+> Your test project should already have a reference to this package, but make sure it is updated to the latest version.
 
 > **Important**:
 > If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
