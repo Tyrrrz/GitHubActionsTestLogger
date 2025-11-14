@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using GitHubActionsTestLogger.Utils;
 using GitHubActionsTestLogger.Utils.Extensions;
 
@@ -10,7 +11,7 @@ namespace GitHubActionsTestLogger.GitHub;
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
 internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
 {
-    private void InvokeCommand(
+    private async Task InvokeCommandAsync(
         string command,
         string message,
         IReadOnlyDictionary<string, string>? options = null
@@ -32,17 +33,17 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         // to make sure there is no preceding text.
         // Preceding text may sometimes appear if the .NET CLI is running with
         // ANSI color codes enabled.
-        commandWriter.WriteLine();
+        await commandWriter.WriteLineAsync();
 
-        commandWriter.WriteLine($"::{command} {formattedOptions}::{Escape(message)}");
+        await commandWriter.WriteLineAsync($"::{command} {formattedOptions}::{Escape(message)}");
 
         // This newline is just for symmetry
-        commandWriter.WriteLine();
+        await commandWriter.WriteLineAsync();
 
-        commandWriter.Flush();
+        await commandWriter.FlushAsync();
     }
 
-    public void CreateErrorAnnotation(
+    public async Task CreateErrorAnnotationAsync(
         string title,
         string message,
         string? filePath = null,
@@ -61,21 +62,21 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         if (column is not null)
             options["col"] = column.Value.ToString();
 
-        InvokeCommand("error", message, options);
+        await InvokeCommandAsync("error", message, options);
     }
 
-    public void CreateSummary(string content)
+    public async Task CreateSummaryAsync(string content)
     {
         // If the summary file already contains HTML content, we need to first add two newlines
         // in order to switch GitHub's parser from HTML mode back to markdown mode.
         // It's safe to do it unconditionally because, if the file is empty, these newlines
         // will simply be ignored.
         // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
-        summaryWriter.WriteLine();
-        summaryWriter.WriteLine();
+        await summaryWriter.WriteLineAsync();
+        await summaryWriter.WriteLineAsync();
 
-        summaryWriter.WriteLine(content);
-        summaryWriter.Flush();
+        await summaryWriter.WriteLineAsync(content);
+        await summaryWriter.FlushAsync();
     }
 }
 

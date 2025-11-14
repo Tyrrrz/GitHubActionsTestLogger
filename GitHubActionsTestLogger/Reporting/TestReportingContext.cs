@@ -79,7 +79,7 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
             // Report failed test results to job annotations
             if (testResult.Outcome == TestOutcome.Failed)
             {
-                github.CreateErrorAnnotation(
+                await github.CreateErrorAnnotationAsync(
                     FormatAnnotationTitle(testResult),
                     FormatAnnotationMessage(testResult),
                     testResult.Definition.SourceFilePath,
@@ -125,7 +125,7 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
             };
 
             // Report the test run to the job summary
-            github.CreateSummary(await template.RenderAsync(cancellationToken));
+            await github.CreateSummaryAsync(await template.RenderAsync(cancellationToken));
         }
         finally
         {
