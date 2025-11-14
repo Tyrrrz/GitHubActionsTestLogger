@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace GitHubActionsTestLogger.Tests.VsTest;
 
-internal class VsTestResultBuilder
+internal class TestResultBuilder
 {
     private TestResult _testResult = new(
         new TestCase
@@ -15,37 +15,37 @@ internal class VsTestResultBuilder
         }
     );
 
-    public VsTestResultBuilder SetDisplayName(string displayName)
+    public TestResultBuilder SetDisplayName(string displayName)
     {
         _testResult.TestCase.DisplayName = displayName;
         return this;
     }
 
-    public VsTestResultBuilder SetFullyQualifiedName(string fullyQualifiedName)
+    public TestResultBuilder SetFullyQualifiedName(string fullyQualifiedName)
     {
         _testResult.TestCase.FullyQualifiedName = fullyQualifiedName;
         return this;
     }
 
-    public VsTestResultBuilder SetTrait(string name, string value)
+    public TestResultBuilder SetTrait(string name, string value)
     {
         _testResult.TestCase.Traits.Add(name, value);
         return this;
     }
 
-    public VsTestResultBuilder SetOutcome(TestOutcome outcome)
+    public TestResultBuilder SetOutcome(TestOutcome outcome)
     {
         _testResult.Outcome = outcome;
         return this;
     }
 
-    public VsTestResultBuilder SetErrorMessage(string message)
+    public TestResultBuilder SetErrorMessage(string message)
     {
         _testResult.ErrorMessage = message;
         return this;
     }
 
-    public VsTestResultBuilder SetErrorStackTrace(string stackTrace)
+    public TestResultBuilder SetErrorStackTrace(string stackTrace)
     {
         _testResult.ErrorStackTrace = stackTrace;
         return this;

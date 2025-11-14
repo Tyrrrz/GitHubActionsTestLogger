@@ -39,13 +39,13 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
 
     public string DisplayName => "GitHub Actions Test Logger";
 
-    public string Description => "Reports test results to GitHub Actions";
+    public string Description => "Reports test results to GitHub Actions.";
 
     public Type[] DataTypesConsumed { get; } = [typeof(TestNodeUpdateMessage)];
 
     public Task<bool> IsEnabledAsync() => Task.FromResult(_isEnabled);
 
-    public async Task OnTestSessionStartingAsync(ITestSessionContext testSessionContext)
+    public async Task OnTestSessionStartingAsync(ITestSessionContext context)
     {
         _stopwatch.Restart();
 
@@ -54,7 +54,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         var testAssembly = Assembly.GetEntryAssembly();
 
         var testRunStartInfo = new TestRunStartInfo(
-            testSessionContext.SessionUid.Value,
+            context.SessionUid.Value,
             testAssembly?.GetName().Name,
             testAssembly
                 ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
@@ -64,10 +64,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         _testRunStartInfo = testRunStartInfo;
         _testResults = [];
 
-        await _context.HandleTestRunStartAsync(
-            testRunStartInfo,
-            testSessionContext.CancellationToken
-        );
+        await _context.HandleTestRunStartAsync(testRunStartInfo, context.CancellationToken);
     }
 
     public async Task ConsumeAsync(
@@ -127,7 +124,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         await _context.HandleTestResultAsync(testResult, cancellationToken);
     }
 
-    public async Task OnTestSessionFinishingAsync(ITestSessionContext testSessionContext)
+    public async Task OnTestSessionFinishingAsync(ITestSessionContext context)
     {
         if (_testRunStartInfo is null)
             throw new InvalidOperationException("Test run has not been started.");
@@ -140,9 +137,6 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
             _stopwatch.Elapsed
         );
 
-        await _context.HandleTestRunEndAsync(
-            testRunStatistics,
-            testSessionContext.CancellationToken
-        );
+        await _context.HandleTestRunEndAsync(testRunStatistics, context.CancellationToken);
     }
 }

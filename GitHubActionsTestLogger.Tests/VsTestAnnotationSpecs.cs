@@ -23,19 +23,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
                 .Build(),
-            new VsTestResultBuilder()
-                .SetDisplayName("Test2")
-                .SetOutcome(TestOutcome.Passed)
-                .Build(),
-            new VsTestResultBuilder()
-                .SetDisplayName("Test3")
-                .SetOutcome(TestOutcome.Skipped)
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test2").SetOutcome(TestOutcome.Passed).Build(),
+            new TestResultBuilder().SetDisplayName("Test3").SetOutcome(TestOutcome.Skipped).Build()
         );
 
         // Assert
@@ -52,11 +46,8 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_extracted_from_exceptions()
     {
-        // .NET test platform never sends source information, so we can only
-        // rely on exception stack traces to get it.
-
         // Arrange
         using var commandWriter = new StringWriter();
 
@@ -67,7 +58,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("I can execute a command with buffering and cancel it immediately")
                 .SetFullyQualifiedName(
                     "CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately()"
@@ -102,11 +93,8 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_for_async_tests()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_extracted_from_async_exceptions()
     {
-        // .NET test platform never sends source information, so we can only
-        // rely on exception stack traces to get it.
-
         // Arrange
         using var commandWriter = new StringWriter();
 
@@ -117,7 +105,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("SendEnvelopeAsync_ItemRateLimit_DropsItem")
                 .SetFullyQualifiedName(
                     "Sentry.Tests.Internals.Http.HttpTransportTests.SendEnvelopeAsync_ItemRateLimit_DropsItem()"
@@ -177,7 +165,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert
@@ -211,7 +199,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
                 .SetTrait("Document", "SS01")
@@ -250,7 +238,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage")
@@ -288,7 +276,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorStackTrace("ErrorStackTrace")
@@ -328,11 +316,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
         events.SimulateTestRun(
             "FakeTests.dll",
             "FakeTargetFramework",
-            new VsTestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
-                .SetErrorStackTrace("ErrorStackTrace")
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert
@@ -362,7 +346,7 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert

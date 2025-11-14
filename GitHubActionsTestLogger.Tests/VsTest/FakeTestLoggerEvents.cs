@@ -7,10 +7,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace GitHubActionsTestLogger.Tests.VsTest;
 
-#pragma warning disable CS0067
-
 internal class FakeTestLoggerEvents : TestLoggerEvents
 {
+    // Not all of these events need to be raised, but they all need to be provided for the interface
+#pragma warning disable CS0067
     public override event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
     public override event EventHandler<TestRunStartEventArgs>? TestRunStart;
     public override event EventHandler<TestResultEventArgs>? TestResult;
@@ -19,6 +19,7 @@ internal class FakeTestLoggerEvents : TestLoggerEvents
     public override event EventHandler<TestRunMessageEventArgs>? DiscoveryMessage;
     public override event EventHandler<DiscoveredTestsEventArgs>? DiscoveredTests;
     public override event EventHandler<DiscoveryCompleteEventArgs>? DiscoveryComplete;
+#pragma warning restore CS0067
 
     public void RaiseTestRunStart(TestRunStartEventArgs args) => TestRunStart?.Invoke(this, args);
 

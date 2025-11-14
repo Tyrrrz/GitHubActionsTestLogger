@@ -21,7 +21,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption AnnotationsTitleFormatOption = new(
-        $"{IsEnabledOption.Name}-annotations-title-format",
+        $"{IsEnabledOption.Name}-annotations-title",
         "Specifies the title format for GitHub Annotations. See documentation for available replacement tokens. "
             + $"Default is '{TestReportingOptions.Default.AnnotationTitleFormat}'.",
         ArgumentArity.ExactlyOne,
@@ -29,7 +29,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption AnnotationsMessageFormatOption = new(
-        $"{IsEnabledOption.Name}-annotations-message-format",
+        $"{IsEnabledOption.Name}-annotations-message",
         "Specifies the message format for GitHub Annotations. See documentation for available replacement tokens. "
             + $"Default is '{TestReportingOptions.Default.AnnotationMessageFormat}'.",
         ArgumentArity.ExactlyOne,
@@ -45,7 +45,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption SummaryIncludePassedTestsOption = new(
-        $"{IsEnabledOption.Name}-summary-include-passed-tests",
+        $"{IsEnabledOption.Name}-summary-include-passed",
         "Whether to include passed tests (in addition to failed tests) in the GitHub Actions summary. "
             + $"Default is '{TestReportingOptions.Default.SummaryIncludePassedTests}'.",
         ArgumentArity.ZeroOrOne,
@@ -53,7 +53,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     );
 
     private static readonly CommandLineOption SummaryIncludeSkippedTestsOption = new(
-        $"{IsEnabledOption.Name}-summary-include-skipped-tests",
+        $"{IsEnabledOption.Name}-summary-include-skipped",
         "Whether to include skipped tests (in addition to failed tests) in the GitHub Actions summary. "
             + $"Default is '{TestReportingOptions.Default.SummaryIncludeSkippedTests}'.",
         ArgumentArity.ZeroOrOne,
@@ -67,7 +67,8 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
 
     public string DisplayName => "GitHub Actions Test Logger Options Provider";
 
-    public string Description => "Provides command line options for the GitHub Actions Test Logger";
+    public string Description =>
+        "Provides command line options for the GitHub Actions Test Logger.";
 
     public Task<bool> IsEnabledAsync() => Task.FromResult(true);
 

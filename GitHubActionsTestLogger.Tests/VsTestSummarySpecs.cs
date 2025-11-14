@@ -50,30 +50,30 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage1")
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage2")
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Failed)
                 .SetErrorMessage("ErrorMessage3")
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test5")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test5")
                 .SetOutcome(TestOutcome.Skipped)
@@ -111,22 +111,22 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -163,22 +163,22 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Passed)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -215,22 +215,22 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
@@ -267,22 +267,22 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         // Act
         events.SimulateTestRun(
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test1")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test2")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test2")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test3")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test3")
                 .SetOutcome(TestOutcome.Skipped)
                 .Build(),
-            new VsTestResultBuilder()
+            new TestResultBuilder()
                 .SetDisplayName("Test4")
                 .SetFullyQualifiedName("TestProject.SomeTests.Test4")
                 .SetOutcome(TestOutcome.Failed)
