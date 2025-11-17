@@ -51,6 +51,28 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 Simply install the package in your test project.
 The provided test reporter will automatically be detected and enabled when running in a GitHub Actions environment.
 
+If you want to enable the reporter manually, for example when executing in a containerized environment, add the `--report-github` option when running tests:
+
+```yaml
+name: main
+on: [push, pull_request]
+
+jobs:
+build:
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+
+    - name: Build & test
+      # Empty double dash separates MTP options from dotnet test options
+      run: dotnet test --configuration Release -- --report-github
+```
+
 > **Important**:
 > The logger has a peer dependency on **Microsoft.Testing.Platform**.
 > Your test project should already have a reference to this package, but make sure it is updated to the latest version.
@@ -181,7 +203,7 @@ The following replacement tokens are available:
 #### Custom annotation message
 
 Use the `[--report-github-]annotations-message` option to specify the annotation message format used for reporting test failures.
-Supports the same replacement tokens as [`annotations-title-format`](#custom-annotation-title).
+Supports the same replacement tokens as the [annotations title](#custom-annotation-title).
 
 **Default**: `@error`.
 
@@ -192,7 +214,7 @@ Supports the same replacement tokens as [`annotations-title-format`](#custom-ann
 
 #### Allow empty test summaries
 
-Use the `[--report-github-]summary-allow-empty` option to specify whether empty test runs should be included in the summary, for example as a result of using [test filters](https://learn.microsoft.com/dotnet/core/testing/selective-unit-tests).
+Use the `[--report-github-]summary-allow-empty` option to specify whether empty test runs should be included in the summary.
 
 **Default**: `false`.
 

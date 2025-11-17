@@ -89,18 +89,17 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     {
         if (!commandLineOptions.IsOptionSet(IsEnabledOption.Name))
         {
-            foreach (
-                var optionName in GetCommandLineOptions()
-                    .Select(o => o.Name)
-                    .Where(n => !string.Equals(n, IsEnabledOption.Name, StringComparison.Ordinal))
-            )
+            var invalidOptionNames = GetCommandLineOptions()
+                .Select(o => o.Name)
+                .Where(n => !string.Equals(n, IsEnabledOption.Name, StringComparison.Ordinal))
+                .Where(commandLineOptions.IsOptionSet)
+                .ToArray();
+
+            if (invalidOptionNames.Any())
             {
-                if (commandLineOptions.IsOptionSet(optionName))
-                {
-                    return ValidationResult.InvalidTask(
-                        $"Option '--{optionName}' can only be used when '--{IsEnabledOption.Name}' is also specified."
-                    );
-                }
+                return ValidationResult.InvalidTask(
+                    $"Option(s) {string.Join(", ", invalidOptionNames.Select(n => "--" + n))} can only be used when '--{IsEnabledOption.Name}' is also specified."
+                );
             }
         }
 
