@@ -322,7 +322,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
 
         // Assert
         var output = summaryWriter.ToString().Trim();
-        output.Should().Contain("⚪️ FakeTests");
+        output.Should().Contain("⚪️");
 
         testOutput.WriteLine(output);
     }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -334,11 +335,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
         ]);
 
         // Can't inject custom framework with MTP since it's not passed as metadata
-        var framework =
-            Assembly
-                .GetEntryAssembly()
-                ?.GetCustomAttribute<TargetFrameworkAttribute>()
-                ?.FrameworkName ?? "UnknownFramework";
+        var framework = AppContext.TargetFrameworkName ?? "UnknownFramework";
 
         builder.RegisterFakeTests(
             new TestNodeBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()

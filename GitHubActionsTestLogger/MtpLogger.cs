@@ -49,16 +49,12 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
     {
         _stopwatch.Restart();
 
-        // MTP test host runs within the test assembly, so we can infer the test suite name
-        // and target framework directly from the assembly metadata.
-        var testAssembly = Assembly.GetEntryAssembly();
-
         var testRunStartInfo = new TestRunStartInfo(
             context.SessionUid.Value,
-            testAssembly?.GetName().Name,
-            testAssembly
-                ?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()
-                ?.FrameworkName ?? RuntimeInformation.FrameworkDescription
+            // MTP test host runs within the test assembly, so we can infer the test suite name
+            // and target framework directly from the assembly metadata.
+            Assembly.GetEntryAssembly()?.GetName().Name,
+            AppContext.TargetFrameworkName ?? RuntimeInformation.FrameworkDescription
         );
 
         _testRunStartInfo = testRunStartInfo;

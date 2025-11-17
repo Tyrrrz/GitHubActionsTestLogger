@@ -133,17 +133,14 @@ internal partial class MtpLoggerOptionsProvider
                 commandLineOptions.GetOptionArgumentOrDefault(AnnotationsMessageFormatOption.Name)
                 ?? TestReportingOptions.Default.AnnotationMessageFormat,
             SummaryAllowEmpty =
-                commandLineOptions
-                    .GetOptionArgumentOrDefault(SummaryAllowEmptyOption.Name, "true")
-                    ?.Pipe(bool.Parse) ?? TestReportingOptions.Default.SummaryAllowEmpty,
+                commandLineOptions.GetOptionSwitchValue(SummaryAllowEmptyOption.Name)
+                ?? TestReportingOptions.Default.SummaryAllowEmpty,
             SummaryIncludePassedTests =
-                commandLineOptions
-                    .GetOptionArgumentOrDefault(SummaryIncludePassedTestsOption.Name, "false")
-                    ?.Pipe(bool.Parse) ?? TestReportingOptions.Default.SummaryIncludePassedTests,
+                commandLineOptions.GetOptionSwitchValue(SummaryIncludePassedTestsOption.Name)
+                ?? TestReportingOptions.Default.SummaryIncludePassedTests,
             SummaryIncludeSkippedTests =
-                commandLineOptions
-                    .GetOptionArgumentOrDefault(SummaryIncludeSkippedTestsOption.Name, "true")
-                    ?.Pipe(bool.Parse) ?? TestReportingOptions.Default.SummaryIncludeSkippedTests,
+                commandLineOptions.GetOptionSwitchValue(SummaryIncludeSkippedTestsOption.Name)
+                ?? TestReportingOptions.Default.SummaryIncludeSkippedTests,
         };
     }
 }
