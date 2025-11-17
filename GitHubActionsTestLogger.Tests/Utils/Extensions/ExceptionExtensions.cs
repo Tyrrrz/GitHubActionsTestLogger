@@ -5,9 +5,12 @@ namespace GitHubActionsTestLogger.Tests.Utils.Extensions;
 
 internal static class ExceptionExtensions
 {
-    public static Exception ReplaceStackTrace(this Exception exception, string stackTrace)
+    extension(Exception exception)
     {
-        ExceptionDispatchInfo.SetRemoteStackTrace(exception, stackTrace);
-        return exception;
+        public Exception ReplaceStackTrace(string stackTrace)
+        {
+            ExceptionDispatchInfo.SetRemoteStackTrace(exception, stackTrace);
+            return exception;
+        }
     }
 }

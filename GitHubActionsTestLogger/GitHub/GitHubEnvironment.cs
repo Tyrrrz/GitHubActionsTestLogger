@@ -1,5 +1,5 @@
 ﻿using System;
-using GitHubActionsTestLogger.Utils;
+using System.IO;
 using GitHubActionsTestLogger.Utils.Extensions;
 
 namespace GitHubActionsTestLogger.GitHub;
@@ -48,7 +48,7 @@ internal static class GitHubEnvironment
             filePath.StartsWith("/_/", StringComparison.Ordinal)
             && !WorkspacePath.StartsWith("/_/", StringComparison.Ordinal)
                 ? filePath[3..]
-                : PathEx.GetRelativePath(WorkspacePath, filePath);
+                : Path.GetRelativePath(WorkspacePath, filePath);
 
         var filePathRoute = filePathRelative.Replace('\\', '/').Trim('/');
         var lineMarker = line?.Pipe(l => $"#L{l}");

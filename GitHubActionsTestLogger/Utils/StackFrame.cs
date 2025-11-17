@@ -60,6 +60,6 @@ internal record StackFrame(string MethodCall, string? FilePath, int? Line)
         select new StackFrame(
             groups["type"].Value + '.' + groups["method"].Value,
             groups["file"].Value,
-            groups["line"].Value.TryParseInt()
+            groups["line"].Value.Pipe(int.ParseOrNull)
         );
 }
