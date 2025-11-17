@@ -19,7 +19,7 @@
     <img src="favicon.png" alt="Icon" />
 </p>
 
-**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** that can report test results to GitHub Actions.
+**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** for reporting test results to GitHub Actions.
 It lists failed tests in job annotations, highlights them in code diffs, and produces a detailed job summary about the executed test run.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
@@ -48,10 +48,10 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ### [Microsoft.Testing.Platform](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro)
 
-Install the package in your test project and the provided test reporter will be automatically added to your configuration.
+Install the package in your test project and the provided test reporter will be detected and registered automatically.
 
-By default, the reporter is only enabled when running in a GitHub Actions environment (i.e. when the `GITHUB_ACTIONS` environment variable is set to `true`).
-You can also enable it manually, for example if executing in a container, by adding the `--report-github` option when running tests:
+The reporter is enabled by default when running in a GitHub Actions environment.
+You can also enable it manually by adding the `--report-github` option when running tests:
 
 ```yaml
 name: main
@@ -141,10 +141,10 @@ jobs:
 
 ### Customizing behavior
 
-When running the tests, you can pass additional options to customize the behavior of the reporter.
+You can customize the behavior of **GitHub Actions Test Logger** by passing additional options when running tests.
 The format of these options differs slightly between **Microsoft.Testing.Platform** and **VSTest**.
 
-With **Microsoft.Testing.Platform**, the options are prefixed with `--report-github-` and can be specified directly on the command line:
+With **Microsoft.Testing.Platform**, the options are prefixed with `--report-github-` and can be specified as separate arguments on the command line:
 
 ```yml
 jobs:
@@ -163,7 +163,7 @@ jobs:
           --report-github-annotations-message @error
 ```
 
-With **VSTest**, the options are specified as part of the reporter configuration string and don't use the `--report-github-` prefix:
+With **VSTest**, the options don't have a prefix and are specified as part of the reporter configuration string, delimited by semicolons:
 
 ```yml
 jobs:
@@ -203,7 +203,7 @@ The following replacement tokens are available:
 #### Custom annotation message
 
 Use the `[--report-github-]annotations-message` option to specify the annotation message format used for reporting test failures.
-Supports the same replacement tokens as the [title](#custom-annotation-title).
+Supports the same replacement tokens as the [title format](#custom-annotation-title).
 
 **Default**: `@error`.
 
