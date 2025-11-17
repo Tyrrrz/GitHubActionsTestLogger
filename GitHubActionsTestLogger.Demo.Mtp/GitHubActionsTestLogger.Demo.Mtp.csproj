@@ -5,15 +5,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <!-- Prevent these tests from running by default, since they are intended to fail by design -->
     <IsTestProject>false</IsTestProject>
-    <TestingPlatformDotnetTestSupport Condition="$(IsTestProject)"
-      >true</TestingPlatformDotnetTestSupport
-    >
+    <EnableMSTestRunner Condition="$(IsTestProject)">true</EnableMSTestRunner>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="MSTest" Version="4.0.1" />
     <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.2" />
-    <PackageReference Include="xunit.v3" Version="3.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GitHubActionsTestLogger\GitHubActionsTestLogger.csproj" />

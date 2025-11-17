@@ -69,13 +69,13 @@ build:
       uses: actions/setup-dotnet@v4
 
     - name: Build & test
-      # Empty double dash separates MTP options from dotnet test options
-      run: dotnet test --configuration Release -- --report-github
+      # If running in VSTest mode, add an empty double dash sequence (--) before reporter options
+      run: dotnet test --configuration Release --report-github
 ```
 
 > **Important**:
 > The extension has a peer dependency on **Microsoft.Testing.Platform** when used in this mode.
-> Your test project should already have a reference to this package, but make sure it is updated to the latest version.
+> Your test project may already have a reference to this package, but make sure it is updated to the latest version.
 
 ### [VSTest](https://github.com/microsoft/vstest)
 
@@ -102,7 +102,7 @@ build:
 
 > **Important**:
 > The extension has a peer dependency on **Microsoft.NET.Test.Sdk** when used in this mode.
-> Your test project should already have a reference to this package, but make sure it is updated to the latest version.
+> Your test project may already have a reference to this package, but make sure it is updated to the latest version.
 
 > **Important**:
 > If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
@@ -158,7 +158,6 @@ jobs:
         run: >
           dotnet test
           --configuration Release
-          --
           --report-github
           --report-github-annotations-title @test
           --report-github-annotations-message @error

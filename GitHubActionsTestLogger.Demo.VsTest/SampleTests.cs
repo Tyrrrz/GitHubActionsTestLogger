@@ -1,16 +1,17 @@
 using System;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GitHubActionsTestLogger.Demo.VsTest;
 
+[TestClass]
 public class SampleTests
 {
-    [Fact]
-    public void Test1() => Assert.True(true);
+    [TestMethod]
+    public void Test1() => Assert.IsEmpty("");
 
-    [Fact]
+    [TestMethod]
     public void Test2() => throw new InvalidOperationException();
 
-    [Fact]
-    public void Test3() => Assert.True(false);
+    [TestMethod]
+    public void Test3() => Assert.Fail();
 }
