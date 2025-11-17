@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Mtp;
+using GitHubActionsTestLogger.Tests.Utils;
 using Microsoft.Testing.Platform.Builder;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,11 +16,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_test_suite_name()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-allow-empty",
         ]);
@@ -43,11 +45,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_list_of_failed_tests()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
         ]);
 
@@ -94,11 +97,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_list_of_passed_tests()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-include-passed",
         ]);
@@ -135,11 +139,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_does_not_include_the_list_of_passed_tests()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-include-passed",
             "false",
@@ -177,11 +182,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_list_of_skipped_tests()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-include-skipped",
         ]);
@@ -218,11 +224,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_does_not_include_the_list_of_skipped_tests()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-include-skipped",
             "false",
@@ -260,11 +267,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_empty_test_runs()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-allow-empty",
         ]);
@@ -287,11 +295,12 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_does_not_include_empty_test_runs()
     {
         // Arrange
+        using var testResultsDir = TempDir.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
-            Path.Combine(Directory.GetCurrentDirectory(), "FakeTestResults"),
+            testResultsDir.Path,
             "--report-github",
             "--report-github-summary-allow-empty",
             "false",

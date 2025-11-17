@@ -37,7 +37,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
 
     public string Version { get; } = typeof(MtpLogger).Assembly.TryGetVersionString() ?? "1.0.0";
 
-    public string DisplayName => "GitHub Actions Test Logger";
+    public string DisplayName => Uid;
 
     public string Description => "Reports test results to GitHub Actions.";
 

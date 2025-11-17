@@ -65,7 +65,7 @@ internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
     public string Version { get; } =
         typeof(MtpLoggerOptionsProvider).Assembly.TryGetVersionString() ?? "1.0.0";
 
-    public string DisplayName => "GitHub Actions Test Logger Options Provider";
+    public string DisplayName => Uid;
 
     public string Description =>
         "Provides command line options for the GitHub Actions Test Logger.";

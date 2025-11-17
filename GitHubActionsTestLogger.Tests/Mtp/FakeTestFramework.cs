@@ -12,7 +12,7 @@ internal class FakeTestFramework(IReadOnlyList<TestNode> testNodes) : ITestFrame
 
     public string Version => "1.33.7";
 
-    public string DisplayName => "Fake Test Framework";
+    public string DisplayName => Uid;
 
     public string Description => "A fake test framework with predefined test nodes.";
 

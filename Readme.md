@@ -19,8 +19,8 @@
     <img src="favicon.png" alt="Icon" />
 </p>
 
-**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** that integrates test reporting with GitHub Actions.
-It lists failed tests in job annotations, highlights them in code diffs, and produces a detailed job summary with information about the executed test run.
+**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** that can report test results to GitHub Actions.
+It lists failed tests in job annotations, highlights them in code diffs, and produces a detailed job summary about the executed test run.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
 
@@ -48,10 +48,10 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ### [Microsoft.Testing.Platform](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro)
 
-Simply install the package in your test project.
-The provided test reporter will automatically be detected and enabled when running in a GitHub Actions environment.
+Install the package in your test project and the provided test reporter will be automatically added to your configuration.
 
-If you want to enable the reporter manually, for example when executing in a containerized environment, add the `--report-github` option when running tests:
+By default, the reporter is only enabled when running in a GitHub Actions environment (i.e. when the `GITHUB_ACTIONS` environment variable is set to `true`).
+You can also enable it manually, for example if executing in a container, by adding the `--report-github` option when running tests:
 
 ```yaml
 name: main
@@ -74,12 +74,12 @@ build:
 ```
 
 > **Important**:
-> The logger has a peer dependency on **Microsoft.Testing.Platform**.
+> The extension has a peer dependency on **Microsoft.Testing.Platform** when used in this mode.
 > Your test project should already have a reference to this package, but make sure it is updated to the latest version.
 
 ### [VSTest](https://github.com/microsoft/vstest)
 
-Install the package in your test project and specify the logger when running `dotnet test`:
+Install the package in your test project and enable the reporter by adding the `--logger GitHubActions` option when running tests:
 
 ```yaml
 name: main
@@ -101,7 +101,7 @@ build:
 ```
 
 > **Important**:
-> The logger has a peer dependency on **Microsoft.NET.Test.Sdk**.
+> The extension has a peer dependency on **Microsoft.NET.Test.Sdk** when used in this mode.
 > Your test project should already have a reference to this package, but make sure it is updated to the latest version.
 
 > **Important**:
@@ -110,7 +110,7 @@ build:
 #### Collecting source information
 
 **GitHub Actions Test Logger** can leverage source information to link reported test results to the locations in the source code where the corresponding tests are defined.
-By default, VSTest does not collect source information, so the logger relies on stack traces to extract it manually.
+By default, VSTest does not collect source information, so the extension relies on stack traces to extract it manually.
 This approach only works for failed tests, and even then may not always be fully accurate.
 
 To instruct the runner to collect source information, add the `RunConfiguration.CollectSourceInformation=true` argument to the command as shown below:
@@ -137,13 +137,14 @@ jobs:
 > This option can also be enabled by setting the corresponding property in a [`.runsettings` file](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file) instead.
 
 > **Warning**:
-> Source information collection may not work properly with legacy .NET Framework.
+> Source information collection may not work properly with the legacy .NET Framework.
 
 ### Customizing behavior
 
-When running `dotnet test`, you can customize the logger's behavior by passing additional options on the command line:
+When running the tests, you can pass additional options to customize the behavior of the reporter.
+The format of these options differs slightly between **Microsoft.Testing.Platform** and **VSTest**.
 
-**Microsoft.Testing.Platform**:
+With **Microsoft.Testing.Platform**, the options are prefixed with `--report-github-` and can be specified directly on the command line:
 
 ```yml
 jobs:
@@ -159,11 +160,11 @@ jobs:
           --configuration Release
           --
           --report-github
-          --report-github-annotations-title=@test
-          --report-github-annotations-message=@error
+          --report-github-annotations-title @test
+          --report-github-annotations-message @error
 ```
 
-**VSTest**:
+With **VSTest**, the options are specified as part of the reporter configuration string and don't use the `--report-github-` prefix:
 
 ```yml
 jobs:
@@ -203,7 +204,7 @@ The following replacement tokens are available:
 #### Custom annotation message
 
 Use the `[--report-github-]annotations-message` option to specify the annotation message format used for reporting test failures.
-Supports the same replacement tokens as the [annotations title](#custom-annotation-title).
+Supports the same replacement tokens as the [title](#custom-annotation-title).
 
 **Default**: `@error`.
 
@@ -221,7 +222,6 @@ Use the `[--report-github-]summary-allow-empty` option to specify whether empty 
 #### Include passed tests in the summary
 
 Use the `[--report-github-]summary-include-passed` option to specify whether passed tests should be included in the summary.
-If you want to link passed tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `true`.
 
@@ -231,7 +231,6 @@ If you want to link passed tests to their corresponding source definitions, make
 #### Include skipped tests in the summary
 
 Use the `[--report-github-]summary-include-skipped` option to specify whether skipped tests should be included in the summary.
-If you want to link skipped tests to their corresponding source definitions, make sure to also enable [source information collection](#collecting-source-information).
 
 **Default**: `true`.
 
