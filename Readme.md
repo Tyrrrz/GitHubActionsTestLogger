@@ -58,19 +58,19 @@ name: main
 on: [push, pull_request]
 
 jobs:
-build:
-  runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Install .NET
-      uses: actions/setup-dotnet@v4
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
 
-    - name: Build & test
-      # If running in VSTest mode, add an empty double dash sequence (--) before reporter options
-      run: dotnet test --configuration Release --report-github
+      - name: Build & test
+        # If running in VSTest mode, add an empty double dash sequence (--) before reporter options
+        run: dotnet test --configuration Release --report-github
 ```
 
 > **Important**:
@@ -86,18 +86,18 @@ name: main
 on: [push, pull_request]
 
 jobs:
-build:
-  runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Install .NET
-      uses: actions/setup-dotnet@v4
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
 
-    - name: Build & test
-      run: dotnet test --configuration Release --logger GitHubActions
+      - name: Build & test
+        run: dotnet test --configuration Release --logger GitHubActions
 ```
 
 > **Important**:
