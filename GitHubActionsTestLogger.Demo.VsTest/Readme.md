@@ -1,4 +1,4 @@
-# GitHub Actions Test Logger Demo
+# GitHub Actions Test Logger Demo (VSTest)
 
 To run the demo tests, use the following command:
 

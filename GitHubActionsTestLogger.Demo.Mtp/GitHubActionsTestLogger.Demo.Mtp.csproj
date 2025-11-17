@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Props/targets are automatically imported by NuGet, but we need to do it manually for local testing -->
+  <Import Project="../GitHubActionsTestLogger/GitHubActionsTestLogger.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Prevent these tests from running by default, since they are intended to fail by design -->
+    <IsTestProject>false</IsTestProject>
+    <EnableMSTestRunner Condition="$(IsTestProject)">true</EnableMSTestRunner>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="Microsoft.VisualStudio.TestTools.UnitTesting.ParallelizeAttribute" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
+    <PackageReference Include="MSTest" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GitHubActionsTestLogger\GitHubActionsTestLogger.csproj" />
+  </ItemGroup>
+</Project>

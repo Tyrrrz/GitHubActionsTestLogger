@@ -1,23 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace GitHubActionsTestLogger.Tests.Utils.Extensions;
+namespace GitHubActionsTestLogger.Tests.VsTest;
 
-internal static class TestLoggerContextExtensions
+internal class FakeTestLoggerEvents : TestLoggerEvents
 {
-    public static void SimulateTestRun(
-        this TestLoggerContext context,
+    // Not all of these events need to be raised, but they all need to be provided for the interface
+#pragma warning disable CS0067
+    public override event EventHandler<TestRunMessageEventArgs>? TestRunMessage;
+    public override event EventHandler<TestRunStartEventArgs>? TestRunStart;
+    public override event EventHandler<TestResultEventArgs>? TestResult;
+    public override event EventHandler<TestRunCompleteEventArgs>? TestRunComplete;
+    public override event EventHandler<DiscoveryStartEventArgs>? DiscoveryStart;
+    public override event EventHandler<TestRunMessageEventArgs>? DiscoveryMessage;
+    public override event EventHandler<DiscoveredTestsEventArgs>? DiscoveredTests;
+    public override event EventHandler<DiscoveryCompleteEventArgs>? DiscoveryComplete;
+#pragma warning restore CS0067
+
+    public void RaiseTestRunStart(TestRunStartEventArgs args) => TestRunStart?.Invoke(this, args);
+
+    public void RaiseTestResult(TestResultEventArgs args) => TestResult?.Invoke(this, args);
+
+    public void RaiseTestRunComplete(TestRunCompleteEventArgs args) =>
+        TestRunComplete?.Invoke(this, args);
+
+    public void SimulateTestRun(
         string testSuiteFilePath,
         string targetFrameworkName,
         params IReadOnlyList<TestResult> testResults
     )
     {
-        context.HandleTestRunStart(
+        RaiseTestRunStart(
             new TestRunStartEventArgs(
                 new TestRunCriteria(
                     [testSuiteFilePath],
@@ -36,9 +53,9 @@ internal static class TestLoggerContextExtensions
         );
 
         foreach (var testResult in testResults)
-            context.HandleTestResult(new TestResultEventArgs(testResult));
+            RaiseTestResult(new TestResultEventArgs(testResult));
 
-        context.HandleTestRunComplete(
+        RaiseTestRunComplete(
             new TestRunCompleteEventArgs(
                 new TestRunStatistics(
                     new Dictionary<TestOutcome, long>
@@ -58,20 +75,17 @@ internal static class TestLoggerContextExtensions
                 false,
                 false,
                 null,
-                new Collection<AttachmentSet>(),
+                [],
                 TimeSpan.FromSeconds(1.234)
             )
         );
     }
 
-    public static void SimulateTestRun(
-        this TestLoggerContext context,
+    public void SimulateTestRun(
         string testSuiteName,
         params IReadOnlyList<TestResult> testResults
-    ) => context.SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
+    ) => SimulateTestRun(testSuiteName, "FakeTargetFramework", testResults);
 
-    public static void SimulateTestRun(
-        this TestLoggerContext context,
-        params IReadOnlyList<TestResult> testResults
-    ) => context.SimulateTestRun("FakeTests.dll", testResults);
+    public void SimulateTestRun(params IReadOnlyList<TestResult> testResults) =>
+        SimulateTestRun("FakeTests.dll", testResults);
 }

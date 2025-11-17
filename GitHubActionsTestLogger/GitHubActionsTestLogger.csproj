@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <IsTrimmable
       Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))"
@@ -13,8 +13,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Authors>$(Company)</Authors>
-    <Description>Custom test logger that reports test results in a structured format that GitHub Actions understands</Description>
-    <PackageTags>github actions test logger</PackageTags>
+    <Description>VSTest and MTP extension that reports test results to GitHub Actions</Description>
+    <PackageTags>github actions test result logger reporter</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/GitHubActionsTestLogger</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/releases</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
@@ -23,10 +23,16 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
+    <Content Include="GitHubActionsTestLogger.props" Pack="true" PackagePath="build" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="1.1.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="18.0.0" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.2" PrivateAssets="all" />
+    <PackageReference
+      Include="Microsoft.TestPlatform.ObjectModel"
+      Version="18.0.1"
+      PrivateAssets="all"
+    />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
     <PackageReference

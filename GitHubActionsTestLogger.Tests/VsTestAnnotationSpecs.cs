@@ -1,14 +1,14 @@
+using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
-using GitHubActionsTestLogger.Tests.Utils;
-using GitHubActionsTestLogger.Tests.Utils.Extensions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
 using Xunit.Abstractions;
+using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
 
 namespace GitHubActionsTestLogger.Tests;
 
-public class AnnotationSpecs(ITestOutputHelper testOutput)
+public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
 {
     [Fact]
     public void I_can_use_the_logger_to_produce_annotations_for_failed_tests()
@@ -16,13 +16,13 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestLoggerOptions.Default
-        );
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(events, [], commandWriter, TextWriter.Null);
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
@@ -46,21 +46,18 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_extracted_from_exceptions()
     {
-        // .NET test platform never sends source information, so we can only
-        // rely on exception stack traces to get it.
-
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestLoggerOptions.Default
-        );
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(events, [], commandWriter, TextWriter.Null);
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("I can execute a command with buffering and cancel it immediately")
                 .SetFullyQualifiedName(
@@ -96,21 +93,18 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_for_async_tests()
+    public void I_can_use_the_logger_to_produce_annotations_that_include_source_information_extracted_from_async_exceptions()
     {
-        // .NET test platform never sends source information, so we can only
-        // rely on exception stack traces to get it.
-
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            TestLoggerOptions.Default
-        );
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(events, [], commandWriter, TextWriter.Null);
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("SendEnvelopeAsync_ItemRateLimit_DropsItem")
                 .SetFullyQualifiedName(
@@ -155,17 +149,22 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?>
             {
-                AnnotationTitleFormat = "<@test>",
-                AnnotationMessageFormat = "[@test]",
-            }
+                ["annotations-title"] = "<@test>",
+                ["annotations-message"] = "[@test]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
@@ -184,17 +183,22 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?>
             {
-                AnnotationTitleFormat = "<@traits.Category -> @test>",
-                AnnotationMessageFormat = "[@traits.Category -> @test]",
-            }
+                ["annotations-title"] = "<@traits.Category -> @test>",
+                ["annotations-message"] = "[@traits.Category -> @test]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetTrait("Category", "UI Test")
@@ -218,17 +222,22 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?>
             {
-                AnnotationTitleFormat = "<@test: @error>",
-                AnnotationMessageFormat = "[@test: @error]",
-            }
+                ["annotations-title"] = "<@test: @error>",
+                ["annotations-message"] = "[@test: @error]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
@@ -251,17 +260,22 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?>
             {
-                AnnotationTitleFormat = "<@test: @trace>",
-                AnnotationMessageFormat = "[@test: @trace]",
-            }
+                ["annotations-title"] = "<@test: @trace>",
+                ["annotations-message"] = "[@test: @trace]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder()
                 .SetDisplayName("Test1")
                 .SetOutcome(TestOutcome.Failed)
@@ -284,24 +298,25 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?>
             {
-                AnnotationTitleFormat = "<@test (@framework)>",
-                AnnotationMessageFormat = "[@test (@framework)]",
-            }
+                ["annotations-title"] = "<@test (@framework)>",
+                ["annotations-message"] = "[@test (@framework)]",
+            },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             "FakeTests.dll",
             "FakeTargetFramework",
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetOutcome(TestOutcome.Failed)
-                .SetErrorStackTrace("ErrorStackTrace")
-                .Build()
+            new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 
         // Assert
@@ -319,13 +334,18 @@ public class AnnotationSpecs(ITestOutputHelper testOutput)
         // Arrange
         using var commandWriter = new StringWriter();
 
-        var context = new TestLoggerContext(
-            new GitHubWorkflow(commandWriter, TextWriter.Null),
-            new TestLoggerOptions { AnnotationMessageFormat = "foo\\nbar" }
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?> { ["annotations-message"] = "foo\\nbar" },
+            commandWriter,
+            TextWriter.Null
         );
 
         // Act
-        context.SimulateTestRun(
+        events.SimulateTestRun(
             new TestResultBuilder().SetDisplayName("Test1").SetOutcome(TestOutcome.Failed).Build()
         );
 

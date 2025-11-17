@@ -4,11 +4,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GitHubActionsTestLogger.Utils;
 
 internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileMode) : Stream
 {
+    // Random is used to introduce variance in backoff delays.
+    // Fixed seed for reproducibility in tests and debugging.
+    private readonly Random _random = new(1173363);
+
     private readonly List<byte> _buffer = new(1024);
 
     [ExcludeFromCodeCoverage]
@@ -38,7 +43,7 @@ internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileM
             catch (IOException) when (retriesRemaining > 0)
             {
                 // Variance in delay to avoid overlapping back-offs
-                Thread.Sleep(RandomEx.Shared.Next(200, 1000));
+                Thread.Sleep(_random.Next(200, 1000));
             }
         }
     }
@@ -46,11 +51,14 @@ internal class ContentionTolerantWriteFileStream(string filePath, FileMode fileM
     public override void Write(byte[] buffer, int offset, int count) =>
         _buffer.AddRange(buffer.Skip(offset).Take(count));
 
-    public override void Flush()
+    public override async Task FlushAsync(CancellationToken cancellationToken)
     {
         using var stream = CreateInnerStream();
-        stream.Write(_buffer.ToArray(), 0, _buffer.Count);
+        await stream.WriteAsync(_buffer.ToArray(), 0, _buffer.Count, cancellationToken);
     }
+
+    [ExcludeFromCodeCoverage]
+    public override void Flush() => FlushAsync().GetAwaiter().GetResult();
 
     [ExcludeFromCodeCoverage]
     protected override void Dispose(bool disposing)

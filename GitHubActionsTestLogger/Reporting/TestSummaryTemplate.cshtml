@@ -1,8 +1,8 @@
 ﻿@using System
 @using System.Collections.Generic
 @using System.Linq
+@using GitHubActionsTestLogger.GitHub
 @using GitHubActionsTestLogger.Utils.Extensions
-@using Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 @inherits RazorBlade.HtmlTemplate
 
@@ -12,19 +12,19 @@
 
     public required string TargetFramework { get; init; }
 
-    public required TestRunStatistics TestRunStatistics { get; init; }
+    public required TestRunEndInfo TestRunEndInfo { get; init; }
 
     public required IReadOnlyList<TestResult> TestResults { get; init; }
 }
 
 <details>
     @{
-        var overallOutcomeEmoji = TestRunStatistics.OverallOutcome switch
+        var overallOutcomeEmoji = TestRunEndInfo.OverallOutcome switch
         {
+            TestOutcome.None => "⚪️",
             TestOutcome.Passed => "🟢",
             TestOutcome.Failed => "🔴",
             TestOutcome.Skipped => "🟡",
-            TestOutcome.NotFound => "⚪️",
             _ => "\u2753"
         };
     }
@@ -44,40 +44,40 @@
         <th width="99999">⧗&nbsp;&nbsp;Elapsed</th>
         <tr>
             <td align="center">
-                @(TestRunStatistics.PassedTestCount > 0
-                    ? TestRunStatistics.PassedTestCount.ToString()
+                @(TestRunEndInfo.PassedTestCount > 0
+                    ? TestRunEndInfo.PassedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @(TestRunStatistics.FailedTestCount > 0
-                    ? TestRunStatistics.FailedTestCount.ToString()
+                @(TestRunEndInfo.FailedTestCount > 0
+                    ? TestRunEndInfo.FailedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @(TestRunStatistics.SkippedTestCount > 0
-                    ? TestRunStatistics.SkippedTestCount.ToString()
+                @(TestRunEndInfo.SkippedTestCount > 0
+                    ? TestRunEndInfo.SkippedTestCount.ToString()
                     : "—")
             </td>
             <td align="center">
-                @TestRunStatistics.TotalTestCount
+                @TestRunEndInfo.TotalTestCount
             </td>
             <td align="center">
-                @TestRunStatistics.OverallDuration.ToHumanString()
+                @TestRunEndInfo.Duration.ToHumanString()
             </td>
         </tr>
     </table>
 
     @{
         var testResultGroups = TestResults
-            .GroupBy(r => r.TestCase.GetTypeFullyQualifiedName(), StringComparer.Ordinal)
+            .GroupBy(r => r.Definition.TypeSymbol.FullyQualifiedName, StringComparer.Ordinal)
             .Select(g => new
             {
                 TypeFullyQualifiedName = g.Key,
-                TypeName = g.First().TestCase.GetTypeMinimallyQualifiedName(),
+                TypeName = g.First().Definition.TypeSymbol.MinimallyQualifiedName,
                 TestResults = g
                     .OrderByDescending(r => r.Outcome == TestOutcome.Failed)
                     .ThenByDescending(r => r.Outcome == TestOutcome.Passed)
-                    .ThenBy(r => r.TestCase.DisplayName, StringComparer.Ordinal)
+                    .ThenBy(r => r.Definition.DisplayName, StringComparer.Ordinal)
                     .ToArray()
             })
             .OrderByDescending(g => g.TestResults.Any(r => r.Outcome == TestOutcome.Failed))
@@ -106,26 +106,24 @@
                     {
                         var outcomeEmoji = testResult.Outcome switch
                         {
+                            TestOutcome.None => "⬜",
                             TestOutcome.Passed => "🟩",
                             TestOutcome.Failed => "🟥",
                             TestOutcome.Skipped => "🟨",
-                            TestOutcome.NotFound => "⬜",
                             _ => "\u2753"
                         };
 
                         // Use the display name if it's different from the fully qualified name,
                         // otherwise use the minimally qualified name.
                         var testName = !string.Equals(
-                            testResult.TestCase.DisplayName,
-                            testResult.TestCase.FullyQualifiedName,
+                            testResult.Definition.DisplayName,
+                            testResult.Definition.Symbol.FullyQualifiedName,
                             StringComparison.Ordinal)
-                            ? testResult.TestCase.DisplayName
-                            : testResult.TestCase.GetMinimallyQualifiedName();
+                            ? testResult.Definition.DisplayName
+                            : testResult.Definition.Symbol.MinimallyQualifiedName;
 
                         // Test source permalink
-                        var filePath = testResult.TryGetSourceFilePath();
-                        var fileLine = testResult.TryGetSourceLine();
-                        var url = filePath?.Pipe(p => GitHubWorkflow.TryGenerateFilePermalink(p, fileLine));
+                        var url = testResult.Definition.SourceFilePath?.Pipe(p => GitHubEnvironment.TryGenerateFilePermalink(p, testResult.Definition.SourceFileLineNumber));
 
                         <li>
                             @outcomeEmoji
@@ -161,14 +159,14 @@
 
 @functions
 {
-    // In order to produce HTML that's also valid Markdown, we need to
-    // remove some whitespace inside literals.
-    public new void WriteLiteral(string? literal)
+    // We need to override the WriteLiteral(...) method to rewrite some literals
+    // so that the generated HTML appears correctly in Markdown.
+    protected override void WriteLiteral(string? value)
     {
-        if (!string.IsNullOrEmpty(literal))
+        if (!string.IsNullOrEmpty(value))
         {
             base.WriteLiteral(
-                literal
+                value
                     // Remove indentation
                     .Replace("    ", "", StringComparison.Ordinal)
                     // Remove linebreaks
@@ -178,7 +176,7 @@
         }
         else
         {
-            base.WriteLiteral(literal);
+            base.WriteLiteral(value);
         }
     }
 

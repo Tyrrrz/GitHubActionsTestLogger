@@ -7,16 +7,7 @@ using GitHubActionsTestLogger.Utils.Extensions;
 namespace GitHubActionsTestLogger.Utils;
 
 // Adapted from https://github.com/atifaziz/StackTraceParser
-internal partial class StackFrame(string methodCall, string? filePath, int? line)
-{
-    public string MethodCall { get; } = methodCall;
-
-    public string? FilePath { get; } = filePath;
-
-    public int? Line { get; } = line;
-}
-
-internal partial class StackFrame
+internal record StackFrame(string MethodCall, string? FilePath, int? Line)
 {
     private const string Space = @"[\x20\t]";
     private const string NotSpace = @"[^\x20\t]";

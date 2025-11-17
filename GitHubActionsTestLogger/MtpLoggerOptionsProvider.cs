@@ -1,0 +1,145 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GitHubActionsTestLogger.GitHub;
+using GitHubActionsTestLogger.Reporting;
+using GitHubActionsTestLogger.Utils.Extensions;
+using Microsoft.Testing.Platform.CommandLine;
+using Microsoft.Testing.Platform.Extensions;
+using Microsoft.Testing.Platform.Extensions.CommandLine;
+
+namespace GitHubActionsTestLogger;
+
+internal partial class MtpLoggerOptionsProvider : ICommandLineOptionsProvider
+{
+    private static readonly CommandLineOption IsEnabledOption = new(
+        "report-github",
+        $"Enables the GitHub Actions test reporter. Default is '{GitHubEnvironment.IsRunningInActions}'.",
+        ArgumentArity.ZeroOrOne,
+        false
+    );
+
+    private static readonly CommandLineOption AnnotationsTitleFormatOption = new(
+        $"{IsEnabledOption.Name}-annotations-title",
+        "Specifies the title format for GitHub Annotations. See documentation for available replacement tokens. "
+            + $"Default is '{TestReportingOptions.Default.AnnotationTitleFormat}'.",
+        ArgumentArity.ExactlyOne,
+        false
+    );
+
+    private static readonly CommandLineOption AnnotationsMessageFormatOption = new(
+        $"{IsEnabledOption.Name}-annotations-message",
+        "Specifies the message format for GitHub Annotations. See documentation for available replacement tokens. "
+            + $"Default is '{TestReportingOptions.Default.AnnotationMessageFormat}'.",
+        ArgumentArity.ExactlyOne,
+        false
+    );
+
+    private static readonly CommandLineOption SummaryAllowEmptyOption = new(
+        $"{IsEnabledOption.Name}-summary-allow-empty",
+        "Whether to produce a summary entry for test runs where no tests were executed. "
+            + $"Default is '{TestReportingOptions.Default.SummaryAllowEmpty}'.",
+        ArgumentArity.ZeroOrOne,
+        false
+    );
+
+    private static readonly CommandLineOption SummaryIncludePassedTestsOption = new(
+        $"{IsEnabledOption.Name}-summary-include-passed",
+        "Whether to include passed tests (in addition to failed tests) in the GitHub Actions summary. "
+            + $"Default is '{TestReportingOptions.Default.SummaryIncludePassedTests}'.",
+        ArgumentArity.ZeroOrOne,
+        false
+    );
+
+    private static readonly CommandLineOption SummaryIncludeSkippedTestsOption = new(
+        $"{IsEnabledOption.Name}-summary-include-skipped",
+        "Whether to include skipped tests (in addition to failed tests) in the GitHub Actions summary. "
+            + $"Default is '{TestReportingOptions.Default.SummaryIncludeSkippedTests}'.",
+        ArgumentArity.ZeroOrOne,
+        false
+    );
+
+    public string Uid => "GitHubActionsTestLogger/OptionsProvider";
+
+    public string Version { get; } =
+        typeof(MtpLoggerOptionsProvider).Assembly.TryGetVersionString() ?? "1.0.0";
+
+    public string DisplayName => Uid;
+
+    public string Description =>
+        "Provides command line options for the GitHub Actions Test Logger.";
+
+    public Task<bool> IsEnabledAsync() => Task.FromResult(true);
+
+    public IReadOnlyCollection<CommandLineOption> GetCommandLineOptions() =>
+        [
+            IsEnabledOption,
+            AnnotationsTitleFormatOption,
+            AnnotationsMessageFormatOption,
+            SummaryAllowEmptyOption,
+            SummaryIncludePassedTestsOption,
+            SummaryIncludeSkippedTestsOption,
+        ];
+
+    // This method is called once after all options are parsed and is used to validate the combination of options.
+    public Task<ValidationResult> ValidateCommandLineOptionsAsync(
+        ICommandLineOptions commandLineOptions
+    )
+    {
+        if (!commandLineOptions.IsOptionSet(IsEnabledOption.Name))
+        {
+            var invalidOptionNames = GetCommandLineOptions()
+                .Select(o => o.Name)
+                .Where(n => !string.Equals(n, IsEnabledOption.Name, StringComparison.Ordinal))
+                .Where(commandLineOptions.IsOptionSet)
+                .ToArray();
+
+            if (invalidOptionNames.Any())
+            {
+                return ValidationResult.InvalidTask(
+                    $"Option(s) {string.Join(", ", invalidOptionNames.Select(n => "--" + n))} can only be used when '--{IsEnabledOption.Name}' is also specified."
+                );
+            }
+        }
+
+        return ValidationResult.ValidTask;
+    }
+
+    // This method is called once per option declared and is used to validate the arguments of the given option.
+    // The arity of the option is checked before this method is called.
+    public Task<ValidationResult> ValidateOptionArgumentsAsync(
+        CommandLineOption commandOption,
+        string[] arguments
+    ) => ValidationResult.ValidTask;
+}
+
+internal partial class MtpLoggerOptionsProvider
+{
+    public static TestReportingOptions Resolve(
+        out bool? isEnabled,
+        ICommandLineOptions commandLineOptions
+    )
+    {
+        isEnabled = commandLineOptions.GetOptionSwitchValue(IsEnabledOption.Name);
+
+        return new TestReportingOptions
+        {
+            AnnotationTitleFormat =
+                commandLineOptions.GetOptionArgumentOrDefault(AnnotationsTitleFormatOption.Name)
+                ?? TestReportingOptions.Default.AnnotationTitleFormat,
+            AnnotationMessageFormat =
+                commandLineOptions.GetOptionArgumentOrDefault(AnnotationsMessageFormatOption.Name)
+                ?? TestReportingOptions.Default.AnnotationMessageFormat,
+            SummaryAllowEmpty =
+                commandLineOptions.GetOptionSwitchValue(SummaryAllowEmptyOption.Name)
+                ?? TestReportingOptions.Default.SummaryAllowEmpty,
+            SummaryIncludePassedTests =
+                commandLineOptions.GetOptionSwitchValue(SummaryIncludePassedTestsOption.Name)
+                ?? TestReportingOptions.Default.SummaryIncludePassedTests,
+            SummaryIncludeSkippedTests =
+                commandLineOptions.GetOptionSwitchValue(SummaryIncludeSkippedTestsOption.Name)
+                ?? TestReportingOptions.Default.SummaryIncludeSkippedTests,
+        };
+    }
+}
