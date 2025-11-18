@@ -11,20 +11,17 @@
       >true</IsAotCompatible
     >
   </PropertyGroup>
+
   <PropertyGroup>
-    <Authors>$(Company)</Authors>
-    <Description>VSTest and MTP extension that reports test results to GitHub Actions</Description>
-    <PackageTags>github actions test result logger reporter</PackageTags>
-    <PackageProjectUrl>https://github.com/Tyrrrz/GitHubActionsTestLogger</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/releases</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
+
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
     <Content Include="GitHubActionsTestLogger.props" Pack="true" PackagePath="build" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.2" PrivateAssets="all" />

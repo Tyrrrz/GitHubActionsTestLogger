@@ -23,4 +23,13 @@
     <EnableAotAnalyzer>false</EnableAotAnalyzer>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Authors>$(Company)</Authors>
+    <Description>VSTest and MTP extension that reports test results to GitHub Actions</Description>
+    <PackageTags>github actions test result logger reporter</PackageTags>
+    <PackageProjectUrl>https://github.com/Tyrrrz/GitHubActionsTestLogger</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/Tyrrrz/GitHubActionsTestLogger/releases</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
 </Project>
