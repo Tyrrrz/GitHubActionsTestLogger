@@ -20,7 +20,7 @@
 </p>
 
 **GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** for reporting test results to GitHub Actions.
-It lists failed tests in job annotations, highlights them in code diffs, and produces a detailed job summary about the executed test run.
+It lists failed tests in job annotations, highlights them in code diffs, and produces detailed job summaries about the executed test runs.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
 
@@ -69,7 +69,7 @@ jobs:
         uses: actions/setup-dotnet@v4
 
       - name: Build & test
-        # If running in VSTest mode, add an empty double dash sequence (--) before reporter options
+        # For .NET 9 and lower, add an extra empty double dash sequence (--) before reporter options
         run: dotnet test --configuration Release --report-github
 ```
 
