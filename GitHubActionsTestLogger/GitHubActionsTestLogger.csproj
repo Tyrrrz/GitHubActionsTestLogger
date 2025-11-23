@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageIcon>favicon.png</PackageIcon>
-    <DevelopmentDependency>true</DevelopmentDependency>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

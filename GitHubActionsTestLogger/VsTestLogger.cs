@@ -13,6 +13,9 @@ using TestResult = GitHubActionsTestLogger.Reporting.TestResult;
 
 namespace GitHubActionsTestLogger;
 
+/// <summary>
+/// GitHub Actions test logger for Visual Studio Test Platform (VSTest).
+/// </summary>
 [FriendlyName("GitHubActions")]
 [ExtensionUri("logger://tyrrrz/ghactions/v3")]
 public class VsTestLogger : ITestLoggerWithParameters
@@ -30,6 +33,13 @@ public class VsTestLogger : ITestLoggerWithParameters
         events.TestRunComplete += (_, args) => OnTestRunComplete(args);
     }
 
+    /// <summary>
+    /// Initializes the logger.
+    /// </summary>
+    /// <remarks>
+    /// This overload is useful for testing purposes, as it allows providing custom
+    /// writers for GitHub's command and summary outputs.
+    /// </remarks>
     public void Initialize(
         TestLoggerEvents events,
         Dictionary<string, string?> parameters,
@@ -64,6 +74,9 @@ public class VsTestLogger : ITestLoggerWithParameters
         Initialize(events, context);
     }
 
+    /// <summary>
+    /// Initializes the logger.
+    /// </summary>
     public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters) =>
         Initialize(
             events,
@@ -72,6 +85,9 @@ public class VsTestLogger : ITestLoggerWithParameters
             GitHubWorkflow.DefaultSummaryWriter
         );
 
+    /// <summary>
+    /// Initializes the logger.
+    /// </summary>
     public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
         Initialize(events, []);
 

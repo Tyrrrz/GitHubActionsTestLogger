@@ -6,8 +6,12 @@ using Microsoft.Testing.Platform.Services;
 
 namespace GitHubActionsTestLogger;
 
+/// <summary>
+/// Extensions that integrate GitHub Actions test reporting into the Microsoft Testing Platform.
+/// </summary>
 public static class MtpIntegration
 {
+    /// <inheritdoc cref="MtpIntegration" />
     extension(ITestApplicationBuilder testApplicationBuilder)
     {
         /// <summary>
