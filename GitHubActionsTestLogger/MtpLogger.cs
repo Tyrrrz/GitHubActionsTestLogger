@@ -97,7 +97,8 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
             message.TestNode.TryGetSourceLine(),
             message
                 .TestNode.Properties.OfType<TestMetadataProperty>()
-                .ToDictionary(p => p.Key, p => p.Value)
+                .DistinctBy(p => p.Key, StringComparer.Ordinal)
+                .ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal)
         );
 
         var testResult = new TestResult(

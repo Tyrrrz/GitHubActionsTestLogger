@@ -111,7 +111,8 @@ public class VsTestLogger : ITestLoggerWithParameters
             args.Result.TryGetSourceFilePath(),
             args.Result.TryGetSourceLine(),
             args.Result.Traits.Union(args.Result.TestCase.Traits)
-                .ToDictionary(t => t.Name, t => t.Value)
+                .DistinctBy(t => t.Name, StringComparer.Ordinal)
+                .ToDictionary(t => t.Name, t => t.Value, StringComparer.Ordinal)
         );
 
         var testResult = new TestResult(
