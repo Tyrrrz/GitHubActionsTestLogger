@@ -83,8 +83,6 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
         if (state is DiscoveredTestNodeStateProperty or InProgressTestNodeStateProperty)
             return;
 
-        var exception = state.TryGetException();
-
         var testDefinition = new TestDefinition(
             message.TestNode.Uid.Value,
             message.TestNode.DisplayName,
@@ -99,6 +97,8 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
             message.TestNode.TryGetSourceFilePath(),
             message.TestNode.TryGetSourceLine()
         );
+
+        var exception = state.TryGetException();
 
         var testResult = new TestResult(
             testDefinition,

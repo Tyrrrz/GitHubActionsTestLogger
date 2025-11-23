@@ -100,7 +100,7 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
         {
             _stopwatch.Stop();
 
-            // Don't render empty summary for projects with no tests
+            // Don't render an empty summary for projects with no tests
             if (!Options.SummaryAllowEmpty && info.OverallOutcome == TestOutcome.None)
                 return;
 
