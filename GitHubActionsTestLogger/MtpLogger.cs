@@ -79,6 +79,10 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
             message.TestNode.Properties.SingleOrDefault<TestNodeStateProperty>()
             ?? throw new InvalidOperationException("Test node state property is missing.");
 
+        // Only consider updates related to tests that have concluded in some final state
+        if (state is DiscoveredTestNodeStateProperty or InProgressTestNodeStateProperty)
+            return;
+
         var exception = state.TryGetException();
 
         var testDefinition = new TestDefinition(
