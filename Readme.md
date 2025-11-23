@@ -186,18 +186,16 @@ Use the `[--report-github-]annotations-title` option to specify the annotation t
 
 The following replacement tokens are available:
 
-- `@test` — replaced with the display name of the test
-- `@traits.TRAIT_NAME` — replaced with the value of the trait named `TRAIT_NAME`
-- `@error` — replaced with the error message
-- `@trace` — replaced with the stack trace
-- `@framework` — replaced with the target framework
+- `@test` — replaced with the display name of the test.
+- `@error` — replaced with the error message.
+- `@trace` — replaced with the stack trace.
+- `@framework` — replaced with the target framework.
 
 **Default**: `@test`.
 
 **Examples**:
 
 - `@test` → `MyTests.Test1`
-- `[@traits.Category] @test` → `[UI Tests] MyTests.Test1`
 - `@test (@framework)` → `MyTests.Test1 (.NETCoreApp,Version=v6.0)`
 
 #### Custom annotation message

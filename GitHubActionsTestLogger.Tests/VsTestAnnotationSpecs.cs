@@ -178,45 +178,6 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public void I_can_use_the_logger_to_produce_annotations_that_include_test_traits()
-    {
-        // Arrange
-        using var commandWriter = new StringWriter();
-
-        var events = new FakeTestLoggerEvents();
-        var logger = new VsTestLogger();
-
-        logger.Initialize(
-            events,
-            new Dictionary<string, string?>
-            {
-                ["annotations-title"] = "<@traits.Category -> @test>",
-                ["annotations-message"] = "[@traits.Category -> @test]",
-            },
-            commandWriter,
-            TextWriter.Null
-        );
-
-        // Act
-        events.SimulateTestRun(
-            new TestResultBuilder()
-                .SetDisplayName("Test1")
-                .SetTrait("Category", "UI Test")
-                .SetTrait("Document", "SS01")
-                .SetOutcome(TestOutcome.Failed)
-                .Build()
-        );
-
-        // Assert
-        var output = commandWriter.ToString().Trim();
-
-        output.Should().Contain("<UI Test -> Test1>");
-        output.Should().Contain("[UI Test -> Test1]");
-
-        testOutput.WriteLine(output);
-    }
-
-    [Fact]
     public void I_can_use_the_logger_to_produce_annotations_that_include_the_error_message()
     {
         // Arrange

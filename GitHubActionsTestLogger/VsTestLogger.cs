@@ -109,9 +109,7 @@ public class VsTestLogger : ITestLoggerWithParameters
                 args.Result.TestCase.GetTypeFullyQualifiedName()
             ),
             args.Result.TryGetSourceFilePath(),
-            args.Result.TryGetSourceLine(),
-            args.Result.Traits.Union(args.Result.TestCase.Traits)
-                .ToDictionary(t => t.Name, t => t.Value)
+            args.Result.TryGetSourceLine()
         );
 
         var testResult = new TestResult(

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.Testing.Platform.Extensions.Messages;
 
@@ -14,7 +13,6 @@ internal class TestNodeBuilder
     private string _methodName = "FakeTestMethod";
     private string? _sourceFilePath;
     private int? _sourceLineNumber;
-    private readonly Dictionary<string, string> _traits = new(StringComparer.Ordinal);
     private TestOutcome _testOutcome;
     private string? _errorMessage;
     private string? _errorStackTrace;
@@ -58,12 +56,6 @@ internal class TestNodeBuilder
     public TestNodeBuilder SetSourceLineNumber(int sourceLineNumber)
     {
         _sourceLineNumber = sourceLineNumber;
-        return this;
-    }
-
-    public TestNodeBuilder SetTrait(string name, string value)
-    {
-        _traits[name] = value;
         return this;
     }
 
@@ -132,10 +124,6 @@ internal class TestNodeBuilder
                 )
             );
         }
-
-        // Traits
-        foreach (var trait in _traits)
-            properties.Add(new TestMetadataProperty(trait.Key, trait.Value));
 
         return new TestNode
         {

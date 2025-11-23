@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -94,10 +93,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
                 message.TestNode.TryGetTypeFullyQualifiedName() ?? "<>"
             ),
             message.TestNode.TryGetSourceFilePath(),
-            message.TestNode.TryGetSourceLine(),
-            message
-                .TestNode.Properties.OfType<TestMetadataProperty>()
-                .ToDictionary(p => p.Key, p => p.Value)
+            message.TestNode.TryGetSourceLine()
         );
 
         var testResult = new TestResult(
