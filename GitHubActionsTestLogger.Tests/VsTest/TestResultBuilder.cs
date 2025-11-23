@@ -27,12 +27,6 @@ internal class TestResultBuilder
         return this;
     }
 
-    public TestResultBuilder SetTrait(string name, string value)
-    {
-        _testResult.TestCase.Traits.Add(name, value);
-        return this;
-    }
-
     public TestResultBuilder SetOutcome(TestOutcome outcome)
     {
         _testResult.Outcome = outcome;

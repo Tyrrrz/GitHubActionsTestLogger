@@ -203,47 +203,6 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     }
 
     [Fact]
-    public async Task I_can_use_the_logger_to_produce_annotations_that_include_test_traits()
-    {
-        // Arrange
-        using var testResultsDir = TempDir.Create();
-        await using var commandWriter = new StringWriter();
-
-        var builder = await TestApplication.CreateBuilderAsync([
-            "--results-directory",
-            testResultsDir.Path,
-            "--report-github",
-            "--report-github-annotations-title",
-            "<@traits.Category -> @test>",
-            "--report-github-annotations-message",
-            "[@traits.Category -> @test]",
-        ]);
-
-        builder.RegisterFakeTests(
-            new TestNodeBuilder()
-                .SetDisplayName("Test1")
-                .SetTrait("Category", "UI Test")
-                .SetTrait("Document", "SS01")
-                .SetOutcome(TestOutcome.Failed)
-                .Build()
-        );
-
-        builder.AddGitHubActionsReporting(commandWriter, TextWriter.Null);
-
-        // Act
-        var app = await builder.BuildAsync();
-        await app.RunAsync();
-
-        // Assert
-        var output = commandWriter.ToString().Trim();
-
-        output.Should().Contain("<UI Test -> Test1>");
-        output.Should().Contain("[UI Test -> Test1]");
-
-        testOutput.WriteLine(output);
-    }
-
-    [Fact]
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_the_error_message()
     {
         // Arrange

@@ -27,10 +27,6 @@ internal class TestReportingContext(GitHubWorkflow github, TestReportingOptions 
         // Name
         buffer.Replace("@test", testResult.Definition.DisplayName);
 
-        // Properties
-        foreach (var property in testResult.Definition.Properties)
-            buffer.Replace($"@traits.{property.Key}", property.Value);
-
         // Error message
         buffer.Replace("@error", testResult.ErrorMessage ?? "");
 
