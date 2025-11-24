@@ -19,7 +19,7 @@
     <img src="favicon.png" alt="Icon" />
 </p>
 
-**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** for reporting test results to GitHub Actions.
+**GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** that reports test results to GitHub Actions.
 It lists failed tests in job annotations, highlights them in code diffs, and produces detailed job summaries about the executed test runs.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
@@ -69,13 +69,18 @@ jobs:
         uses: actions/setup-dotnet@v4
 
       - name: Build & test
-        # For .NET 9 and lower, add an extra empty double dash sequence (--) before reporter options
+        # Can also use with `dotnet run` or `dotnet exec`, depending on your setup.
+        # For .NET 9 and lower, add an extra empty double dash sequence (--) before reporter options.
         run: dotnet test --configuration Release --report-github
 ```
 
-> **Important**:
-> The extension has a peer dependency on **Microsoft.Testing.Platform** when used in this mode.
-> Your test project may already have a reference to this package, but make sure it is updated to the latest version.
+> [!IMPORTANT]
+> If you are using **Microsoft.Testing.Platform** with **xUnit v3**, then make sure to replace the `xunit.v3` package reference with [`xunit.v3.mtp-v2`](https://nuget.org/packages/xunit.v3.mtp-v2).
+> The base `xunit.v3` package relies on MTP v1, which is incompatible with this extension.
+
+> [!IMPORTANT]
+> The extension has a peer dependency on the [**Microsoft.Testing.Platform**](https://nuget.org/packages/Microsoft.Testing.Platform) package when used in this mode.
+> It is **highly recommended** to install the latest version of this package in your test project to ensure compatibility.
 
 ### [VSTest](https://github.com/microsoft/vstest)
 
@@ -100,17 +105,21 @@ jobs:
         run: dotnet test --configuration Release --logger GitHubActions
 ```
 
-> **Important**:
-> The extension has a peer dependency on **Microsoft.NET.Test.Sdk** when used in this mode.
-> Your test project may already have a reference to this package, but make sure it is updated to the latest version.
+> [!IMPORTANT]
+> If you are using **VSTest** with **xUnit v3**, then make sure to replace the `xunit.v3` package reference with [`xunit.v3.mtp-off`](https://nuget.org/packages/xunit.v3.mtp-off).
+> The base `xunit.v3` package has a built-in dependency on MTP, which may cause conflicts with this extension.
 
-> **Important**:
+> [!IMPORTANT]
+> The extension has a peer dependency on the [**Microsoft.NET.Test.Sdk**](https://nuget.org/packages/Microsoft.NET.Test.Sdk) package when used in this mode.
+> It is **highly recommended** to install the latest version of this package in your test project to ensure compatibility.
+
+> [!IMPORTANT]
 > If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
 #### Collecting source information
 
 **GitHub Actions Test Logger** can leverage source information to link reported test results to the locations in the source code where the corresponding tests are defined.
-By default, VSTest does not collect source information, so the extension relies on stack traces to extract it manually.
+By default, **VSTest** does not collect source information, so the extension relies on stack traces to extract it manually.
 This approach only works for failed tests, and even then may not always be fully accurate.
 
 To instruct the runner to collect source information, add the `RunConfiguration.CollectSourceInformation=true` argument to the command as shown below:
@@ -133,10 +142,10 @@ jobs:
           RunConfiguration.CollectSourceInformation=true
 ```
 
-> **Note**:
+> [!NOTE]
 > This option can also be enabled by setting the corresponding property in a [`.runsettings` file](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file) instead.
 
-> **Warning**:
+> [!WARNING]
 > Source information collection may not work properly with the legacy .NET Framework.
 
 ### Customizing behavior
@@ -222,7 +231,7 @@ Use the `[--report-github-]summary-include-passed` option to specify whether pas
 
 **Default**: `true`.
 
-> **Warning**:
+> [!WARNING]
 > If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
 
 #### Include skipped tests in the summary
@@ -231,6 +240,6 @@ Use the `[--report-github-]summary-include-skipped` option to specify whether sk
 
 **Default**: `true`.
 
-> **Warning**:
+> [!WARNING]
 > If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
 
