@@ -82,6 +82,10 @@ jobs:
 > The extension has a peer dependency on the [**Microsoft.Testing.Platform**](https://nuget.org/packages/Microsoft.Testing.Platform) package when used in this mode.
 > It is **highly recommended** to install the latest version of this package in your test project to ensure compatibility.
 
+> [!WARNING]
+> When used with **Microsoft.Testing.Platform**, do not mark the package reference to **GitHubActionsTestLogger** as private or exclude it from the build output.
+> If you are upgrading from older versions of the extension, make sure to remove `PrivateAssets="all"` from the package reference.
+
 ### [VSTest](https://github.com/microsoft/vstest)
 
 Install the package in your test project and enable the reporter by adding the `--logger GitHubActions` option when running tests:
@@ -115,6 +119,9 @@ jobs:
 
 > [!IMPORTANT]
 > If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
+
+> [!NOTE]
+> When used with **VSTest**, the package reference to **GitHubActionsTestLogger** can be marked as private by adding `PrivateAssets="all"` to the package reference.
 
 #### Collecting source information
 
