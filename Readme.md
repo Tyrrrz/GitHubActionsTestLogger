@@ -79,11 +79,11 @@ jobs:
 > The base `xunit.v3` package relies on MTP v1, which is incompatible with this extension.
 
 > [!IMPORTANT]
-> The extension has a peer dependency on the [**Microsoft.Testing.Platform**](https://nuget.org/packages/Microsoft.Testing.Platform) package when used in this mode.
+> The extension has a peer dependency on the [`Microsoft.Testing.Platform`](https://nuget.org/packages/Microsoft.Testing.Platform) package when used in this mode.
 > It is **highly recommended** to install the latest version of this package in your test project to ensure compatibility.
 
 > [!WARNING]
-> When used with **Microsoft.Testing.Platform**, do not mark the package reference to **GitHubActionsTestLogger** as private or exclude it from the build output.
+> When used with **Microsoft.Testing.Platform**, do not mark the package reference to `GitHubActionsTestLogger` as private or exclude it from the build output.
 > If you are upgrading from older versions of the extension, make sure to remove `PrivateAssets="all"` from the package reference.
 
 ### [VSTest](https://github.com/microsoft/vstest)
@@ -114,14 +114,14 @@ jobs:
 > The base `xunit.v3` package has a built-in dependency on MTP, which may cause conflicts with this extension.
 
 > [!IMPORTANT]
-> The extension has a peer dependency on the [**Microsoft.NET.Test.Sdk**](https://nuget.org/packages/Microsoft.NET.Test.Sdk) package when used in this mode.
+> The extension has a peer dependency on the [`Microsoft.NET.Test.Sdk`](https://nuget.org/packages/Microsoft.NET.Test.Sdk) package when used in this mode.
 > It is **highly recommended** to install the latest version of this package in your test project to ensure compatibility.
 
 > [!IMPORTANT]
 > If you are using **.NET SDK v2.2 or lower**, you need to [set the `<CopyLocalLockFileAssemblies>` property to `true` in your test project](https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/5#issuecomment-648431667).
 
 > [!NOTE]
-> When used with **VSTest**, the package reference to **GitHubActionsTestLogger** can be marked as private by adding `PrivateAssets="all"` to the package reference.
+> When used with **VSTest**, the package reference to `GitHubActionsTestLogger` can be marked as private by adding `PrivateAssets="all"` to the package reference.
 
 #### Collecting source information
 
