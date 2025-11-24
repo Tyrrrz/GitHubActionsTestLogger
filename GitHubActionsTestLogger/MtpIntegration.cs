@@ -44,11 +44,13 @@ public static class MtpIntegration
                 GitHubWorkflow.DefaultCommandWriter,
                 GitHubWorkflow.DefaultSummaryWriter
             );
-
-        /// <summary>
-        /// Adds GitHub Actions reporting support to the Testing Platform Builder.
-        /// </summary>
-        // This method is called implicitly by MTP to automatically register this extension
-        public void AddExtensions(string[] _) => testApplicationBuilder.AddGitHubActionsReporting();
     }
+
+    /// <summary>
+    /// Adds GitHub Actions reporting support to the Testing Platform Builder.
+    /// </summary>
+    // This method is called implicitly by MTP to automatically register this extension.
+    // This method does not need to be an extension method, and it's better that it isn't to avoid confusion.
+    public static void AddExtensions(ITestApplicationBuilder testApplicationBuilder, string[] _) =>
+        testApplicationBuilder.AddGitHubActionsReporting();
 }
