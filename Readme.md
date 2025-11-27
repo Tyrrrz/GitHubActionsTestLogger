@@ -150,7 +150,7 @@ jobs:
 ```
 
 > [!NOTE]
-> This option can also be enabled by setting the corresponding property in a [`.runsettings` file](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file) instead.
+> This option can also be enabled by setting the corresponding property in a [`.runsettings` file](https://learn.microsoft.com/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file) instead.
 
 > [!WARNING]
 > Source information collection may not work properly with the legacy .NET Framework.
