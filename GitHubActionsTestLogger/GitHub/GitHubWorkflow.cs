@@ -84,7 +84,8 @@ internal partial class GitHubWorkflow
 {
     public static TextWriter DefaultCommandWriter => Console.Out;
 
-    public static TextWriter DefaultSummaryWriter => // Summary is written to the file specified by an environment variable.
+    public static TextWriter DefaultSummaryWriter =>
+        // Summary is written to the file specified by an environment variable.
         // We may need to write to the summary file from multiple test suites in parallel,
         // so we should use a stream that delays acquiring the file lock until the very last moment,
         // and employs retry logic to handle potential race conditions.
