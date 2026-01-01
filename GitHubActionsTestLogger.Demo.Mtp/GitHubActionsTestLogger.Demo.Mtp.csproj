@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
-    <PackageReference Include="MSTest" Version="4.0.1" />
+    <PackageReference Include="MSTest" Version="4.0.2" />
     <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.2" />
   </ItemGroup>
 
