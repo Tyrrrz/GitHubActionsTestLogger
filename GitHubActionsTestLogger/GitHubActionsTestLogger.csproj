@@ -24,17 +24,17 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Testing.Platform" Version="2.0.2" PrivateAssets="all" />
     <PackageReference
       Include="Microsoft.TestPlatform.ObjectModel"
       Version="18.0.1"
       PrivateAssets="all"
     />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="PolyShim" Version="2.0.0" PrivateAssets="all" />
+    <PackageReference Include="PolyShim" Version="2.4.0" PrivateAssets="all" />
     <PackageReference
       Include="RazorBlade"
-      Version="0.10.0"
+      Version="0.11.0"
       ExcludeAssets="compile;runtime"
       PrivateAssets="all"
     />
