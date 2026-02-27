@@ -31,9 +31,7 @@ internal static class StringExtensions
         )
         {
             var index = str.LastIndexOf(sub, comparison);
-            return index >= 0
-                ? str.Substring(index + sub.Length, str.Length - index - sub.Length)
-                : "";
+            return index < 0 ? "" : str[(index + sub.Length)..];
         }
     }
 
