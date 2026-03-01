@@ -109,6 +109,7 @@ internal class MtpLogger : IDataConsumer, ITestSessionLifetimeHandler
                 ErrorTestNodeStateProperty => TestOutcome.Failed,
                 TimeoutTestNodeStateProperty => TestOutcome.Failed,
                 SkippedTestNodeStateProperty => TestOutcome.Skipped,
+// Backwards compatibility with frameworks that still emit this property
 #pragma warning disable CS0618
                 CancelledTestNodeStateProperty => TestOutcome.Skipped,
 #pragma warning restore CS0618
