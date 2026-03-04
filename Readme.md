@@ -1,9 +1,9 @@
 # GitHub Actions Test Logger
 
-[![Status](https://img.shields.io/badge/status-maintenance-ffd700.svg)](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)
+[![Status](https://img.shields.io/badge/status-maintenance-ffd700.svg)](https://github.com/Tyrrrz/.github/blob/prime/docs/project-status.md)
 [![Made in Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://tyrrrz.me/ukraine)
-[![Build](https://img.shields.io/github/actions/workflow/status/Tyrrrz/GitHubActionsTestLogger/main.yml?branch=master)](https://github.com/Tyrrrz/GitHubActionsTestLogger/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/GitHubActionsTestLogger/master)](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger)
+[![Build](https://img.shields.io/github/actions/workflow/status/Tyrrrz/GitHubActionsTestLogger/main.yml?branch=prime)](https://github.com/Tyrrrz/GitHubActionsTestLogger/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/GitHubActionsTestLogger/prime)](https://codecov.io/gh/Tyrrrz/GitHubActionsTestLogger)
 [![Version](https://img.shields.io/nuget/v/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Downloads](https://img.shields.io/nuget/dt/GitHubActionsTestLogger.svg)](https://nuget.org/packages/GitHubActionsTestLogger)
 [![Discord](https://img.shields.io/discord/869237470565392384?label=discord)](https://discord.gg/2SUWKFnHSm)
@@ -22,7 +22,7 @@
 **GitHub Actions Test Logger** is an extension for **VSTest** and **Microsoft.Testing.Platform** that reports test results to GitHub Actions.
 It lists failed tests in job annotations, highlights them in code diffs, and produces detailed job summaries about the executed test runs.
 
-## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
+## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/prime/docs/why-so-political.md)</sup>
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:
 
@@ -249,4 +249,3 @@ Use the `[--report-github-]summary-include-skipped` option to specify whether sk
 
 > [!WARNING]
 > If your test suite is really large, enabling this option may cause the summary to exceed the [maximum allowed size](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#step-isolation-and-limits).
-
