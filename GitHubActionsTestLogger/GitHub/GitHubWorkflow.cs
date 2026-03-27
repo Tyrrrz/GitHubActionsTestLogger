@@ -10,11 +10,7 @@ using GitHubActionsTestLogger.Utils.Extensions;
 namespace GitHubActionsTestLogger.GitHub;
 
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
-internal partial class GitHubWorkflow(
-    TextWriter commandWriter,
-    TextWriter summaryWriter,
-    string? summaryFilePath = null
-)
+internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
 {
     // GitHub step summary file size limit (1 MiB)
     // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary
@@ -85,11 +81,22 @@ internal partial class GitHubWorkflow(
 
     public async Task CreateSummaryAsync(string content)
     {
-        // If we have a file path, monitor the file size and truncate if needed
-        if (!string.IsNullOrEmpty(summaryFilePath))
+        // Try to extract the underlying file path from the summary writer to monitor file size.
+        // This works when the writer wraps a ContentionTolerantWriteFileStream (production)
+        // or a plain FileStream (tests).
+        var detectedFilePath = summaryWriter is StreamWriter sw
+            ? sw.BaseStream switch
+            {
+                ContentionTolerantWriteFileStream cts => cts.FilePath,
+                FileStream fs => fs.Name,
+                _ => null,
+            }
+            : null;
+
+        if (detectedFilePath != null)
         {
-            var existingSize = File.Exists(summaryFilePath)
-                ? new FileInfo(summaryFilePath).Length
+            var existingSize = File.Exists(detectedFilePath)
+                ? new FileInfo(detectedFilePath).Length
                 : 0L;
 
             var newlineSize = Encoding.UTF8.GetByteCount(Environment.NewLine);
@@ -233,8 +240,6 @@ internal partial class GitHubWorkflow(
 internal partial class GitHubWorkflow
 {
     public static TextWriter DefaultCommandWriter => Console.Out;
-
-    public static string? DefaultSummaryFilePath => GitHubEnvironment.SummaryFilePath;
 
     public static TextWriter DefaultSummaryWriter =>
         // Summary is written to the file specified by an environment variable.
