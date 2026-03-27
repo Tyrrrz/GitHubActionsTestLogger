@@ -44,7 +44,8 @@ public class VsTestLogger : ITestLoggerWithParameters
         TestLoggerEvents events,
         Dictionary<string, string?> parameters,
         TextWriter commandWriter,
-        TextWriter summaryWriter
+        TextWriter summaryWriter,
+        string? summaryFilePath = null
     )
     {
         var options = new TestReportingOptions
@@ -67,7 +68,7 @@ public class VsTestLogger : ITestLoggerWithParameters
         };
 
         var context = new TestReportingContext(
-            new GitHubWorkflow(commandWriter, summaryWriter),
+            new GitHubWorkflow(commandWriter, summaryWriter, summaryFilePath),
             options
         );
 
@@ -82,7 +83,8 @@ public class VsTestLogger : ITestLoggerWithParameters
             events,
             parameters,
             GitHubWorkflow.DefaultCommandWriter,
-            GitHubWorkflow.DefaultSummaryWriter
+            GitHubWorkflow.DefaultSummaryWriter,
+            GitHubWorkflow.DefaultSummaryFilePath
         );
 
     /// <summary>

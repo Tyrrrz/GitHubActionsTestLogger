@@ -21,11 +21,15 @@ public static class MtpIntegration
         /// This overload is useful for testing purposes, as it allows providing custom
         /// writers for GitHub's command and summary outputs.
         /// </remarks>
-        public void AddGitHubActionsReporting(TextWriter commandWriter, TextWriter summaryWriter)
+        public void AddGitHubActionsReporting(
+            TextWriter commandWriter,
+            TextWriter summaryWriter,
+            string? summaryFilePath = null
+        )
         {
             var compositeExtension = new CompositeExtensionFactory<MtpLogger>(
                 serviceProvider => new MtpLogger(
-                    new GitHubWorkflow(commandWriter, summaryWriter),
+                    new GitHubWorkflow(commandWriter, summaryWriter, summaryFilePath),
                     serviceProvider.GetCommandLineOptions()
                 )
             );
@@ -42,7 +46,8 @@ public static class MtpIntegration
         public void AddGitHubActionsReporting() =>
             testApplicationBuilder.AddGitHubActionsReporting(
                 GitHubWorkflow.DefaultCommandWriter,
-                GitHubWorkflow.DefaultSummaryWriter
+                GitHubWorkflow.DefaultSummaryWriter,
+                GitHubWorkflow.DefaultSummaryFilePath
             );
     }
 
