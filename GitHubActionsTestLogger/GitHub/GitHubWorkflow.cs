@@ -116,14 +116,28 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
                     // Can't produce a legible summary — skip writing entirely
                     await CreateWarningAnnotationAsync(
                         "GitHub Actions Test Logger",
-                        BuildSummaryOmittedWarning(isSharedFile: existingSize > 0)
+                        "The test summary was omitted because it exceeded GitHub's step summary size limit (1 MiB). "
+                            + "To reduce the summary size, consider excluding passed tests by setting "
+                            + "`summary-include-passed=false` or skipped tests by setting `summary-include-skipped=false`."
+                            + (
+                                existingSize > 0
+                                    ? " The summary file is shared with other test steps — consider splitting them into separate jobs."
+                                    : ""
+                            )
                     );
                     return;
                 }
 
                 await CreateWarningAnnotationAsync(
                     "GitHub Actions Test Logger",
-                    BuildSummaryTruncatedWarning(isSharedFile: existingSize > 0)
+                    "The test summary was truncated because it exceeded GitHub's step summary size limit (1 MiB). "
+                        + "To reduce the summary size, consider excluding passed tests by setting "
+                        + "`summary-include-passed=false` or skipped tests by setting `summary-include-skipped=false`."
+                        + (
+                            existingSize > 0
+                                ? " The summary file is shared with other test steps — consider splitting them into separate jobs."
+                                : ""
+                        )
                 );
                 content = truncated;
             }
@@ -206,34 +220,6 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         }
 
         return content.Substring(0, bestCutPoint) + bestCutSuffix;
-    }
-
-    private static string BuildSummaryTruncatedWarning(bool isSharedFile)
-    {
-        var message =
-            "The test summary was truncated because it exceeded GitHub's step summary size limit (1 MiB). "
-            + "To reduce the summary size, consider excluding passed tests by setting "
-            + "`summary-include-passed=false` or skipped tests by setting `summary-include-skipped=false`.";
-
-        if (isSharedFile)
-            message +=
-                " The summary file is shared with other test steps — consider splitting them into separate jobs.";
-
-        return message;
-    }
-
-    private static string BuildSummaryOmittedWarning(bool isSharedFile)
-    {
-        var message =
-            "The test summary was omitted because it exceeded GitHub's step summary size limit (1 MiB). "
-            + "To reduce the summary size, consider excluding passed tests by setting "
-            + "`summary-include-passed=false` or skipped tests by setting `summary-include-skipped=false`.";
-
-        if (isSharedFile)
-            message +=
-                " The summary file is shared with other test steps — consider splitting them into separate jobs.";
-
-        return message;
     }
 }
 
