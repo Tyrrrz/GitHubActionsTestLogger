@@ -114,7 +114,6 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
             if (existingSize + totalToWrite > GitHubEnvironment.SummaryFileSizeLimit)
             {
-                // Compute available size as a long to avoid overflow, then clamp to int range.
                 var availableSizeLong =
                     GitHubEnvironment.SummaryFileSizeLimit - existingSize - newlineSize * 3L;
 
@@ -122,8 +121,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
                 if (availableSizeLong > 0)
                 {
-                    var availableSize =
-                        availableSizeLong > int.MaxValue ? int.MaxValue : (int)availableSizeLong;
+                    var availableSize = (int)Math.Min(availableSizeLong, int.MaxValue);
                     var bytes = Encoding.UTF8.GetBytes(content);
                     if (bytes.Length > availableSize)
                     {
