@@ -21,7 +21,12 @@ internal static class FileExtensions
 
         public static byte[] ReadAllBytes(string path, int offset)
         {
-            using var stream = File.OpenRead(path);
+            using var stream = new FileStream(
+                path,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite
+            );
             stream.Seek(offset, SeekOrigin.Begin);
 
             var buffer = new byte[stream.Length - offset];
