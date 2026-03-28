@@ -15,6 +15,7 @@ internal static class FileExtensions
                 FileShare.None,
                 bufferSize: 1
             );
+
             fs.SetLength(count);
         }
     }
