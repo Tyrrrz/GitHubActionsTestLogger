@@ -12,10 +12,6 @@ namespace GitHubActionsTestLogger.GitHub;
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
 internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summaryWriter)
 {
-    // GitHub step summary file size limit (1 MiB)
-    // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary
-    private const long SummaryFileSizeLimit = 1024 * 1024;
-
     private async Task InvokeCommandAsync(
         string command,
         string message,
@@ -48,17 +44,6 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         await commandWriter.FlushAsync();
     }
 
-    public Task CreateErrorAnnotationAsync(
-        string title,
-        string message,
-        string? filePath = null,
-        int? line = null,
-        int? column = null
-    ) => CreateAnnotationAsync(GitHubAnnotationKind.Error, title, message, filePath, line, column);
-
-    public Task CreateWarningAnnotationAsync(string title, string message) =>
-        CreateAnnotationAsync(GitHubAnnotationKind.Warning, title, message);
-
     private async Task CreateAnnotationAsync(
         GitHubAnnotationKind kind,
         string title,
@@ -81,6 +66,25 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
         await InvokeCommandAsync(kind.ToString().ToLowerInvariant(), message, options);
     }
+
+    public async Task CreateErrorAnnotationAsync(
+        string title,
+        string message,
+        string? filePath = null,
+        int? line = null,
+        int? column = null
+    ) =>
+        await CreateAnnotationAsync(
+            GitHubAnnotationKind.Error,
+            title,
+            message,
+            filePath,
+            line,
+            column
+        );
+
+    public async Task CreateWarningAnnotationAsync(string title, string message) =>
+        await CreateAnnotationAsync(GitHubAnnotationKind.Warning, title, message);
 
     public async Task CreateSummaryAsync(string content)
     {
@@ -108,11 +112,31 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             // Two leading newlines + content + trailing newline
             var totalToWrite = newlineSize * 3 + contentSize;
 
-            if (existingSize + totalToWrite > SummaryFileSizeLimit)
+            if (existingSize + totalToWrite > GitHubEnvironment.SummaryFileSizeLimit)
             {
-                var availableSize = (int)(SummaryFileSizeLimit - existingSize - newlineSize * 3);
+                var availableSize = (int)(
+                    GitHubEnvironment.SummaryFileSizeLimit - existingSize - newlineSize * 3
+                );
 
-                var truncated = TryTruncateSummary(content, availableSize);
+                string? truncated = null;
+                if (availableSize > 0)
+                {
+                    var bytes = Encoding.UTF8.GetBytes(content);
+                    if (bytes.Length > availableSize)
+                    {
+                        // Trim back to a valid UTF-8 character boundary
+                        var count = availableSize;
+                        while (count > 0 && (bytes[count] & 0xC0) == 0x80)
+                            count--;
+
+                        if (count > 0)
+                            truncated = Encoding.UTF8.GetString(bytes, 0, count);
+                    }
+                    else
+                    {
+                        truncated = content;
+                    }
+                }
 
                 if (string.IsNullOrWhiteSpace(truncated))
                 {
@@ -156,25 +180,6 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
         await summaryWriter.WriteLineAsync(content);
         await summaryWriter.FlushAsync();
-    }
-
-    // Attempt to truncate the rendered summary HTML so that it fits within maxBytes.
-    // Returns the truncated content, or null if nothing legible fits.
-    private static string? TryTruncateSummary(string content, int maxBytes)
-    {
-        if (maxBytes <= 0)
-            return null;
-
-        var bytes = Encoding.UTF8.GetBytes(content);
-        if (bytes.Length <= maxBytes)
-            return content;
-
-        // Trim back to a valid UTF-8 character boundary
-        var count = maxBytes;
-        while (count > 0 && (bytes[count] & 0xC0) == 0x80)
-            count--;
-
-        return count > 0 ? Encoding.UTF8.GetString(bytes, 0, count) : null;
     }
 }
 

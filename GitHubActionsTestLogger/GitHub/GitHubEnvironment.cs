@@ -6,6 +6,10 @@ namespace GitHubActionsTestLogger.GitHub;
 
 internal static class GitHubEnvironment
 {
+    // GitHub step summary file size limit (1 MiB)
+    // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary
+    public const long SummaryFileSizeLimit = 1024 * 1024;
+
     public static bool IsRunningInActions { get; } =
         string.Equals(
             Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),

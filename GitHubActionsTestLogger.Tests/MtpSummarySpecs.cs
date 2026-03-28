@@ -337,9 +337,13 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         // Use a file-backed StreamWriter so that the file path is exposed internally
-        await using var summaryWriter = new StreamWriter(
-            new FileStream(summaryFile.Path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)
+        await using var summaryFileStream = new FileStream(
+            summaryFile.Path,
+            FileMode.Append,
+            FileAccess.Write,
+            FileShare.ReadWrite
         );
+        await using var summaryWriter = new StreamWriter(summaryFileStream);
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
@@ -392,21 +396,17 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         // Act
         var app = await builder.BuildAsync();
         await app.RunAsync();
+
         await summaryWriter.FlushAsync();
 
         // Assert
         var commandOutput = commandWriter.ToString();
 
-        // Read only the bytes appended after the pre-fill
         var summaryOutput = Encoding.UTF8.GetString(
             File.ReadAllBytes(summaryFile.Path, prefillSize)
         );
 
-        // A truncation warning annotation should have been written
-        commandOutput.Should().Contain("::warning");
-        commandOutput.Should().Contain("truncated");
-
-        // Some summary content should have been written
+        commandOutput.Should().ContainAll("::warning", "truncated");
         summaryOutput.Should().NotBeNullOrWhiteSpace();
 
         testOutput.WriteLine("Command output:");
@@ -430,9 +430,13 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         // Use a file-backed StreamWriter so that the file path is exposed internally
-        await using var summaryWriter = new StreamWriter(
-            new FileStream(summaryFile.Path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)
+        await using var summaryFileStream = new FileStream(
+            summaryFile.Path,
+            FileMode.Append,
+            FileAccess.Write,
+            FileShare.ReadWrite
         );
+        await using var summaryWriter = new StreamWriter(summaryFileStream);
 
         var builder = await TestApplication.CreateBuilderAsync([
             "--results-directory",
@@ -447,19 +451,14 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         // Act
         var app = await builder.BuildAsync();
         await app.RunAsync();
+
         await summaryWriter.FlushAsync();
 
         // Assert
         var commandOutput = commandWriter.ToString();
-
-        // File should be exactly the prefill size (no summary content appended)
         var fileLength = new FileInfo(summaryFile.Path).Length;
 
-        // An omission warning annotation should have been written
-        commandOutput.Should().Contain("::warning");
-        commandOutput.Should().Contain("omitted");
-
-        // No summary content should have been written
+        commandOutput.Should().ContainAll("::warning", "omitted");
         fileLength.Should().Be(prefillSize);
 
         testOutput.WriteLine("Command output:");
