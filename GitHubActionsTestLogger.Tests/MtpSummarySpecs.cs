@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Mtp;
 using GitHubActionsTestLogger.Tests.Utils;
+using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.Testing.Platform.Builder;
 using Xunit;
 using Xunit.Abstractions;
@@ -318,5 +320,153 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         output.Should().BeNullOrEmpty();
 
         testOutput.WriteLine(output);
+    }
+
+    [Fact]
+    public async Task I_can_try_to_use_the_logger_to_produce_a_summary_when_the_output_file_is_nearly_full_and_get_a_truncated_summary()
+    {
+        // Arrange
+        using var testResultsDir = TempDir.Create();
+        using var summaryFile = TempFile.Create();
+
+        // Pre-fill the summary file to within ~1000 bytes of the 1 MiB limit.
+        // This forces any summary larger than ~1000 bytes to be truncated.
+        const int prefillSize = 1024 * 1024 - 1000;
+        File.WriteAllZeroes(summaryFile.Path, prefillSize);
+
+        using var commandWriter = new StringWriter();
+
+        // Use a file-backed StreamWriter so that the file path is exposed internally
+        await using var summaryWriter = new StreamWriter(
+            new FileStream(summaryFile.Path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)
+        );
+
+        var builder = await TestApplication.CreateBuilderAsync([
+            "--results-directory",
+            testResultsDir.Path,
+            "--report-github",
+            "--report-github-summary-include-passed",
+        ]);
+
+        builder.RegisterFakeTests(
+            // Group A
+            new TestNodeBuilder()
+                .SetTypeName("GroupA")
+                .SetDisplayName("TestGroupA_LongTestName_One")
+                .SetOutcome(Mtp.TestOutcome.Passed)
+                .Build(),
+            new TestNodeBuilder()
+                .SetTypeName("GroupA")
+                .SetDisplayName("TestGroupA_LongTestName_Two")
+                .SetOutcome(Mtp.TestOutcome.Failed)
+                .SetErrorMessage("Expected: something, but got: something else (GroupA)")
+                .Build(),
+            // Group B
+            new TestNodeBuilder()
+                .SetTypeName("GroupB")
+                .SetDisplayName("TestGroupB_LongTestName_One")
+                .SetOutcome(Mtp.TestOutcome.Passed)
+                .Build(),
+            new TestNodeBuilder()
+                .SetTypeName("GroupB")
+                .SetDisplayName("TestGroupB_LongTestName_Two")
+                .SetOutcome(Mtp.TestOutcome.Failed)
+                .SetErrorMessage("Expected: something, but got: something else (GroupB)")
+                .Build(),
+            // Group C
+            new TestNodeBuilder()
+                .SetTypeName("GroupC")
+                .SetDisplayName("TestGroupC_LongTestName_One")
+                .SetOutcome(Mtp.TestOutcome.Passed)
+                .Build(),
+            new TestNodeBuilder()
+                .SetTypeName("GroupC")
+                .SetDisplayName("TestGroupC_LongTestName_Two")
+                .SetOutcome(Mtp.TestOutcome.Failed)
+                .SetErrorMessage("Expected: something, but got: something else (GroupC)")
+                .Build()
+        );
+
+        builder.AddGitHubActionsReporting(commandWriter, summaryWriter);
+
+        // Act
+        var app = await builder.BuildAsync();
+        await app.RunAsync();
+        await summaryWriter.FlushAsync();
+
+        // Assert
+        var commandOutput = commandWriter.ToString();
+
+        // Read only the bytes appended after the pre-fill
+        var summaryOutput = Encoding.UTF8.GetString(
+            File.ReadAllBytes(summaryFile.Path, prefillSize)
+        );
+
+        // A truncation warning annotation should have been written
+        commandOutput.Should().Contain("::warning");
+        commandOutput.Should().Contain("truncated");
+
+        // The summary should be valid HTML (all opened <details> tags are closed)
+        summaryOutput.Should().Contain("<details>");
+        summaryOutput
+            .Split("<details>")
+            .Length.Should()
+            .Be(summaryOutput.Split("</details>").Length);
+
+        testOutput.WriteLine("Command output:");
+        testOutput.WriteLine(commandOutput);
+        testOutput.WriteLine("Summary output:");
+        testOutput.WriteLine(summaryOutput);
+    }
+
+    [Fact]
+    public async Task I_can_try_to_use_the_logger_to_produce_a_summary_when_the_output_file_is_full_and_get_the_summary_omitted()
+    {
+        // Arrange
+        using var testResultsDir = TempDir.Create();
+        using var summaryFile = TempFile.Create();
+
+        // Pre-fill the summary file to within ~100 bytes of the 1 MiB limit.
+        // This leaves insufficient room for even the smallest legible summary.
+        const int prefillSize = 1024 * 1024 - 100;
+        File.WriteAllZeroes(summaryFile.Path, prefillSize);
+
+        using var commandWriter = new StringWriter();
+
+        // Use a file-backed StreamWriter so that the file path is exposed internally
+        await using var summaryWriter = new StreamWriter(
+            new FileStream(summaryFile.Path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)
+        );
+
+        var builder = await TestApplication.CreateBuilderAsync([
+            "--results-directory",
+            testResultsDir.Path,
+            "--report-github",
+            "--report-github-summary-allow-empty",
+        ]);
+
+        builder.RegisterFakeTests();
+        builder.AddGitHubActionsReporting(commandWriter, summaryWriter);
+
+        // Act
+        var app = await builder.BuildAsync();
+        await app.RunAsync();
+        await summaryWriter.FlushAsync();
+
+        // Assert
+        var commandOutput = commandWriter.ToString();
+
+        // File should be exactly the prefill size (no summary content appended)
+        var fileLength = new FileInfo(summaryFile.Path).Length;
+
+        // An omission warning annotation should have been written
+        commandOutput.Should().Contain("::warning");
+        commandOutput.Should().Contain("omitted");
+
+        // No summary content should have been written
+        fileLength.Should().Be(prefillSize);
+
+        testOutput.WriteLine("Command output:");
+        testOutput.WriteLine(commandOutput);
     }
 }

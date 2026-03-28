@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using FluentAssertions;
+using GitHubActionsTestLogger.Tests.Utils;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
@@ -359,168 +360,156 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
     public void I_can_try_to_use_the_logger_to_produce_a_summary_when_the_output_file_is_nearly_full_and_get_a_truncated_summary()
     {
         // Arrange
-        var summaryFilePath = Path.GetTempFileName();
-        try
-        {
-            // Pre-fill the summary file to within ~1000 bytes of the 1 MiB limit.
-            // This forces any summary larger than ~1000 bytes to be truncated.
-            const int prefillSize = 1024 * 1024 - 1000;
-            File.WriteAllZeroes(summaryFilePath, prefillSize);
+        using var summaryFile = TempFile.Create();
 
-            using var commandWriter = new StringWriter();
+        // Pre-fill the summary file to within ~1000 bytes of the 1 MiB limit.
+        // This forces any summary larger than ~1000 bytes to be truncated.
+        const int prefillSize = 1024 * 1024 - 1000;
+        File.WriteAllZeroes(summaryFile.Path, prefillSize);
 
-            var events = new FakeTestLoggerEvents();
-            var logger = new VsTestLogger();
+        using var commandWriter = new StringWriter();
 
-            // Use a file-backed StreamWriter so GitHubWorkflow can detect the file path via cast
-            using (
-                var summaryWriter = new StreamWriter(
-                    new FileStream(
-                        summaryFilePath,
-                        FileMode.Append,
-                        FileAccess.Write,
-                        FileShare.ReadWrite
-                    )
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        // Use a file-backed StreamWriter so that the file path is exposed internally
+        using (
+            var summaryWriter = new StreamWriter(
+                new FileStream(
+                    summaryFile.Path,
+                    FileMode.Append,
+                    FileAccess.Write,
+                    FileShare.ReadWrite
                 )
             )
-            {
-                logger.Initialize(
-                    events,
-                    new Dictionary<string, string?> { ["summary-include-passed"] = "true" },
-                    commandWriter,
-                    summaryWriter
-                );
-
-                // Act — simulate a run with multiple test groups to produce a multi-group summary
-                events.SimulateTestRun(
-                    // Group A
-                    new TestResultBuilder()
-                        .SetDisplayName("TestGroupA_LongTestName_One")
-                        .SetFullyQualifiedName("TestProject.GroupA.TestGroupA_LongTestName_One")
-                        .SetOutcome(TestOutcome.Passed)
-                        .Build(),
-                    new TestResultBuilder()
-                        .SetDisplayName("TestGroupA_LongTestName_Two")
-                        .SetFullyQualifiedName("TestProject.GroupA.TestGroupA_LongTestName_Two")
-                        .SetOutcome(TestOutcome.Failed)
-                        .SetErrorMessage("Expected: something, but got: something else (GroupA)")
-                        .Build(),
-                    // Group B
-                    new TestResultBuilder()
-                        .SetDisplayName("TestGroupB_LongTestName_One")
-                        .SetFullyQualifiedName("TestProject.GroupB.TestGroupB_LongTestName_One")
-                        .SetOutcome(TestOutcome.Passed)
-                        .Build(),
-                    new TestResultBuilder()
-                        .SetDisplayName("TestGroupB_LongTestName_Two")
-                        .SetFullyQualifiedName("TestProject.GroupB.TestGroupB_LongTestName_Two")
-                        .SetOutcome(TestOutcome.Failed)
-                        .SetErrorMessage("Expected: something, but got: something else (GroupB)")
-                        .Build(),
-                    // Group C
-                    new TestResultBuilder()
-                        .SetDisplayName("TestGroupC_LongTestName_One")
-                        .SetFullyQualifiedName("TestProject.GroupC.TestGroupC_LongTestName_One")
-                        .SetOutcome(TestOutcome.Passed)
-                        .Build(),
-                    new TestResultBuilder()
-                        .SetDisplayName("TestGroupC_LongTestName_Two")
-                        .SetFullyQualifiedName("TestProject.GroupC.TestGroupC_LongTestName_Two")
-                        .SetOutcome(TestOutcome.Failed)
-                        .SetErrorMessage("Expected: something, but got: something else (GroupC)")
-                        .Build()
-                );
-            } // Dispose writer before reading to ensure content is fully flushed
-
-            // Assert
-            var commandOutput = commandWriter.ToString();
-
-            // Read only the bytes appended after the pre-fill
-            var fileBytes = File.ReadAllBytes(summaryFilePath);
-            var summaryOutput = Encoding.UTF8.GetString(
-                fileBytes,
-                prefillSize,
-                fileBytes.Length - prefillSize
+        )
+        {
+            logger.Initialize(
+                events,
+                new Dictionary<string, string?> { ["summary-include-passed"] = "true" },
+                commandWriter,
+                summaryWriter
             );
 
-            // A truncation warning annotation should have been written
-            commandOutput.Should().Contain("::warning");
-            commandOutput.Should().Contain("truncated");
+            // Act — simulate a run with multiple test groups to produce a multi-group summary
+            events.SimulateTestRun(
+                // Group A
+                new TestResultBuilder()
+                    .SetDisplayName("TestGroupA_LongTestName_One")
+                    .SetFullyQualifiedName("TestProject.GroupA.TestGroupA_LongTestName_One")
+                    .SetOutcome(TestOutcome.Passed)
+                    .Build(),
+                new TestResultBuilder()
+                    .SetDisplayName("TestGroupA_LongTestName_Two")
+                    .SetFullyQualifiedName("TestProject.GroupA.TestGroupA_LongTestName_Two")
+                    .SetOutcome(TestOutcome.Failed)
+                    .SetErrorMessage("Expected: something, but got: something else (GroupA)")
+                    .Build(),
+                // Group B
+                new TestResultBuilder()
+                    .SetDisplayName("TestGroupB_LongTestName_One")
+                    .SetFullyQualifiedName("TestProject.GroupB.TestGroupB_LongTestName_One")
+                    .SetOutcome(TestOutcome.Passed)
+                    .Build(),
+                new TestResultBuilder()
+                    .SetDisplayName("TestGroupB_LongTestName_Two")
+                    .SetFullyQualifiedName("TestProject.GroupB.TestGroupB_LongTestName_Two")
+                    .SetOutcome(TestOutcome.Failed)
+                    .SetErrorMessage("Expected: something, but got: something else (GroupB)")
+                    .Build(),
+                // Group C
+                new TestResultBuilder()
+                    .SetDisplayName("TestGroupC_LongTestName_One")
+                    .SetFullyQualifiedName("TestProject.GroupC.TestGroupC_LongTestName_One")
+                    .SetOutcome(TestOutcome.Passed)
+                    .Build(),
+                new TestResultBuilder()
+                    .SetDisplayName("TestGroupC_LongTestName_Two")
+                    .SetFullyQualifiedName("TestProject.GroupC.TestGroupC_LongTestName_Two")
+                    .SetOutcome(TestOutcome.Failed)
+                    .SetErrorMessage("Expected: something, but got: something else (GroupC)")
+                    .Build()
+            );
+        } // Dispose writer before reading to ensure content is fully flushed
 
-            // The summary should still be written with valid HTML (legible truncation)
-            summaryOutput.Should().Contain("<details>");
-            summaryOutput.Should().Contain("</details>");
+        // Assert
+        var commandOutput = commandWriter.ToString();
 
-            testOutput.WriteLine("Command output:");
-            testOutput.WriteLine(commandOutput);
-            testOutput.WriteLine("Summary output:");
-            testOutput.WriteLine(summaryOutput);
-        }
-        finally
-        {
-            File.Delete(summaryFilePath);
-        }
+        // Read only the bytes appended after the pre-fill
+        var summaryOutput = Encoding.UTF8.GetString(
+            File.ReadAllBytes(summaryFile.Path, prefillSize)
+        );
+
+        // A truncation warning annotation should have been written
+        commandOutput.Should().Contain("::warning");
+        commandOutput.Should().Contain("truncated");
+
+        // The summary should be valid HTML (all opened <details> tags are closed)
+        summaryOutput.Should().Contain("<details>");
+        summaryOutput
+            .Split("<details>")
+            .Length.Should()
+            .Be(summaryOutput.Split("</details>").Length);
+
+        testOutput.WriteLine("Command output:");
+        testOutput.WriteLine(commandOutput);
+        testOutput.WriteLine("Summary output:");
+        testOutput.WriteLine(summaryOutput);
     }
 
     [Fact]
     public void I_can_try_to_use_the_logger_to_produce_a_summary_when_the_output_file_is_full_and_get_the_summary_omitted()
     {
         // Arrange
-        var summaryFilePath = Path.GetTempFileName();
-        try
-        {
-            // Pre-fill the summary file to within ~100 bytes of the 1 MiB limit.
-            // This leaves insufficient room for even the smallest legible summary.
-            const int prefillSize = 1024 * 1024 - 100;
-            File.WriteAllZeroes(summaryFilePath, prefillSize);
+        using var summaryFile = TempFile.Create();
 
-            using var commandWriter = new StringWriter();
+        // Pre-fill the summary file to within ~100 bytes of the 1 MiB limit.
+        // This leaves insufficient room for even the smallest legible summary.
+        const int prefillSize = 1024 * 1024 - 100;
+        File.WriteAllZeroes(summaryFile.Path, prefillSize);
 
-            var events = new FakeTestLoggerEvents();
-            var logger = new VsTestLogger();
+        using var commandWriter = new StringWriter();
 
-            // Use a file-backed StreamWriter so GitHubWorkflow can detect the file path via cast
-            using (
-                var summaryWriter = new StreamWriter(
-                    new FileStream(
-                        summaryFilePath,
-                        FileMode.Append,
-                        FileAccess.Write,
-                        FileShare.ReadWrite
-                    )
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        // Use a file-backed StreamWriter so that the file path is exposed internally
+        using (
+            var summaryWriter = new StreamWriter(
+                new FileStream(
+                    summaryFile.Path,
+                    FileMode.Append,
+                    FileAccess.Write,
+                    FileShare.ReadWrite
                 )
             )
-            {
-                logger.Initialize(
-                    events,
-                    new Dictionary<string, string?> { ["summary-allow-empty"] = "true" },
-                    commandWriter,
-                    summaryWriter
-                );
-
-                // Act
-                events.SimulateTestRun("TestProject.dll");
-            } // Dispose writer before reading to ensure content is fully flushed
-
-            // Assert
-            var commandOutput = commandWriter.ToString();
-
-            // File should be exactly the prefill size (no summary content appended)
-            var fileLength = new FileInfo(summaryFilePath).Length;
-
-            // An omission warning annotation should have been written
-            commandOutput.Should().Contain("::warning");
-            commandOutput.Should().Contain("omitted");
-
-            // No summary content should have been written
-            fileLength.Should().Be(prefillSize);
-
-            testOutput.WriteLine("Command output:");
-            testOutput.WriteLine(commandOutput);
-        }
-        finally
+        )
         {
-            File.Delete(summaryFilePath);
-        }
+            logger.Initialize(
+                events,
+                new Dictionary<string, string?> { ["summary-allow-empty"] = "true" },
+                commandWriter,
+                summaryWriter
+            );
+
+            // Act
+            events.SimulateTestRun("TestProject.dll");
+        } // Dispose writer before reading to ensure content is fully flushed
+
+        // Assert
+        var commandOutput = commandWriter.ToString();
+
+        // File should be exactly the prefill size (no summary content appended)
+        var fileLength = new FileInfo(summaryFile.Path).Length;
+
+        // An omission warning annotation should have been written
+        commandOutput.Should().Contain("::warning");
+        commandOutput.Should().Contain("omitted");
+
+        // No summary content should have been written
+        fileLength.Should().Be(prefillSize);
+
+        testOutput.WriteLine("Command output:");
+        testOutput.WriteLine(commandOutput);
     }
 }

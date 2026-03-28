@@ -8,7 +8,7 @@ internal static class FileExtensions
     {
         public static void WriteAllZeroes(string path, long count)
         {
-            using var fs = new FileStream(
+            using var stream = new FileStream(
                 path,
                 FileMode.Create,
                 FileAccess.Write,
@@ -16,7 +16,13 @@ internal static class FileExtensions
                 bufferSize: 1
             );
 
-            fs.SetLength(count);
+            stream.SetLength(count);
+        }
+
+        public static byte[] ReadAllBytes(string path, int start)
+        {
+            var allBytes = File.ReadAllBytes(path);
+            return allBytes[start..];
         }
     }
 }

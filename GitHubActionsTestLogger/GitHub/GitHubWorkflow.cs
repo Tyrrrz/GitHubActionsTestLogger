@@ -56,6 +56,30 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         int? column = null
     )
     {
+        await CreateAnnotationAsync(
+            GitHubAnnotationKind.Error,
+            title,
+            message,
+            filePath,
+            line,
+            column
+        );
+    }
+
+    public async Task CreateWarningAnnotationAsync(string title, string message)
+    {
+        await CreateAnnotationAsync(GitHubAnnotationKind.Warning, title, message);
+    }
+
+    private async Task CreateAnnotationAsync(
+        GitHubAnnotationKind kind,
+        string title,
+        string message,
+        string? filePath = null,
+        int? line = null,
+        int? column = null
+    )
+    {
         var options = new Dictionary<string, string> { ["title"] = title };
 
         if (!string.IsNullOrWhiteSpace(filePath))
@@ -67,15 +91,15 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         if (column is not null)
             options["col"] = column.Value.ToString();
 
-        await InvokeCommandAsync("error", message, options);
-    }
-
-    public async Task CreateWarningAnnotationAsync(string title, string message)
-    {
         await InvokeCommandAsync(
-            "warning",
+            kind switch
+            {
+                GitHubAnnotationKind.Error => "error",
+                GitHubAnnotationKind.Warning => "warning",
+                _ => throw new ArgumentOutOfRangeException(nameof(kind)),
+            },
             message,
-            new Dictionary<string, string> { ["title"] = title }
+            options
         );
     }
 
@@ -93,7 +117,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             }
             : null;
 
-        if (detectedFilePath != null)
+        if (!string.IsNullOrWhiteSpace(detectedFilePath))
         {
             var existingSize = File.Exists(detectedFilePath)
                 ? new FileInfo(detectedFilePath).Length
@@ -107,11 +131,11 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
             if (existingSize + totalToWrite > SummaryFileSizeLimit)
             {
-                var availableBytes = (int)(SummaryFileSizeLimit - existingSize - newlineSize * 3);
+                var availableSize = (int)(SummaryFileSizeLimit - existingSize - newlineSize * 3);
 
-                var truncated = TryTruncateSummary(content, availableBytes);
+                var truncated = TryTruncateSummary(content, availableSize);
 
-                if (truncated == null)
+                if (string.IsNullOrWhiteSpace(truncated))
                 {
                     // Can't produce a legible summary — skip writing entirely
                     await CreateWarningAnnotationAsync(
@@ -166,61 +190,55 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         if (Encoding.UTF8.GetByteCount(content) <= maxBytes)
             return content;
 
-        // HTML pattern that marks the end of a test-group list item in the outer <ul>.
-        // Each group closes as: </ul><p></p></li>  (inner results list, margin, group item)
-        const string groupItemClose = "</ul><p></p></li>";
-
-        // Suffix to append after a group-item cut to produce valid HTML
-        const string groupCutSuffix = "</ul></details>";
-
-        // Minimum legible content ends right after </table>;
-        // just close the <details> element to produce a valid (stats-only) summary.
-        const string tableEndTag = "</table>";
-        const string tableCutSuffix = "</details>";
-
-        var tableEndIndex = content.LastIndexOf(tableEndTag, StringComparison.Ordinal);
-        if (tableEndIndex < 0)
-            return null;
-
-        var tableContentEnd = tableEndIndex + tableEndTag.Length;
-
-        // Check whether even the minimal (stats-table-only) content fits.
-        // Accumulate byte counts incrementally to avoid O(n²) recalculation.
-        var tableCutSuffixBytes = Encoding.UTF8.GetByteCount(tableCutSuffix);
-        var tableContentBytes = Encoding.UTF8.GetByteCount(content.Substring(0, tableContentEnd));
-        if (tableContentBytes + tableCutSuffixBytes > maxBytes)
-            return null;
-
-        // Try to include as many complete test groups as possible
-        var groupCutSuffixBytes = Encoding.UTF8.GetByteCount(groupCutSuffix);
-        var bestCutPoint = tableContentEnd;
-        var bestCutSuffix = tableCutSuffix;
-
-        var currentBytes = tableContentBytes;
-        var searchFrom = tableContentEnd;
-        while (true)
+        // Try to cut at the last occurrence of each tag that still fits within maxBytes.
+        // First try cutting after a complete group item (preserves the most content),
+        // then fall back to cutting after the stats table (minimal but legible output).
+        foreach (
+            var (cutTag, suffix) in new (string CutTag, string Suffix)[]
+            {
+                ("</ul><p></p></li>", "</ul></details>"),
+                ("</table>", "</details>"),
+            }
+        )
         {
-            var groupEnd = content.IndexOf(groupItemClose, searchFrom, StringComparison.Ordinal);
-            if (groupEnd < 0)
-                break;
+            var suffixBytes = Encoding.UTF8.GetByteCount(suffix);
+            var searchFrom = 0;
+            var contentBytes = 0;
+            var bestCutPoint = -1;
 
-            var cutPoint = groupEnd + groupItemClose.Length;
+            while (true)
+            {
+                var tagIndex = content.IndexOf(cutTag, searchFrom, StringComparison.Ordinal);
+                if (tagIndex < 0)
+                    break;
 
-            // Count only the bytes of the new segment (incremental accumulation)
-            currentBytes += Encoding.UTF8.GetByteCount(
-                content.Substring(searchFrom, cutPoint - searchFrom)
-            );
+                var cutPoint = tagIndex + cutTag.Length;
 
-            if (currentBytes + groupCutSuffixBytes > maxBytes)
-                break; // This group doesn't fit — stop
+                // Count only the bytes of the new segment (incremental accumulation)
+                contentBytes += Encoding.UTF8.GetByteCount(
+                    content.Substring(searchFrom, cutPoint - searchFrom)
+                );
 
-            bestCutPoint = cutPoint;
-            bestCutSuffix = groupCutSuffix;
-            searchFrom = cutPoint;
+                if (contentBytes + suffixBytes <= maxBytes)
+                    bestCutPoint = cutPoint;
+                else
+                    break; // subsequent cut points will only be larger
+
+                searchFrom = cutPoint;
+            }
+
+            if (bestCutPoint >= 0)
+                return content[..bestCutPoint] + suffix;
         }
 
-        return content.Substring(0, bestCutPoint) + bestCutSuffix;
+        return null;
     }
+}
+
+internal enum GitHubAnnotationKind
+{
+    Error,
+    Warning,
 }
 
 internal partial class GitHubWorkflow
