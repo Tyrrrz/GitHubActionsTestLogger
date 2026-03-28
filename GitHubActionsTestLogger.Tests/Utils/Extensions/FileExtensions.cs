@@ -21,8 +21,13 @@ internal static class FileExtensions
 
         public static byte[] ReadAllBytes(string path, int offset)
         {
-            var allBytes = File.ReadAllBytes(path);
-            return allBytes[offset..];
+            using var stream = File.OpenRead(path);
+            stream.Seek(offset, SeekOrigin.Begin);
+
+            var buffer = new byte[stream.Length - offset];
+            stream.ReadExactly(buffer);
+
+            return buffer;
         }
     }
 }
