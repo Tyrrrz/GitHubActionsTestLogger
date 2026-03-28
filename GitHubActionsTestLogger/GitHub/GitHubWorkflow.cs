@@ -48,28 +48,16 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         await commandWriter.FlushAsync();
     }
 
-    public async Task CreateErrorAnnotationAsync(
+    public Task CreateErrorAnnotationAsync(
         string title,
         string message,
         string? filePath = null,
         int? line = null,
         int? column = null
-    )
-    {
-        await CreateAnnotationAsync(
-            GitHubAnnotationKind.Error,
-            title,
-            message,
-            filePath,
-            line,
-            column
-        );
-    }
+    ) => CreateAnnotationAsync(GitHubAnnotationKind.Error, title, message, filePath, line, column);
 
-    public async Task CreateWarningAnnotationAsync(string title, string message)
-    {
-        await CreateAnnotationAsync(GitHubAnnotationKind.Warning, title, message);
-    }
+    public Task CreateWarningAnnotationAsync(string title, string message) =>
+        CreateAnnotationAsync(GitHubAnnotationKind.Warning, title, message);
 
     private async Task CreateAnnotationAsync(
         GitHubAnnotationKind kind,
@@ -91,16 +79,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         if (column is not null)
             options["col"] = column.Value.ToString();
 
-        await InvokeCommandAsync(
-            kind switch
-            {
-                GitHubAnnotationKind.Error => "error",
-                GitHubAnnotationKind.Warning => "warning",
-                _ => throw new ArgumentOutOfRangeException(nameof(kind)),
-            },
-            message,
-            options
-        );
+        await InvokeCommandAsync(kind.ToString().ToLowerInvariant(), message, options);
     }
 
     public async Task CreateSummaryAsync(string content)
@@ -180,65 +159,23 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
     }
 
     // Attempt to truncate the rendered summary HTML so that it fits within maxBytes.
-    // Returns the truncated content, or null if even the minimal legible content won't fit.
+    // Returns the truncated content, or null if nothing legible fits.
     private static string? TryTruncateSummary(string content, int maxBytes)
     {
         if (maxBytes <= 0)
             return null;
 
-        // Fast path: content already fits
-        if (Encoding.UTF8.GetByteCount(content) <= maxBytes)
+        var bytes = Encoding.UTF8.GetBytes(content);
+        if (bytes.Length <= maxBytes)
             return content;
 
-        // Try to cut at the last occurrence of each tag that still fits within maxBytes.
-        // First try cutting after a complete group item (preserves the most content),
-        // then fall back to cutting after the stats table (minimal but legible output).
-        foreach (
-            var (cutTag, suffix) in new (string CutTag, string Suffix)[]
-            {
-                ("</ul><p></p></li>", "</ul></details>"),
-                ("</table>", "</details>"),
-            }
-        )
-        {
-            var suffixBytes = Encoding.UTF8.GetByteCount(suffix);
-            var searchFrom = 0;
-            var contentBytes = 0;
-            var bestCutPoint = -1;
+        // Trim back to a valid UTF-8 character boundary
+        var count = maxBytes;
+        while (count > 0 && (bytes[count] & 0xC0) == 0x80)
+            count--;
 
-            while (true)
-            {
-                var tagIndex = content.IndexOf(cutTag, searchFrom, StringComparison.Ordinal);
-                if (tagIndex < 0)
-                    break;
-
-                var cutPoint = tagIndex + cutTag.Length;
-
-                // Count only the bytes of the new segment (incremental accumulation)
-                contentBytes += Encoding.UTF8.GetByteCount(
-                    content.Substring(searchFrom, cutPoint - searchFrom)
-                );
-
-                if (contentBytes + suffixBytes <= maxBytes)
-                    bestCutPoint = cutPoint;
-                else
-                    break; // subsequent cut points will only be larger
-
-                searchFrom = cutPoint;
-            }
-
-            if (bestCutPoint >= 0)
-                return content[..bestCutPoint] + suffix;
-        }
-
-        return null;
+        return count > 0 ? Encoding.UTF8.GetString(bytes, 0, count) : null;
     }
-}
-
-internal enum GitHubAnnotationKind
-{
-    Error,
-    Warning,
 }
 
 internal partial class GitHubWorkflow
