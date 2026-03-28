@@ -373,7 +373,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
         var logger = new VsTestLogger();
 
         // Use a file-backed StreamWriter so that the file path is exposed internally
-        using var summaryFileStream = new FileStream(
+        using var summaryFileStream = File.Open(
             summaryFile.Path,
             FileMode.Append,
             FileAccess.Write,
@@ -462,7 +462,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
         var logger = new VsTestLogger();
 
         // Use a file-backed StreamWriter so that the file path is exposed internally
-        using var summaryFileStream = new FileStream(
+        using var summaryFileStream = File.Open(
             summaryFile.Path,
             FileMode.Append,
             FileAccess.Write,

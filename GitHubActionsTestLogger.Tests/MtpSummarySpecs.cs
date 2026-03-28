@@ -337,7 +337,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         // Use a file-backed StreamWriter so that the file path is exposed internally
-        await using var summaryFileStream = new FileStream(
+        await using var summaryFileStream = File.Open(
             summaryFile.Path,
             FileMode.Append,
             FileAccess.Write,
@@ -430,7 +430,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         using var commandWriter = new StringWriter();
 
         // Use a file-backed StreamWriter so that the file path is exposed internally
-        await using var summaryFileStream = new FileStream(
+        await using var summaryFileStream = File.Open(
             summaryFile.Path,
             FileMode.Append,
             FileAccess.Write,
