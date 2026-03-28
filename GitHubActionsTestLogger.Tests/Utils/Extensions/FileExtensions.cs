@@ -19,10 +19,10 @@ internal static class FileExtensions
             stream.SetLength(count);
         }
 
-        public static byte[] ReadAllBytes(string path, int start)
+        public static byte[] ReadAllBytes(string path, int offset)
         {
             var allBytes = File.ReadAllBytes(path);
-            return allBytes[start..];
+            return allBytes[offset..];
         }
     }
 }
