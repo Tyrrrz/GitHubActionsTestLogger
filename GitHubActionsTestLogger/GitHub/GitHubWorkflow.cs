@@ -122,9 +122,8 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
                 if (availableSizeLong > 0)
                 {
-                    var availableSize = availableSizeLong > int.MaxValue
-                        ? int.MaxValue
-                        : (int)availableSizeLong;
+                    var availableSize =
+                        availableSizeLong > int.MaxValue ? int.MaxValue : (int)availableSizeLong;
                     var bytes = Encoding.UTF8.GetBytes(content);
                     if (bytes.Length > availableSize)
                     {
@@ -148,8 +147,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
                     await CreateWarningAnnotationAsync(
                         "GitHub Actions Test Logger",
                         "The test summary was omitted because it exceeded GitHub's step summary size limit (1 MiB). "
-                            + "To reduce the summary size, consider excluding passed tests by setting "
-                            + "`summary-include-passed=false` or skipped tests by setting `summary-include-skipped=false`."
+                            + "To reduce the summary size, consider disabling passed or skipped test reporting."
                             + (
                                 existingSize > 0
                                     ? " The summary file is shared with other test steps — consider splitting them into separate jobs."
@@ -162,8 +160,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
                 await CreateWarningAnnotationAsync(
                     "GitHub Actions Test Logger",
                     "The test summary was truncated because it exceeded GitHub's step summary size limit (1 MiB). "
-                        + "To reduce the summary size, consider excluding passed tests by setting "
-                        + "`summary-include-passed=false` or skipped tests by setting `summary-include-skipped=false`."
+                        + "To reduce the summary size, consider disabling passed or skipped test reporting."
                         + (
                             existingSize > 0
                                 ? " The summary file is shared with other test steps — consider splitting them into separate jobs."
