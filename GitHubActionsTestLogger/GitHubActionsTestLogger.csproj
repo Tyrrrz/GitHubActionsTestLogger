@@ -30,7 +30,11 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Testing.Platform" PrivateAssets="all" />
+    <PackageReference
+      Include="Microsoft.Testing.Platform"
+      VersionOverride="2.0.0"
+      PrivateAssets="all"
+    />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="all" />
     <PackageReference Include="PolyShim" PrivateAssets="all" />
     <PackageReference Include="RazorBlade" ExcludeAssets="compile;runtime" PrivateAssets="all" />
