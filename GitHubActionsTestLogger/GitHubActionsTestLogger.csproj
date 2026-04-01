@@ -30,6 +30,8 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
+    <!-- Pinned to the lowest version in the major to avoid CS1705 errors in consuming projects
+         that may reference an older version of Microsoft.Testing.Platform. -->
     <PackageReference
       Include="Microsoft.Testing.Platform"
       VersionOverride="2.0.0"
