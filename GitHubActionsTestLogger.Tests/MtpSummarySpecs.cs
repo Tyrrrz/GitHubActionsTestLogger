@@ -7,6 +7,7 @@ using GitHubActionsTestLogger.Tests.Mtp;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.Testing.Platform.Builder;
 using PowerKit;
+using PowerKit.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 

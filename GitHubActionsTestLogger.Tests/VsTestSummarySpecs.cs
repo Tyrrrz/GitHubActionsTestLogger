@@ -6,6 +6,7 @@ using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using GitHubActionsTestLogger.Tests.VsTest;
 using PowerKit;
+using PowerKit.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
