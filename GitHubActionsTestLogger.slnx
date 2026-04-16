@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Misc/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="License.txt" />
+    <File Path="NuGet.config" />
+    <File Path="Readme.md" />
+  </Folder>
+
+  <Project Path="GitHubActionsTestLogger/GitHubActionsTestLogger.csproj" />
+  <Project Path="GitHubActionsTestLogger.Demo.Mtp/GitHubActionsTestLogger.Demo.Mtp.csproj" />
+  <Project Path="GitHubActionsTestLogger.Demo.VsTest/GitHubActionsTestLogger.Demo.VsTest.csproj" />
+  <Project Path="GitHubActionsTestLogger.Tests/GitHubActionsTestLogger.Tests.csproj" />
+</Solution>
