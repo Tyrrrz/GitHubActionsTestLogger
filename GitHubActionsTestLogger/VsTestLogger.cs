@@ -8,6 +8,7 @@ using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using PowerKit.Extensions;
 using TestOutcome = GitHubActionsTestLogger.Reporting.TestOutcome;
 using TestResult = GitHubActionsTestLogger.Reporting.TestResult;
 

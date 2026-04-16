@@ -13,6 +13,7 @@ using Microsoft.Testing.Platform.Extensions;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.TestHost;
 using Microsoft.Testing.Platform.Services;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger;
 

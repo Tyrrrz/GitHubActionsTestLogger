@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions.Messages;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger.Utils.Extensions;
 

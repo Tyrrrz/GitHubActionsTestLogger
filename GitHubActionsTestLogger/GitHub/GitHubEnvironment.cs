@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using GitHubActionsTestLogger.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger.GitHub;
 
