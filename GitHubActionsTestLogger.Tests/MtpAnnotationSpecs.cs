@@ -3,8 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Mtp;
-using GitHubActionsTestLogger.Tests.Utils;
 using Microsoft.Testing.Platform.Builder;
+using PowerKit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,7 +16,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_for_failed_tests()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -58,7 +58,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_source_information_extracted_from_exceptions()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -112,7 +112,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_source_information_extracted_from_async_exceptions()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -170,7 +170,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_the_test_name()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -206,7 +206,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_the_error_message()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -246,7 +246,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_the_error_stacktrace()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -287,7 +287,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_the_target_framework_version()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -326,7 +326,7 @@ public class MtpAnnotationSpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_annotations_that_include_line_breaks()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var commandWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
