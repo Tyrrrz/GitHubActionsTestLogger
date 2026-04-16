@@ -1,4 +1,4 @@
-﻿namespace GitHubActionsTestLogger.Reporting;
+namespace GitHubActionsTestLogger.Reporting;
 
 internal partial class TestReportingOptions
 {

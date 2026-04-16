@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.Testing.Platform.Extensions.Messages;
 

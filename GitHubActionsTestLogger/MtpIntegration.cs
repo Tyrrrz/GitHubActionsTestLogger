@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using GitHubActionsTestLogger.GitHub;
 using Microsoft.Testing.Platform.Builder;
 using Microsoft.Testing.Platform.Extensions;

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using GitHubActionsTestLogger.Tests.Mtp;
 using Microsoft.Testing.Platform.Builder;
 using PowerKit;

@@ -1,4 +1,4 @@
-﻿namespace GitHubActionsTestLogger.Tests.Mtp;
+namespace GitHubActionsTestLogger.Tests.Mtp;
 
 internal enum TestOutcome
 {

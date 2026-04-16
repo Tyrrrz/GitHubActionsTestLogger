@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.ExceptionServices;
 
 namespace GitHubActionsTestLogger.Tests.Utils.Extensions;
