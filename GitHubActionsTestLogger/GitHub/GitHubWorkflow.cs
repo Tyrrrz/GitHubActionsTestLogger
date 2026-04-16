@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitHubActionsTestLogger.Utils;
-using GitHubActionsTestLogger.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger.GitHub;
 
@@ -171,5 +171,6 @@ internal partial class GitHubWorkflow
         // and employs retry logic to handle potential race conditions.
         GitHubEnvironment
             .SummaryFilePath?.Pipe(f => new ContentionTolerantWriteFileStream(f, FileMode.Append))
-            .Pipe(s => new StreamWriter(s)) ?? TextWriter.Null;
+            .Pipe(s => new StreamWriter(s))
+        ?? TextWriter.Null;
 }

@@ -4,9 +4,10 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GitHubActionsTestLogger.Tests.Mtp;
-using GitHubActionsTestLogger.Tests.Utils;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.Testing.Platform.Builder;
+using PowerKit;
+using PowerKit.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -18,7 +19,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_test_suite_name()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -47,7 +48,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_list_of_failed_tests()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -99,7 +100,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_list_of_passed_tests()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -141,7 +142,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_does_not_include_the_list_of_passed_tests()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -184,7 +185,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_the_list_of_skipped_tests()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -226,7 +227,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_does_not_include_the_list_of_skipped_tests()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -269,7 +270,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_includes_empty_test_runs()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -297,7 +298,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_use_the_logger_to_produce_a_summary_that_does_not_include_empty_test_runs()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         await using var summaryWriter = new StringWriter();
 
         var builder = await TestApplication.CreateBuilderAsync([
@@ -326,7 +327,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
     public async Task I_can_try_to_use_the_logger_to_produce_a_summary_when_the_output_file_is_nearly_full_and_get_a_truncated_summary()
     {
         // Arrange
-        using var testResultsDir = TempDir.Create();
+        using var testResultsDir = TempDirectory.Create();
         using var summaryFile = TempFile.Create();
 
         const int prefillSize = 1024 * 1024 - 250;

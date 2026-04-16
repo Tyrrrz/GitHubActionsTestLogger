@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GitHubActionsTestLogger.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger.Utils;
 

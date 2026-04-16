@@ -8,6 +8,7 @@ using GitHubActionsTestLogger.Utils.Extensions;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions;
 using Microsoft.Testing.Platform.Extensions.CommandLine;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger;
 

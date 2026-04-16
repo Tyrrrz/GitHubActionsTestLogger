@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHubActionsTestLogger.GitHub;
-using GitHubActionsTestLogger.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger.Reporting;
 
