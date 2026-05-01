@@ -86,6 +86,25 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             column
         );
 
+    private static string TruncateToUtf8ByteCount(string value, int byteLimit)
+    {
+        if (byteLimit <= 0)
+            return string.Empty;
+
+        if (Encoding.UTF8.GetByteCount(value) <= byteLimit)
+            return value;
+
+        var bytes = Encoding.UTF8.GetBytes(value);
+        var limit = byteLimit;
+
+        // If the byte at 'limit' is a UTF-8 continuation byte (10xxxxxx), back up to the start
+        // of the multi-byte sequence so we don't split a character in the middle.
+        while (limit > 0 && (bytes[limit] & 0xC0) == 0x80)
+            limit--;
+
+        return Encoding.UTF8.GetString(bytes, 0, limit);
+    }
+
     private string TruncateSummary(string content)
     {
         // Try to extract the underlying file path from the summary writer to monitor file size
@@ -122,7 +141,8 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
                 && requiredSize <= availableSize
                     ? content
                 // There is enough space to fit some of the content
-                : availableSize > 0 && requiredSize > availableSize ? content[..availableSize]
+                : availableSize > 0 && requiredSize > availableSize
+                    ? TruncateToUtf8ByteCount(content, availableSize)
                 // There is no space at all
                 : string.Empty;
         }
@@ -155,7 +175,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         await summaryWriter.WriteLineAsync();
         await summaryWriter.WriteLineAsync();
 
-        await summaryWriter.WriteLineAsync(content);
+        await summaryWriter.WriteLineAsync(truncated);
         await summaryWriter.FlushAsync();
     }
 }
