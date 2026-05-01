@@ -370,6 +370,7 @@ public class MtpSummarySpecs(ITestOutputHelper testOutput)
         await app.RunAsync();
 
         await summaryWriter.FlushAsync();
+        await summaryWriter.DisposeAsync();
 
         // Assert
         var commandOutput = commandWriter.ToString();
