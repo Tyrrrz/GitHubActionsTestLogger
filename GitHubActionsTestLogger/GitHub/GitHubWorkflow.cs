@@ -130,8 +130,8 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             Environment.NewLine + Environment.NewLine + content + Environment.NewLine;
 
         // Truncate summary to fit into GitHub's step summary size limit
-        var truncated = TruncateSummary(actualContent);
-        if (truncated.Length < actualContent.Length)
+        var truncatedContent = TruncateSummary(actualContent);
+        if (truncatedContent.Length < actualContent.Length)
         {
             await CreateWarningAnnotationAsync(
                 "Test summary truncated",
@@ -144,7 +144,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             );
         }
 
-        await summaryWriter.WriteAsync(truncated);
+        await summaryWriter.WriteAsync(truncatedContent);
         await summaryWriter.FlushAsync();
     }
 }
