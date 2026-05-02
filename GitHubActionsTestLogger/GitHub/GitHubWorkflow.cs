@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitHubActionsTestLogger.Utils;
-using GitHubActionsTestLogger.Utils.Extensions;
 using PowerKit.Extensions;
 
 namespace GitHubActionsTestLogger.GitHub;
@@ -124,7 +123,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
                     ? content
                 // There is enough space to fit some of the content
                 : availableSize > 0 && requiredSize > availableSize
-                    ? content.Truncate(availableSize, Encoding.UTF8)
+                    ? content.TruncateBytes(availableSize, Encoding.UTF8)
                 // There is no space at all
                 : string.Empty;
         }
