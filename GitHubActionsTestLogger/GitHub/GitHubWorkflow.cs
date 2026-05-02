@@ -126,11 +126,12 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
         // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
         // The newlines are included in the content before truncation so that the byte budget
         // is always accurate and the file never exceeds the size limit.
-        var fullContent = Environment.NewLine + Environment.NewLine + content + Environment.NewLine;
+        var actualContent =
+            Environment.NewLine + Environment.NewLine + content + Environment.NewLine;
 
         // Truncate summary to fit into GitHub's step summary size limit
-        var truncated = TruncateSummary(fullContent);
-        if (truncated.Length < fullContent.Length)
+        var truncated = TruncateSummary(actualContent);
+        if (truncated.Length < actualContent.Length)
         {
             await CreateWarningAnnotationAsync(
                 "Test summary truncated",
