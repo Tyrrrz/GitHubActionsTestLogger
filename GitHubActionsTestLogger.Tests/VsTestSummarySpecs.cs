@@ -415,6 +415,7 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
         );
 
         await summaryWriter.FlushAsync();
+        await summaryWriter.DisposeAsync();
 
         // Assert
         var commandOutput = commandWriter.ToString();

@@ -3,16 +3,16 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="coverlet.collector" Version="8.0.1" />
+    <PackageVersion Include="coverlet.collector" Version="10.0.0" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
     <PackageVersion Include="FluentAssertions" Version="8.9.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.3.0" />
-    <PackageVersion Include="Microsoft.Testing.Platform" Version="2.1.0" />
-    <PackageVersion Include="MSTest" Version="4.1.0" />
-    <PackageVersion Include="PolyShim" Version="2.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.5.1" />
+    <PackageVersion Include="Microsoft.Testing.Platform" Version="2.2.2" />
+    <PackageVersion Include="MSTest" Version="4.2.2" />
+    <PackageVersion Include="PolyShim" Version="2.11.0" />
     <PackageVersion Include="PowerKit" Version="1.2.0" />
-    <PackageVersion Include="RazorBlade" Version="0.11.0" />
+    <PackageVersion Include="RazorBlade" Version="1.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
