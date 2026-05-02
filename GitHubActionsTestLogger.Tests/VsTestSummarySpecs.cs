@@ -432,4 +432,65 @@ public class VsTestSummarySpecs(ITestOutputHelper testOutput)
         testOutput.WriteLine("Summary output:");
         testOutput.WriteLine(summaryOutput);
     }
+
+    [Fact]
+    public async Task I_can_try_to_use_the_logger_to_produce_a_summary_when_the_output_file_is_nearly_full_and_content_contains_non_ascii_characters_and_get_a_truncated_summary_within_the_size_limit()
+    {
+        // Arrange
+        using var summaryFile = TempFile.Create();
+
+        const int prefillSize = 1024 * 1024 - 250;
+        File.WriteAllZeroes(summaryFile.Path, prefillSize);
+
+        using var commandWriter = new StringWriter();
+
+        var events = new FakeTestLoggerEvents();
+        var logger = new VsTestLogger();
+
+        // Use a file-backed StreamWriter so that the file path is exposed internally
+        using var summaryFileStream = File.Open(
+            summaryFile.Path,
+            FileMode.Append,
+            FileAccess.Write,
+            FileShare.ReadWrite
+        );
+
+        using var summaryWriter = new StreamWriter(summaryFileStream);
+
+        logger.Initialize(
+            events,
+            new Dictionary<string, string?> { ["summary-include-passed"] = "true" },
+            commandWriter,
+            summaryWriter
+        );
+
+        // Act
+        // Use non-ASCII characters in test names (each Chinese character is 3 bytes in UTF-8,
+        // so truncating by char count instead of byte count would exceed the size limit)
+        events.SimulateTestRun(
+            new TestResultBuilder()
+                .SetDisplayName(new string('一', 100))
+                .SetFullyQualifiedName("TestProject.SomeTests.Test1")
+                .SetOutcome(TestOutcome.Failed)
+                .Build(),
+            new TestResultBuilder()
+                .SetDisplayName(new string('二', 100))
+                .SetFullyQualifiedName("TestProject.SomeTests.Test2")
+                .SetOutcome(TestOutcome.Failed)
+                .Build()
+        );
+
+        await summaryWriter.FlushAsync();
+
+        // Assert
+        var commandOutput = commandWriter.ToString();
+        var summaryFileSize = new FileInfo(summaryFile.Path).Length;
+
+        commandOutput.Should().ContainAll("::warning", "truncated");
+        summaryFileSize.Should().BeLessThanOrEqualTo(1024 * 1024);
+
+        testOutput.WriteLine($"Summary file size: {summaryFileSize}");
+        testOutput.WriteLine("Command output:");
+        testOutput.WriteLine(commandOutput);
+    }
 }
