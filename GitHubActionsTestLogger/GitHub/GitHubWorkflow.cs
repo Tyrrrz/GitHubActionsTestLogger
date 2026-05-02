@@ -102,29 +102,15 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             return content;
 
         var existingSize = File.Exists(filePath) ? new FileInfo(filePath).Length : 0L;
-
-        // Calculate required size for the summary content
         var contentSize = Encoding.UTF8.GetByteCount(content);
-        var newLineSize = Encoding.UTF8.GetByteCount(Environment.NewLine);
-        var requiredSize = contentSize + newLineSize * 3;
 
-        if (existingSize + requiredSize > GitHubEnvironment.SummaryFileSizeLimit)
+        if (existingSize + contentSize > GitHubEnvironment.SummaryFileSizeLimit)
         {
             var availableSize = (int)
-                Math.Min(
-                    GitHubEnvironment.SummaryFileSizeLimit - existingSize - newLineSize * 3L,
-                    int.MaxValue
-                );
+                Math.Min(GitHubEnvironment.SummaryFileSizeLimit - existingSize, int.MaxValue);
 
-            return
-                // There is enough space to fit the whole content
-                availableSize > 0
-                && requiredSize <= availableSize
-                    ? content
-                // There is enough space to fit some of the content
-                : availableSize > 0 && requiredSize > availableSize
-                    ? content.TruncateBytes(availableSize, Encoding.UTF8)
-                // There is no space at all
+            return availableSize > 0
+                ? content.TruncateBytes(availableSize, Encoding.UTF8)
                 : string.Empty;
         }
 
@@ -133,9 +119,18 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
 
     public async Task CreateSummaryAsync(string content)
     {
+        // If the summary file already contains HTML content, we need to first add two newlines
+        // in order to switch GitHub's parser from HTML mode back to markdown mode.
+        // It's safe to do it unconditionally because, if the file is empty, these newlines
+        // will simply be ignored.
+        // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
+        // The newlines are included in the content before truncation so that the byte budget
+        // is always accurate and the file never exceeds the size limit.
+        var fullContent = Environment.NewLine + Environment.NewLine + content + Environment.NewLine;
+
         // Truncate summary to fit into GitHub's step summary size limit
-        var truncated = TruncateSummary(content);
-        if (truncated.Length < content.Length)
+        var truncated = TruncateSummary(fullContent);
+        if (truncated.Length < fullContent.Length)
         {
             await CreateWarningAnnotationAsync(
                 "Test summary truncated",
@@ -148,15 +143,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
             );
         }
 
-        // If the summary file already contains HTML content, we need to first add two newlines
-        // in order to switch GitHub's parser from HTML mode back to markdown mode.
-        // It's safe to do it unconditionally because, if the file is empty, these newlines
-        // will simply be ignored.
-        // https://github.com/Tyrrrz/GitHubActionsTestLogger/issues/22
-        await summaryWriter.WriteLineAsync();
-        await summaryWriter.WriteLineAsync();
-
-        await summaryWriter.WriteLineAsync(truncated);
+        await summaryWriter.WriteAsync(truncated);
         await summaryWriter.FlushAsync();
     }
 }
