@@ -2,6 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
