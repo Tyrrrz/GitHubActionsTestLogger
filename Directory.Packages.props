@@ -4,6 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageVersion Include="Binternal" Version="1.0.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
     <PackageVersion Include="FluentAssertions" Version="8.10.0" />
@@ -12,7 +13,7 @@
     <PackageVersion Include="Microsoft.Testing.Platform" Version="2.2.3" />
     <PackageVersion Include="MSTest" Version="4.2.3" />
     <PackageVersion Include="PolyShim" Version="2.11.0" />
-    <PackageVersion Include="PowerKit" Version="1.2.0" />
+    <PackageVersion Include="PowerKit" Version="2.0.1" />
     <PackageVersion Include="RazorBlade" Version="1.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />

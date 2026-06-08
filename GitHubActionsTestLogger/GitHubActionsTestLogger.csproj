@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Binternal" PrivateAssets="all" />
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
     <!-- Pinned to the lowest version in the major to avoid CS1705 errors in consuming projects
          that may reference an older version of Microsoft.Testing.Platform. -->
@@ -39,7 +40,7 @@
     />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" PrivateAssets="all" />
     <PackageReference Include="PolyShim" PrivateAssets="all" />
-    <PackageReference Include="PowerKit" PrivateAssets="all" />
+    <PackageReference Include="PowerKit" Internalize="true" PrivateAssets="all" />
     <PackageReference Include="RazorBlade" ExcludeAssets="compile;runtime" PrivateAssets="all" />
   </ItemGroup>
 </Project>
