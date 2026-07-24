@@ -19,7 +19,11 @@
 
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
-    <Content Include="GitHubActionsTestLogger.props" Pack="true" PackagePath="build;buildTransitive" />
+    <Content
+      Include="GitHubActionsTestLogger.props"
+      Pack="true"
+      PackagePath="build;buildTransitive"
+    />
   </ItemGroup>
 
   <ItemGroup>
