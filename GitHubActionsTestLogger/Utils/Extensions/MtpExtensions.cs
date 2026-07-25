@@ -75,14 +75,14 @@ internal static class MtpExtensions
                 ?.StackTrace?.Pipe(StackFrame.ParseMany)
                 .LastOrDefault(f =>
                     // Sync method call
-                    // e.g. MyTests.EnsureOnePlusOneEqualsTwo()
+                    // e.g., MyTests.EnsureOnePlusOneEqualsTwo()
                     f.MethodCall.StartsWith(
                         testMethodFullyQualifiedName,
                         StringComparison.OrdinalIgnoreCase
                     )
                     ||
                     // Async method call
-                    // e.g. MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
+                    // e.g., MyTests.<EnsureOnePlusOneEqualsTwo>d__3.MoveNext()
                     f.MethodCall.Contains(
                         '<' + testMethodName + '>',
                         StringComparison.OrdinalIgnoreCase

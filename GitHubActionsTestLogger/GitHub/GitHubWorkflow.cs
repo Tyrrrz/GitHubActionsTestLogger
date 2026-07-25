@@ -139,7 +139,7 @@ internal partial class GitHubWorkflow(TextWriter commandWriter, TextWriter summa
                 The test summary was truncated or completely omitted because it exceeded GitHub's size limit of 1 MiB.
 
                 To reduce the summary size, consider disabling reporting of passed and skipped tests, if enabled.
-                If you have multiple summary providers in the same step (e.g. running multiple test suites), consider splitting them into separate steps to avoid sharing the same summary output.
+                If you have multiple summary providers in the same step (e.g., running multiple test suites), consider splitting them into separate steps to avoid sharing the same summary output.
                 """
             );
         }
