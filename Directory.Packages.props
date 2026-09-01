@@ -8,15 +8,15 @@
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
     <PackageVersion Include="FluentAssertions" Version="8.10.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.8.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.9.0" />
     <PackageVersion Include="Microsoft.Testing.Platform" Version="2.3.3" />
     <PackageVersion Include="MSTest" Version="4.3.3" />
-    <PackageVersion Include="PolyShim" Version="2.12.2" />
+    <PackageVersion Include="PolyShim" Version="2.13.0" />
     <PackageVersion Include="PowerKit" Version="2.3.1" />
     <PackageVersion Include="RazorBlade" Version="1.0.0" />
     <PackageVersion Include="Snek" Version="1.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
   </ItemGroup>
 </Project>
