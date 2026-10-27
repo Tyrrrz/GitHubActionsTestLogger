@@ -2,7 +2,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using GitHubActionsTestLogger.Tests.Mtp;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using Microsoft.Testing.Platform.Builder;

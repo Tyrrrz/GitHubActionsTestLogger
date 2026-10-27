@@ -4,10 +4,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
     <PackageVersion Include="Binternal" Version="1.0.2" />
     <PackageVersion Include="coverlet.collector" Version="10.1.0" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
-    <PackageVersion Include="FluentAssertions" Version="8.11.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.10.1" />
     <PackageVersion Include="Microsoft.Testing.Platform" Version="2.4.1" />

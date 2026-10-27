@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using GitHubActionsTestLogger.Tests.Utils.Extensions;
 using GitHubActionsTestLogger.Tests.VsTest;
 using PowerKit;

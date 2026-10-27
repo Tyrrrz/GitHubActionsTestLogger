@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-using FluentAssertions;
+using AwesomeAssertions;
 using GitHubActionsTestLogger.Tests.VsTest;
 using Xunit;
 using Xunit.Abstractions;
@@ -67,13 +67,13 @@ public class VsTestAnnotationSpecs(ITestOutputHelper testOutput)
                 .SetErrorMessage("ErrorMessage")
                 .SetErrorStackTrace(
                     """
-                    at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
-                    at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
-                    at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
-                    at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
-                    at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
-                    at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
-                    at FluentAssertions.Primitives.BooleanAssertions.BeFalse(String because, Object[] becauseArgs)
+                    at AwesomeAssertions.Execution.XUnit2TestFramework.Throw(String message)
+                    at AwesomeAssertions.Execution.TestFrameworkProvider.Throw(String message)
+                    at AwesomeAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+                    at AwesomeAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+                    at AwesomeAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+                    at AwesomeAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+                    at AwesomeAssertions.Primitives.BooleanAssertions.BeFalse(String because, Object[] becauseArgs)
                     at CliWrap.Tests.CancellationSpecs.I_can_execute_a_command_with_buffering_and_cancel_it_immediately() in /dir/CliWrap.Tests/CancellationSpecs.cs:line 75
                     """
                 )
