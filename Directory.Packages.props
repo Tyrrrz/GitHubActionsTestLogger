@@ -5,18 +5,18 @@
 
   <ItemGroup>
     <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
-    <PackageVersion Include="Binternal" Version="1.0.2" />
+    <PackageVersion Include="Binternal" Version="1.0.3" />
     <PackageVersion Include="coverlet.collector" Version="10.1.0" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.10.1" />
-    <PackageVersion Include="Microsoft.Testing.Platform" Version="2.4.1" />
-    <PackageVersion Include="MSTest" Version="4.4.1" />
-    <PackageVersion Include="PolyShim" Version="2.13.0" />
-    <PackageVersion Include="PowerKit" Version="2.4.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.11.0" />
+    <PackageVersion Include="Microsoft.Testing.Platform" Version="2.5.2" />
+    <PackageVersion Include="MSTest" Version="4.5.2" />
+    <PackageVersion Include="PolyShim" Version="2.15.0" />
+    <PackageVersion Include="PowerKit" Version="2.5.0" />
     <PackageVersion Include="RazorBlade" Version="1.0.0" />
-    <PackageVersion Include="Snek" Version="1.0.0" />
+    <PackageVersion Include="Snek" Version="2.0.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
   </ItemGroup>
 </Project>
